@@ -1,0 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+.h1 {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 27px;
+}
+.budgetMain {
+  padding: 20px 20px 0 20px;
+  background-color: #f0f2f5;
+}
+.pesquisa {
+  margin-top: 20px;
+  width: 100%;
+  height: 120px;
+  background-color: white;
+  filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161));
+  padding: 20px;
+}
+.divPrimary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.divPrimary .buttonFiltro {
+  width: 113px;
+  height: 58px;
+  font-size: 18px;
+  background-color: #1acaba;
+  margin-left: 37px;
+}
+.divPrimary form {
+  display: flex;
+}
+.divPrimary .buttonBudget {
+  background-color: #0e948b;
+}
+.pesquisa input {
+  width: 500px;
+  max-width: 100%;
+  height: 58px;
+  background-color: white;
+  filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161));
+  border: none;
+}
+.pesquisa input::placeholder {
+  color: #8f8f8f;
+  padding-left: 15px;
+}
+.buttonSearch {
+  width: 75px;
+  height: 58px;
+  margin-left: 12px;
+  text-align: center;
+  background-color: #1c4961;
+}
+.buttonSearch span {
+  margin: 0;
+}
+.thead {
+  background: #1c4961;
+  width: 100%;
+  height: 66px;
+  color: white;
+}
+.thead th {
+  width: 110px;
+  background: #1c4961;
+  border-right: 1px solid #1c4961;
+}
+.table {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+.table td {
+  padding: 20px;
+}
+.table tbody {
+  filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161));
+  background-color: white;
+  text-align: center;
+}
