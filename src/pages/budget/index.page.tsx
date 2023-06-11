@@ -9,7 +9,7 @@ import { ApiCore } from '@/lib/api'
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
 export default function BudgetList() {
-  const [infoBudget, setBudget] = React.useState()
+  const [infoBudget, setBudget] = React.useState<BudgetItem[] | undefined>();
   const [value, setValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
 
@@ -20,6 +20,22 @@ export default function BudgetList() {
       dateStart: string | null
       dateEnd: string | null
     }
+  }
+  interface BudgetItem {
+    id: number;
+    client: {
+      name: string;
+    };
+    client_vehicle: {
+      plate: string;
+      chasis: string;
+    };
+    technical_consultant: {
+      name: string;
+    };
+    TotalGeralDesconto: number;
+    TotalGeral: number;
+    total: number;
   }
   const handleCloseSnackbar = () => {
     setOpen(false)
