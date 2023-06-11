@@ -26,7 +26,7 @@ export default function BudgetList() {
   }
 
   async function getBudget(values: String) {
-    if (values == 'null') {
+    if (values === 'null') {
       api.get(`${url}/api/quotations?company_id=1`).then((response) => {
         setBudget(response.data.data)
         console.log(response.data.data)
