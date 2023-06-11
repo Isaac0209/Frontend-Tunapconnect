@@ -9,7 +9,7 @@ const api = new ApiCore()
 export function ActionDeleteConfirmations(
   id: number,
   handleDelete: (id: number) => void,
-  router = ''
+  router = '',
 ) {
   return MySwal.fire({
     title: <p>Deseja deletar o agendamento {id}</p>,

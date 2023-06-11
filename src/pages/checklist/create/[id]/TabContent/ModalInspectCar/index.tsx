@@ -200,7 +200,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
       stageData,
       handleInspectionData,
     }: ModalInspectCarProps,
-    ref
+    ref,
   ) {
     const theme = useTheme()
     const [tabsValue, setTabsValue] = useState(0)
@@ -280,7 +280,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                   containerImageCarLateralEsquerdaRef.current,
                   {
                     cacheBust: true,
-                  }
+                  },
                 )
                 return result
               } catch (error) {
@@ -297,7 +297,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                   containerImageCarLateralDireitaRef.current,
                   {
                     cacheBust: true,
-                  }
+                  },
                 )
                 return result
               } catch (error) {
@@ -314,7 +314,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                   containerImageCarTraseiraRef.current,
                   {
                     cacheBust: true,
-                  }
+                  },
                 )
                 return result
               } catch (error) {
@@ -346,7 +346,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
         containerImageCarLateralEsquerdaRef,
         containerImageCarTraseiraRef,
         containerImageCarTetoRef,
-      ]
+      ],
     )
 
     const handleChange = async (event: SyntheticEvent, newValue: number) => {
@@ -395,7 +395,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           [positionsCar[tabsValue]]: prevState[positionsCar[tabsValue]].filter(
             (m) => {
               return m.id !== id
-            }
+            },
           ),
         }
       })
@@ -458,7 +458,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
 
     function handleAddImageUrlList(
       images: imageData[],
-      position: positionsTypes
+      position: positionsTypes,
     ) {
       setListImagesUpload((prevState) => {
         return {
@@ -637,27 +637,27 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
       // StagesDataProps[]
 
       const sessionStorageData = sessionStorage.getItem(
-        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`
+        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
       )
 
       if (sessionStorageData) {
         const sessionStorageStage: StagesDataProps[] =
           JSON.parse(sessionStorageData)
         const sessionStorageStageActual = sessionStorageStage.filter(
-          (item) => item.name === stageData?.name
+          (item) => item.name === stageData?.name,
         )[0]
         if (sessionStorageStageActual) {
           positonsCarData = sessionStorageStageActual.itens.filter(
-            (itens) => itens.rules.type === 'visual_inspect'
+            (itens) => itens.rules.type === 'visual_inspect',
           )
         } else {
           positonsCarData = stageData?.itens.filter(
-            (itens) => itens.rules.type === 'visual_inspect'
+            (itens) => itens.rules.type === 'visual_inspect',
           )
         }
       } else {
         positonsCarData = stageData?.itens.filter(
-          (itens) => itens.rules.type === 'visual_inspect'
+          (itens) => itens.rules.type === 'visual_inspect',
         )
       }
 
@@ -1055,6 +1055,6 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
         </DialogContent>
       </Dialog>
     )
-  }
+  },
 )
 export default ModalInspectCar

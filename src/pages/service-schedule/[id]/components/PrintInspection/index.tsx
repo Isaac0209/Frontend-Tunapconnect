@@ -59,10 +59,10 @@ export function PrintInspection({
         .get(`/checklist/${checklistId}?company_id=${companyId}`)
         .then((response) => {
           const reception = response.data.data.stages.filter(
-            (st: any) => st.name === 'Recepção'
+            (st: any) => st.name === 'Recepção',
           )
           const delivery = response.data.data.stages.filter(
-            (st: any) => st.name === 'Entrega'
+            (st: any) => st.name === 'Entrega',
           )
           // console.log(reception[0])
           setReceptionStage(reception[0])
@@ -72,15 +72,15 @@ export function PrintInspection({
     {
       refetchOnWindowFocus: false,
       // enabled: !!checklistId && !!router?.query?.id,
-    }
+    },
   )
 
   // console.log(data)
   const recepcaoInspecao = data?.stages[0].itens.filter(
-    (item) => item.rules.type === 'visual_inspect'
+    (item) => item.rules.type === 'visual_inspect',
   )
   const entregaInspecao = data?.stages[1].itens.filter(
-    (item) => item.rules.type === 'visual_inspect'
+    (item) => item.rules.type === 'visual_inspect',
   )
 
   console.log(data)
@@ -134,7 +134,7 @@ export function PrintInspection({
               className={classNames(
                 style['col-40'],
                 style['d-flex'],
-                style['align-items-center']
+                style['align-items-center'],
               )}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -167,7 +167,7 @@ export function PrintInspection({
               style.row,
               style['my-2'],
               style['text-center'],
-              style['fw-500']
+              style['fw-500'],
             )}
           >
             <div className={style.col}>
@@ -175,7 +175,7 @@ export function PrintInspection({
                 className={classNames(
                   style['bg-success'],
                   style['p-2'],
-                  style['round-2']
+                  style['round-2'],
                 )}
               >
                 OK/SUBSTITUÍDO
@@ -186,7 +186,7 @@ export function PrintInspection({
                 className={classNames(
                   style['bg-warning'],
                   style['p-2'],
-                  style['round-2']
+                  style['round-2'],
                 )}
               >
                 REQUER TROCA/REPARO FUTURO{' '}
@@ -197,7 +197,7 @@ export function PrintInspection({
                 className={classNames(
                   style['bg-danger'],
                   style['p-2'],
-                  style['round-2']
+                  style['round-2'],
                 )}
               >
                 REQUER TROCA/REPARO IMEDIATO
@@ -217,7 +217,7 @@ export function PrintInspection({
                 className={classNames(
                   style.row,
                   style['mt-1'],
-                  style['les-tres']
+                  style['les-tres'],
                 )}
               >
                 <div className={style.col}>
@@ -244,7 +244,7 @@ export function PrintInspection({
                         style['text-black'],
                         style['text-center'],
                         style['fw-700'],
-                        style['py-1']
+                        style['py-1'],
                       )}
                     >
                       Condição
@@ -257,7 +257,7 @@ export function PrintInspection({
                         style['text-black'],
                         style['text-center'],
                         style['fw-700'],
-                        style['py-1']
+                        style['py-1'],
                       )}
                     >
                       Assinatura
@@ -278,7 +278,7 @@ export function PrintInspection({
                         style['text-center'],
                         style['pt-1'],
                         style['fw-700'],
-                        style.small
+                        style.small,
                       )}
                     >
                       <div
@@ -286,7 +286,7 @@ export function PrintInspection({
                           style.col,
                           style['round-2'],
                           style['b-1'],
-                          style['mx-5']
+                          style['mx-5'],
                         )}
                       >
                         Sim
@@ -296,7 +296,7 @@ export function PrintInspection({
                           style.col,
                           style['round-2'],
                           style['b-1'],
-                          style['mx-5']
+                          style['mx-5'],
                         )}
                       >
                         Não
@@ -491,7 +491,7 @@ export function PrintInspection({
                         style['text-center'],
                         style['pt-1'],
                         style['fw-700'],
-                        style.small
+                        style.small,
                       )}
                     >
                       <div
@@ -500,7 +500,7 @@ export function PrintInspection({
                           style['round-2'],
                           style['round-2'],
                           style['b-1'],
-                          style['mx-5']
+                          style['mx-5'],
                         )}
                       >
                         Sim
@@ -511,7 +511,7 @@ export function PrintInspection({
                           style['round-2'],
                           style['round-2'],
                           style['b-1'],
-                          style['mx-5']
+                          style['mx-5'],
                         )}
                       >
                         Não
@@ -714,7 +714,7 @@ export function PrintInspection({
                         style['table-head'],
                         style['border-1'],
                         style['my-2'],
-                        style['cell-h-sm']
+                        style['cell-h-sm'],
                       )}
                     >
                       <thead>
@@ -730,7 +730,7 @@ export function PrintInspection({
                       className={classNames(
                         style.bordered,
                         style['table-head'],
-                        style['cell-h-sm']
+                        style['cell-h-sm'],
                       )}
                     >
                       <thead>
@@ -858,7 +858,7 @@ export function PrintInspection({
                       className={classNames(
                         style.bordered,
                         style['table-head'],
-                        style['cell-h-sm']
+                        style['cell-h-sm'],
                       )}
                     >
                       <thead>
@@ -969,7 +969,7 @@ export function PrintInspection({
                     className={classNames(
                       style.col,
                       style['p-1'],
-                      style['lh-150']
+                      style['lh-150'],
                     )}
                     style={{ paddingBottom: '16px' }}
                   >
@@ -1002,7 +1002,7 @@ export function PrintInspection({
             className={classNames(
               style.row,
               style['equal-form-slots'],
-              style['h-12mm']
+              style['h-12mm'],
             )}
           >
             <div className={style['col-6']}>
@@ -1039,7 +1039,7 @@ export function PrintInspection({
                 className={classNames(
                   style['form-slot'],
                   style['p-2'],
-                  style['me-1']
+                  style['me-1'],
                 )}
               >
                 <div
@@ -1055,7 +1055,7 @@ export function PrintInspection({
                   className={classNames(
                     style.signature,
                     style['px-4'],
-                    style.small
+                    style.small,
                   )}
                 >
                   <div>
@@ -1083,7 +1083,7 @@ export function PrintInspection({
                   className={classNames(
                     style.signature,
                     style['px-4'],
-                    style.small
+                    style.small,
                   )}
                 >
                   <div>
@@ -1101,7 +1101,7 @@ export function PrintInspection({
               style['icon-header'],
               style['p-1'],
               style['text-white'],
-              style['mt-1']
+              style['mt-1'],
             )}
           >
             <div className={style.row}>
@@ -1113,7 +1113,7 @@ export function PrintInspection({
             className={classNames(
               style.row,
               style['align-items-start'],
-              style['ls-05']
+              style['ls-05'],
             )}
           >
             <div className={classNames(style['col-4'], style['pe-1'])}>
@@ -1268,7 +1268,7 @@ export function PrintInspection({
                 className={classNames(
                   style['icon-header'],
                   style['mb-1'],
-                  style['mt-1']
+                  style['mt-1'],
                 )}
               >
                 <span>COM O CAPÔ ABERTO</span>
@@ -1491,7 +1491,7 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style['last-checks']
+                  style['last-checks'],
                 )}
               >
                 <thead>
@@ -1551,7 +1551,7 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style['last-checks']
+                  style['last-checks'],
                 )}
               >
                 <thead>
@@ -1611,7 +1611,7 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style['last-checks']
+                  style['last-checks'],
                 )}
               >
                 <thead>
@@ -1657,7 +1657,7 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style['last-checks']
+                  style['last-checks'],
                 )}
               >
                 <tbody>

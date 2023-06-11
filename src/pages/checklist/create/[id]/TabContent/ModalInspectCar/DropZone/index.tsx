@@ -138,7 +138,7 @@ export function InspectionDropzone({
       }
       handleAddImageUrlList(filesUploaded, positionsCar)
     },
-    [positionsCar]
+    [positionsCar],
   )
 
   // async function postUploadFile(data: any) {
@@ -181,7 +181,7 @@ export function InspectionDropzone({
       ...(isDragAccept ? acceptStyle : {}),
       ...(isDragReject ? rejectStyle : {}),
     }),
-    [isFocused, isDragAccept, isDragReject]
+    [isFocused, isDragAccept, isDragReject],
   )
 
   return (

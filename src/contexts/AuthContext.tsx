@@ -40,7 +40,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     console.log(resp)
     localStorage.setItem(
       process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME as string,
-      JSON.stringify('resp')
+      JSON.stringify('resp'),
     )
 
     console.log(resp)

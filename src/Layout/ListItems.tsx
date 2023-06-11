@@ -76,7 +76,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
         title: 'Orçamentos',
       },
     ],
-    [companySelected]
+    [companySelected],
   )
 
   const menuListCompanyId = useMemo(
@@ -89,7 +89,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
               href: `${item.href}`,
             }
       }),
-    [companySelected]
+    [companySelected],
   )
 
   useEffect(() => {

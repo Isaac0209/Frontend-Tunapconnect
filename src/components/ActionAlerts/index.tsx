@@ -6,7 +6,7 @@ import { ActionAlertsComponentProps } from './ActionAlerts'
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
-  ref
+  ref,
 ) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
@@ -24,7 +24,7 @@ export default function ActionAlerts({
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === 'clickaway') {
       return

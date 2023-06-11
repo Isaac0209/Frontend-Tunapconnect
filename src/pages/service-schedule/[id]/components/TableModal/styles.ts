@@ -63,20 +63,20 @@ export const TableDataGrid = styled(DataGrid)(({ theme }) => ({
     '&.Mui-selected': {
       backgroundColor: alpha(
         theme.palette.primary.main,
-        ODD_OPACITY + theme.palette.action.selectedOpacity
+        ODD_OPACITY + theme.palette.action.selectedOpacity,
       ),
       '&:hover, &.Mui-hovered': {
         backgroundColor: alpha(
           theme.palette.primary.main,
           ODD_OPACITY +
             theme.palette.action.selectedOpacity +
-            theme.palette.action.hoverOpacity
+            theme.palette.action.hoverOpacity,
         ),
 
         '@media (hover: none)': {
           backgroundColor: alpha(
             theme.palette.primary.main,
-            ODD_OPACITY + theme.palette.action.selectedOpacity
+            ODD_OPACITY + theme.palette.action.selectedOpacity,
           ),
         },
       },

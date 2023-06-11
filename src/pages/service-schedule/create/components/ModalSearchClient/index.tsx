@@ -58,7 +58,7 @@ export default function ModalSearchClient({
     console.log(data)
     try {
       const result = await api.get(
-        `/client?company_id=${companySelected}&search=${data.search}`
+        `/client?company_id=${companySelected}&search=${data.search}`,
       )
       console.log(result.data.data)
       setClientList(result.data.data)

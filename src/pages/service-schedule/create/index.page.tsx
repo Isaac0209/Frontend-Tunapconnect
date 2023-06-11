@@ -175,7 +175,7 @@ export default function ServiceSchedulesCreate() {
     try {
       const respCreate: any = await api.create(
         '/service-schedule',
-        dataFormatted
+        dataFormatted,
       )
       const idCreatedResponse = respCreate.data.data.id
 
@@ -250,11 +250,11 @@ export default function ServiceSchedulesCreate() {
     ],
     async () => {
       const resp = await api.get(
-        `/technical-consultant?company_id=${companySelected}`
+        `/technical-consultant?company_id=${companySelected}`,
       )
       return resp.data.data
     },
-    { enabled: !!companySelected }
+    { enabled: !!companySelected },
   )
 
   useEffect(() => {
@@ -263,7 +263,7 @@ export default function ServiceSchedulesCreate() {
         dataTechnicalConsultantList.map((item: TechnicalConsultant) => ({
           id: item.id,
           name: item.name,
-        }))
+        })),
       )
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])

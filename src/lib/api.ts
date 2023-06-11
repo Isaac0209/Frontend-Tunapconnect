@@ -21,7 +21,7 @@ export class ApiCore {
       },
       function (error) {
         return Promise.reject(error)
-      }
+      },
     )
   }
 

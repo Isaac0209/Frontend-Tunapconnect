@@ -39,14 +39,14 @@ export function MoreOptionsButtonSelect({
       const checklistListLocalStorage = localStorage.getItem('checklist-list')
       if (checklistListLocalStorage) {
         const checklistListLocalStorageParse = JSON.parse(
-          checklistListLocalStorage
+          checklistListLocalStorage,
         )
         const checklistFindOne = checklistListLocalStorageParse.filter(
-          (c: any) => c.id === Number(checklistId)
+          (c: any) => c.id === Number(checklistId),
         )
         localStorage.setItem(
           'checklist-edit-byId',
-          JSON.stringify(checklistFindOne)
+          JSON.stringify(checklistFindOne),
         )
         router.push(`/checklist/create/${checklistId}`)
       }

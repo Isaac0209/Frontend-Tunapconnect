@@ -175,7 +175,7 @@ export default function ServiceSchedulesEdit() {
     try {
       const respUpdate: any = await api.update(
         '/service-schedule/' + router.query.id,
-        dataFormatted
+        dataFormatted,
       )
       setIsEditSelectedCard(null)
       setActionAlerts({
@@ -288,7 +288,7 @@ export default function ServiceSchedulesEdit() {
       if (modelChecklist.data.data.length > 0) {
         const createdDefault = await api.create(
           '/checklist',
-          dataCreateChecklist
+          dataCreateChecklist,
         )
         router.replace(`/checklist/create/${createdDefault?.data?.data?.id}`)
       }
@@ -310,11 +310,11 @@ export default function ServiceSchedulesEdit() {
     ],
     async () => {
       const resp = await api.get(
-        `/technical-consultant?company_id=${companySelected}`
+        `/technical-consultant?company_id=${companySelected}`,
       )
       return resp.data.data
     },
-    { enabled: !!companySelected && wasEdited }
+    { enabled: !!companySelected && wasEdited },
   )
 
   const { data: dataServiceSchedule, status: dataServiceScheduleStatus } =
@@ -335,7 +335,7 @@ export default function ServiceSchedulesEdit() {
         dataTechnicalConsultantList.map((item: TechnicalConsultant) => ({
           id: item.id,
           name: item.name,
-        }))
+        })),
       )
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
@@ -387,7 +387,7 @@ export default function ServiceSchedulesEdit() {
       ],
       async () => {
         const resp = await api.get(
-          `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`
+          `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
         )
         if (resp.data.data.length > 0) {
           setDefaultCheckListPrint(resp.data.data[0].id)
@@ -398,7 +398,7 @@ export default function ServiceSchedulesEdit() {
       },
       {
         enabled: openPrintInspectionModal,
-      }
+      },
     )
 
   console.log(serviceScheduleDefaultStatus)

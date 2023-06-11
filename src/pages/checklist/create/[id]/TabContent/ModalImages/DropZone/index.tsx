@@ -117,7 +117,7 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
       ...(isDragAccept ? acceptStyle : {}),
       ...(isDragReject ? rejectStyle : {}),
     }),
-    [isFocused, isDragAccept, isDragReject]
+    [isFocused, isDragAccept, isDragReject],
   )
 
   return (

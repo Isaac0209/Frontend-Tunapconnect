@@ -84,7 +84,7 @@ export function TableApp({
               onRowClick={(id) => {
                 try {
                   const listSession = localStorage.getItem(
-                    'service-schedule-list'
+                    'service-schedule-list',
                   )
                   if (listSession) {
                     const items = JSON.parse(listSession)
@@ -92,7 +92,7 @@ export function TableApp({
                     const item = items.filter((i: any) => i.id === id.id)
                     localStorage.setItem(
                       'service-schedule-by-id',
-                      JSON.stringify(item)
+                      JSON.stringify(item),
                     )
                     router.push(`/service-schedule/${id.id}`)
                   }

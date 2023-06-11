@@ -149,7 +149,7 @@ interface modalInspectionCarRefType {
 
 const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   props,
-  ref
+  ref,
 ) {
   const {
     stageData,
@@ -265,7 +265,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       name: string
       url: string
       size: string
-    }
+    },
   ) {
     console.log(image)
     setListImage((prevState) => {
@@ -328,7 +328,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   function handleRemoveImageInListImage(index: number, imageId: number) {
     const findIndexListImage = listImage[stageName].findIndex(
-      (item) => item.id === index
+      (item) => item.id === index,
     )
 
     setListImage((prevState) => {
@@ -448,7 +448,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   function onSubmitData(data: OnSubmitData) {
     const isAlreadyInspections = stageData?.itens.filter(
-      (item) => item.rules.type === 'visual_inspect'
+      (item) => item.rules.type === 'visual_inspect',
     )
 
     let defaultLabel: any
@@ -502,7 +502,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   useEffect(() => {
     const sessionStorageData = sessionStorage.getItem(
-      `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`
+      `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
     )
 
     const dataSessionStorage: StagesDataProps[] = sessionStorageData
@@ -513,7 +513,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
     if (dataSessionStorage) {
       const stageLocalSession = dataSessionStorage.filter(
-        (data) => data.name === stageName
+        (data) => data.name === stageName,
       )[0]
       if (stageLocalSession) {
         console.log(stageLocalSession)
@@ -536,7 +536,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
             `${stageName}.${index}.inputs`,
             item.rules.type === 'select'
               ? valueSelectedFormatted
-              : item.values.value
+              : item.values.value,
           )
           setValue(`${stageName}.${index}.observation`, item.comment)
         })
@@ -558,7 +558,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       console.log('não exists')
       sessionStorage.setItem(
         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-        JSON.stringify([stageData])
+        JSON.stringify([stageData]),
       )
     }
   }, [])
@@ -588,7 +588,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                         index,
                         isClosed,
                         control,
-                        handleOpenModalInspectCar
+                        handleOpenModalInspectCar,
                       )}
                     </TableCell>
                     <TableCell>

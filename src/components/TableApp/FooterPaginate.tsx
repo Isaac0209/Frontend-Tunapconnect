@@ -13,7 +13,7 @@ import { ButtonIcon } from './styles'
 // }
 
 export function CustomFooterStatusComponent(
-  props: NonNullable<GridSlotsComponentsProps['footer']>
+  props: NonNullable<GridSlotsComponentsProps['footer']>,
 ) {
   return (
     <Stack

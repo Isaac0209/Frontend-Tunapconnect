@@ -40,7 +40,7 @@ interface IModalImageProps {
       name: string
       url: string
       size: string
-    }
+    },
   ) => void
   handleRemoveImageInListImage: (index: number, idImage: number) => void
   listImage: ListImages

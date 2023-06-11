@@ -61,7 +61,7 @@ export default function ModalSearchClientVehicle({
     console.log(data)
     try {
       const result = await api.get(
-        `/client-vehicle?company_id=${companySelected}&search=${data.search}`
+        `/client-vehicle?company_id=${companySelected}&search=${data.search}`,
       )
       console.log(result.data.data)
       setClientVehicleList(result.data.data)

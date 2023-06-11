@@ -31,7 +31,7 @@ export default function CompanyList() {
     {
       refetchOnWindowFocus: false,
       retry: false,
-    }
+    },
   )
 
   return (

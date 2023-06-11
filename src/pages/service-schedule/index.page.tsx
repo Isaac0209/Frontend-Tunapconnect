@@ -100,7 +100,7 @@ export default function ServiceSchedulesList() {
         router.query.current_page
           ? '&current_page=' + router.query.current_page
           : ''
-      }`
+      }`,
     )
   }
 
@@ -256,7 +256,7 @@ export default function ServiceSchedulesList() {
         },
       },
     ],
-    []
+    [],
   )
 
   const {
@@ -275,7 +275,7 @@ export default function ServiceSchedulesList() {
         console.log(response)
         localStorage.setItem(
           'service-schedule-list',
-          JSON.stringify(response.data.data)
+          JSON.stringify(response.data.data),
         )
         const resp = response.data.data.map((data: any) => {
           return {
@@ -315,7 +315,7 @@ export default function ServiceSchedulesList() {
       // enabled: !!companySelected || !!url,
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-    }
+    },
   )
 
   function handlePages(nextPage: any): void {

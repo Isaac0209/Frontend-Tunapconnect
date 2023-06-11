@@ -23,7 +23,7 @@ export class apiCoreClient {
       },
       function (error) {
         return Promise.reject(error)
-      }
+      },
     )
   }
 

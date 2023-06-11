@@ -141,7 +141,7 @@ export default function ChecklistCreateById() {
         })
         console.log(err)
       },
-    }
+    },
   )
 
   const { data, isSuccess, isLoading, isFetching } =
@@ -156,7 +156,7 @@ export default function ChecklistCreateById() {
       {
         refetchOnWindowFocus: false,
         enabled: !!router?.query?.id,
-      }
+      },
     )
 
   function handleAlert(isOpen: boolean) {
@@ -213,34 +213,34 @@ export default function ChecklistCreateById() {
       const result = await tabContentRef.current.handleGetValuesForm()
       console.log(result)
       const sessionStorageData = sessionStorage.getItem(
-        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`
+        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
       )
 
       if (sessionStorageData) {
         const storageStage: StagesDataProps[] = JSON.parse(sessionStorageData)
         const storageStageActualIndex = storageStage.findIndex(
-          (item: any) => item.name === result.name
+          (item: any) => item.name === result.name,
         )
 
         if (storageStageActualIndex >= 0) {
           const newStorageSessionFiltered = storageStage.filter(
-            (item) => item.name !== result.name
+            (item) => item.name !== result.name,
           )
 
           sessionStorage.setItem(
             `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-            JSON.stringify([...newStorageSessionFiltered, result])
+            JSON.stringify([...newStorageSessionFiltered, result]),
           )
         } else {
           sessionStorage.setItem(
             `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-            JSON.stringify([...storageStage, result])
+            JSON.stringify([...storageStage, result]),
           )
         }
       } else {
         sessionStorage.setItem(
           `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-          JSON.stringify([result])
+          JSON.stringify([result]),
         )
       }
     }
@@ -256,7 +256,7 @@ export default function ChecklistCreateById() {
       if (data?.stages.length > 0) {
         sessionStorage.setItem(
           `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-          JSON.stringify(data?.stages)
+          JSON.stringify(data?.stages),
         )
       }
     }

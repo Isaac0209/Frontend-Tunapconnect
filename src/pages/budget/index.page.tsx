@@ -56,7 +56,7 @@ export default function BudgetList() {
   }
   const handleClick = (
     event: React.MouseEvent<HTMLButtonElement>,
-    value: number
+    value: number,
   ) => {
     deleteBudget(value)
   }

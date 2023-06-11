@@ -32,7 +32,7 @@ export default function ModalSearchClaimService({
 }: ModalSearchClaimServiceProps) {
   const [ClaimServiceList, setClaimServiceList] = useState<any[] | []>([])
   const [ClaimServiceSelected, setClaimServiceSelected] = useState<any | null>(
-    null
+    null,
   )
 
   const {
@@ -53,7 +53,7 @@ export default function ModalSearchClaimService({
     console.log(data)
     try {
       const result = await api.get(
-        `/claim-service=${companySelected}&search=${data.search}`
+        `/claim-service=${companySelected}&search=${data.search}`,
       )
       console.log(result.data.data)
       setClaimServiceList(result.data.data)

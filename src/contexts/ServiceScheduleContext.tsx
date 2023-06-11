@@ -18,7 +18,7 @@ type ServiceScheduleProviderProps = {
 }
 
 export const ServiceScheduleContext = createContext(
-  {} as ServiceScheduleContextProps
+  {} as ServiceScheduleContextProps,
 )
 
 export function ServiceScheduleProvider({
@@ -29,14 +29,14 @@ export function ServiceScheduleProvider({
     {
       list: [],
       selectedActual: null,
-    }
+    },
   )
 
   // const api = new ApiCore()
 
   function serviceScheduleListReducer(
     state: StateType,
-    action: any
+    action: any,
   ): StateType {
     const { type, payload } = action
     switch (type) {
@@ -69,7 +69,7 @@ export function ServiceScheduleProvider({
 
   function getServiceScheduleById(id: number): ServiceScheduleType | null {
     const isExistsServiceSchedule = serviceScheduleState.list.filter(
-      (s) => s.id === id
+      (s) => s.id === id,
     )
     if (isExistsServiceSchedule.length > 0) {
       return isExistsServiceSchedule[0]
@@ -79,7 +79,7 @@ export function ServiceScheduleProvider({
 
   function setServiceScheduleSelectedById(id: number) {
     const isExistsServiceSchedule = serviceScheduleState.list.filter(
-      (s) => s.id === id
+      (s) => s.id === id,
     )
     if (isExistsServiceSchedule.length > 0) {
       dispatch({

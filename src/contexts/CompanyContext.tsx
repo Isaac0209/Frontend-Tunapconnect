@@ -59,7 +59,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
       {
         maxAge: 30 * 24 * 60 * 60,
         path: '/',
-      }
+      },
     )
     isRedirect &&
       (await router.push(`/service-schedule?company_id=${company.id}`))
@@ -87,7 +87,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
           cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]
         ) {
           const companySelectedCookie: cookieCompany = JSON.parse(
-            cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]
+            cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string],
           )
           if (`${companySelectedCookie.companySelected}` !== company_id) {
             createCompany(
@@ -98,7 +98,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
                 cpf: isExistCompany[0]?.cpf,
                 active: isExistCompany[0]?.active,
               },
-              false
+              false,
             )
           }
         }
@@ -115,7 +115,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
       const cookies = parseCookies()
       if (cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]) {
         const companySelectedCookie: cookieCompany = JSON.parse(
-          cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]
+          cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string],
         )
         if (!companySelectedCookie.companySelected) router.push('/company')
         setCompanySelected(parseInt(companySelectedCookie.companySelected))

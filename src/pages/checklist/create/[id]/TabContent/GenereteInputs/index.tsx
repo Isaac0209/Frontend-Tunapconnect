@@ -161,7 +161,7 @@ export function genereteInput(
   indexRegister: number,
   isClosed: boolean,
   control: Control,
-  handleOpenModalInspectCar: (value: boolean) => void
+  handleOpenModalInspectCar: (value: boolean) => void,
 ) {
   const optionsSelect = itemValues ? itemValues?.options : []
   switch (type) {

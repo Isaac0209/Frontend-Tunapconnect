@@ -11,7 +11,7 @@ export const config = {
 
 const readFile = (
   req: NextApiRequest,
-  saveLocally?: boolean
+  saveLocally?: boolean,
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   const options: formidable.Options = {}
   if (saveLocally) {

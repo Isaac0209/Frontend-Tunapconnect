@@ -172,7 +172,7 @@ export function TableModal({
         },
       },
     ],
-    []
+    [],
   )
 
   // const router = useRouter()
@@ -201,7 +201,7 @@ export function TableModal({
     () => {
       return api
         .get(
-          `/checklist/list?company_id=${companySelected}&service_schedule_id=${serviceScheduleId}&orderby=updated_at desc`
+          `/checklist/list?company_id=${companySelected}&service_schedule_id=${serviceScheduleId}&orderby=updated_at desc`,
         )
         .then((response) => {
           const { data } = response.data
@@ -211,13 +211,13 @@ export function TableModal({
               id: item?.id,
               createAt: item?.created_at,
               status: `${item?.status[0].toUpperCase()}${item?.status.substring(
-                1
+                1,
               )}`,
             }
           })
         })
     },
-    { enabled: isOpen && !!companySelected }
+    { enabled: isOpen && !!companySelected },
   )
 
   return (
