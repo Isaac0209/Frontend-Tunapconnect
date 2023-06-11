@@ -11,7 +11,7 @@
 .pesquisa {
   margin-top: 20px;
   width: 100%;
-  height: 120px;
+  min-height: 120px;
   background-color: white;
   filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161));
   padding: 20px;
@@ -20,6 +20,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  row-gap: 24px;
 }
 .divPrimary .buttonFiltro {
   width: 113px;
@@ -30,13 +31,17 @@
 }
 .divPrimary form {
   display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  max-width: 100%;
+  row-gap: 24px;
 }
 .divPrimary .buttonBudget {
   background-color: #0e948b;
 }
 .pesquisa input {
   width: 500px;
-  max-width: 100%;
+  max-width: 90%;
   height: 58px;
   background-color: white;
   filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161));
@@ -70,12 +75,43 @@
 .table {
   border-collapse: separate;
   border-spacing: 0 10px;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  display: block;
 }
 .table td {
   padding: 20px;
 }
+.table td, .table th {
+  white-space: nowrap;
+}
+
 .table tbody {
   filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.161));
   background-color: white;
   text-align: center;
+}
+@media (max-width: 900px) {
+  .divPrimary form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    max-width: 100%;
+    row-gap: 24px;
+    align-items: center;
+  }
+  .table td, .table th {
+    white-space: normal;
+  }
+
+  .divPrimary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 24px
+  }
+  .divPrimary button {
+    margin-left: 0;
+  }
 }
