@@ -1,26 +1,26 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from 'react'
 
-import { BoxContainer } from "./styles";
+import { BoxContainer } from './styles'
 
-import { useTheme } from "@mui/material/styles";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
+import { useTheme } from '@mui/material/styles'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
 
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { PrintInspection } from "../PrintInspection";
-import ReactToPrint from "react-to-print";
-import PrintIcon from "@mui/icons-material/Print";
-import { Button } from "@mui/material";
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { PrintInspection } from '../PrintInspection'
+import ReactToPrint from 'react-to-print'
+import PrintIcon from '@mui/icons-material/Print'
+import { Button } from '@mui/material'
 
-import { CompanyContext } from "@/contexts/CompanyContext";
-import { ChecklistProps } from "@/pages/checklist/types";
+import { CompanyContext } from '@/contexts/CompanyContext'
+import { ChecklistProps } from '@/pages/checklist/types'
 
 interface PrintInspectionModalProps {
-  isOpen: boolean;
-  closeModal: () => void;
-  checkListIdForModal: number;
-  checkListData?: ChecklistProps;
+  isOpen: boolean
+  closeModal: () => void
+  checkListIdForModal: number
+  checkListData?: ChecklistProps
 }
 
 export function PrintInspectionModal({
@@ -28,24 +28,24 @@ export function PrintInspectionModal({
   closeModal,
   checkListIdForModal,
 }: PrintInspectionModalProps) {
-  const [open, setOpen] = useState(false);
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const [open, setOpen] = useState(false)
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
-  const { companySelected } = useContext(CompanyContext);
+  const { companySelected } = useContext(CompanyContext)
 
-  const printInspectionRef = useRef(null);
+  const printInspectionRef = useRef(null)
 
   const handleClose = () => {
-    setOpen(false);
-    closeModal();
-  };
+    setOpen(false)
+    closeModal()
+  }
 
   useEffect(() => {
     if (isOpen) {
-      setOpen(true);
+      setOpen(true)
     }
-  }, [isOpen, companySelected]);
+  }, [isOpen, companySelected])
 
   return (
     <>
@@ -91,5 +91,5 @@ export function PrintInspectionModal({
         </DialogActions>
       </Dialog>
     </>
-  );
+  )
 }

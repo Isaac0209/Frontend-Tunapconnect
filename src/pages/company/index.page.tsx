@@ -1,38 +1,38 @@
-import * as React from "react";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
+import * as React from 'react'
+import Container from '@mui/material/Container'
+import Grid from '@mui/material/Grid'
 
-import { useContext } from "react";
-import { Skeleton, Typography } from "@mui/material";
-import Title from "@/components/Title";
-import { ContainerItem } from "./styles";
+import { useContext } from 'react'
+import { Skeleton, Typography } from '@mui/material'
+import Title from '@/components/Title'
+import { ContainerItem } from './styles'
 
-import { getSession } from "next-auth/react";
-import { useQuery } from "react-query";
-import { CompanyContext } from "@/contexts/CompanyContext";
+import { getSession } from 'next-auth/react'
+import { useQuery } from 'react-query'
+import { CompanyContext } from '@/contexts/CompanyContext'
 
 interface companyProps {
-  id: number;
-  name: string;
-  cnpj: string;
-  cpf: string;
-  active?: boolean;
+  id: number
+  name: string
+  cnpj: string
+  cpf: string
+  active?: boolean
 }
 export default function CompanyList() {
-  const { handleCompanySelected } = useContext(CompanyContext);
+  const { handleCompanySelected } = useContext(CompanyContext)
 
   function handleSelectCompany(newCompany: companyProps) {
-    handleCompanySelected(newCompany);
+    handleCompanySelected(newCompany)
   }
 
   const { data, isSuccess, isLoading } = useQuery<companyProps[] | []>(
-    ["company-page-list-company"],
+    ['company-page-list-company'],
     () => getSession().then((resp) => resp?.user.companies as companyProps[]),
     {
       refetchOnWindowFocus: false,
       retry: false,
     }
-  );
+  )
 
   return (
     <>
@@ -77,21 +77,21 @@ export default function CompanyList() {
                   <ContainerItem
                     sx={{
                       p: 2,
-                      display: "flex",
-                      flexDirection: "column",
+                      display: 'flex',
+                      flexDirection: 'column',
                       height: 180,
                     }}
                   >
-                    <Title>{item.name || "Não informado"}</Title>
+                    <Title>{item.name || 'Não informado'}</Title>
                     <Typography>{item.cnpj || item.cpf}</Typography>
                   </ContainerItem>
                 </Grid>
-              );
+              )
             })}
         </Grid>
       </Container>
     </>
-  );
+  )
 }
 
-CompanyList.auth = true;
+CompanyList.auth = true

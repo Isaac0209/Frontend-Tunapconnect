@@ -1,58 +1,58 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDropzone } from "react-dropzone";
-import PhotoSizeSelectActualOutlinedIcon from "@mui/icons-material/PhotoSizeSelectActualOutlined";
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDropzone } from 'react-dropzone'
+import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
 
-import { LinearProgress, Stack } from "@mui/material";
+import { LinearProgress, Stack } from '@mui/material'
 // import axios from 'axios'
-import { ApiCore } from "@/lib/api";
-import Image from "next/image";
+import { ApiCore } from '@/lib/api'
+import Image from 'next/image'
 // import { GetServerSideProps } from 'next/types'
 // import path from 'path'
 // import fs from 'fs/promises'
 
-import { ContainerImages } from "./style";
+import { ContainerImages } from './style'
 
 const baseStyle = {
   flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  padding: "8px",
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '8px',
   borderWidth: 2,
   borderRadius: 2,
-  borderColor: "#707070",
-  borderStyle: "dashed",
-  backgroundColor: "#fafafa",
-  color: "#bdbdbd",
+  borderColor: '#707070',
+  borderStyle: 'dashed',
+  backgroundColor: '#fafafa',
+  color: '#bdbdbd',
   fontSize: 10,
-  outline: "none",
-  transition: "border .24s ease-in-out",
-};
+  outline: 'none',
+  transition: 'border .24s ease-in-out',
+}
 
 const focusedStyle = {
-  borderColor: "#2196f3",
-};
+  borderColor: '#2196f3',
+}
 
 const acceptStyle = {
-  borderColor: "#00e676",
-};
+  borderColor: '#00e676',
+}
 
 const rejectStyle = {
-  borderColor: "#ff1744",
-};
+  borderColor: '#ff1744',
+}
 
 interface imageData {
-  id: number;
-  name: string;
-  url: string;
-  size: string;
+  id: number
+  name: string
+  url: string
+  size: string
 }
 type positionsTypes =
-  | "frente"
-  | "lateralEsquerdo"
-  | "lateralDireito"
-  | "traseira"
-  | "teto";
+  | 'frente'
+  | 'lateralEsquerdo'
+  | 'lateralDireito'
+  | 'traseira'
+  | 'teto'
 
 // const positionsCar: Array<positionsTypes> = [
 //   'frente',
@@ -63,17 +63,17 @@ type positionsTypes =
 // ]
 
 interface imagemList {
-  frente: imageData[];
-  lateralEsquerdo: imageData[];
-  lateralDireito: imageData[];
-  traseira: imageData[];
-  teto: imageData[];
+  frente: imageData[]
+  lateralEsquerdo: imageData[]
+  lateralDireito: imageData[]
+  traseira: imageData[]
+  teto: imageData[]
 }
 
 interface MyDropzoneProps {
-  listImagesUpload: imagemList;
-  handleAddImageUrlList: (value: imageData[], position: positionsTypes) => void;
-  positionsCar: positionsTypes;
+  listImagesUpload: imagemList
+  handleAddImageUrlList: (value: imageData[], position: positionsTypes) => void
+  positionsCar: positionsTypes
 }
 
 // async function savePathTemp(filesList = []) {
@@ -91,19 +91,19 @@ export function InspectionDropzone({
   listImagesUpload,
   positionsCar,
 }: MyDropzoneProps) {
-  const api = new ApiCore();
-  const [list, setList] = useState<imageData[] | []>([]);
+  const api = new ApiCore()
+  const [list, setList] = useState<imageData[] | []>([])
   const [listProgress, setListProgress] = useState<
-    Array<"loading" | "complete"> | []
-  >([]);
+    Array<'loading' | 'complete'> | []
+  >([])
 
   async function updLoadImage(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
+    const formData = new FormData()
+    formData.append('file', file)
 
     return api
-      .create("/uploads", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      .create('/uploads', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {
         return {
@@ -111,35 +111,35 @@ export function InspectionDropzone({
           name: response.data.data.original_name,
           url: response.data.data.url,
           size: response.data.data.size,
-        };
-      });
+        }
+      })
   }
 
   const onDrop = useCallback(
     async (acceptedFiles: any) => {
       const filesLoading = acceptedFiles.map((file: File) => {
-        return "loading";
-      });
+        return 'loading'
+      })
 
-      setListProgress(filesLoading);
-      const filesUploaded = [];
+      setListProgress(filesLoading)
+      const filesUploaded = []
       for (const file of acceptedFiles) {
-        const result = await updLoadImage(file);
+        const result = await updLoadImage(file)
 
-        filesUploaded.push(result);
-        const newProgress = [...listProgress];
-        const isProgress = newProgress.shift();
-        setList((prevState) => [...prevState, result]);
+        filesUploaded.push(result)
+        const newProgress = [...listProgress]
+        const isProgress = newProgress.shift()
+        setList((prevState) => [...prevState, result])
         if (isProgress === undefined) {
-          setListProgress([]);
+          setListProgress([])
         } else {
-          setListProgress(newProgress);
+          setListProgress(newProgress)
         }
       }
-      handleAddImageUrlList(filesUploaded, positionsCar);
+      handleAddImageUrlList(filesUploaded, positionsCar)
     },
     [positionsCar]
-  );
+  )
 
   // async function postUploadFile(data: any) {
   //   const session = await getSession()
@@ -161,18 +161,18 @@ export function InspectionDropzone({
   // }
 
   useEffect(() => {
-    setList(listImagesUpload[positionsCar]);
-  }, [positionsCar]);
+    setList(listImagesUpload[positionsCar])
+  }, [positionsCar])
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({
       onDrop,
       // maxFiles: 1,
       accept: {
-        "image/png": [".png"],
-        "image/jpg": [".jpg"],
+        'image/png': ['.png'],
+        'image/jpg': ['.jpg'],
       },
-    });
+    })
 
   const style: any = useMemo(
     () => ({
@@ -182,7 +182,7 @@ export function InspectionDropzone({
       ...(isDragReject ? rejectStyle : {}),
     }),
     [isFocused, isDragAccept, isDragReject]
-  );
+  )
 
   return (
     <>
@@ -210,8 +210,8 @@ export function InspectionDropzone({
               >
                 <Image
                   style={{
-                    maxWidth: "23px",
-                    maxHeight: "22px",
+                    maxWidth: '23px',
+                    maxHeight: '22px',
                   }}
                   src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${item?.url}`}
                   height={22}
@@ -220,14 +220,14 @@ export function InspectionDropzone({
                   alt=""
                 />
               </a>
-            );
+            )
           })}
         {listProgress.map((item, index) => (
           <Stack
             sx={{
               width: 23,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
               // marginTop: '-2px',
               padding: 0,
             }}
@@ -236,14 +236,14 @@ export function InspectionDropzone({
           >
             <PhotoSizeSelectActualOutlinedIcon
               sx={{
-                marginTop: "-2px",
+                marginTop: '-2px',
               }}
             />
             <LinearProgress
               sx={{
                 width: 21,
                 height: 2,
-                marginTop: "-2px",
+                marginTop: '-2px',
                 padding: 0,
               }}
               color="inherit"
@@ -252,5 +252,5 @@ export function InspectionDropzone({
         ))}
       </ContainerImages>
     </>
-  );
+  )
 }

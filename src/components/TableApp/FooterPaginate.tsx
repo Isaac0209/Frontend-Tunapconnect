@@ -1,10 +1,10 @@
-import * as React from "react";
+import * as React from 'react'
 
-import { GridSlotsComponentsProps } from "@mui/x-data-grid";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import Stack from "@mui/material/Stack";
-import { ButtonIcon } from "./styles";
+import { GridSlotsComponentsProps } from '@mui/x-data-grid'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import Stack from '@mui/material/Stack'
+import { ButtonIcon } from './styles'
 
 // declare module '@mui/x-data-grid' {
 //   interface FooterPropsOverrides {
@@ -13,7 +13,7 @@ import { ButtonIcon } from "./styles";
 // }
 
 export function CustomFooterStatusComponent(
-  props: NonNullable<GridSlotsComponentsProps["footer"]>
+  props: NonNullable<GridSlotsComponentsProps['footer']>
 ) {
   return (
     <Stack
@@ -28,7 +28,7 @@ export function CustomFooterStatusComponent(
         disabled={!props.previousPage}
         onClick={() => {
           if (props?.handlePages) {
-            props?.handlePages("back");
+            props?.handlePages('back')
           }
         }}
         // disabled={!props.previousPage}
@@ -40,12 +40,12 @@ export function CustomFooterStatusComponent(
         disabled={!props.nextPage}
         onClick={() => {
           if (props?.handlePages) {
-            props?.handlePages("next");
+            props?.handlePages('next')
           }
         }}
       >
         <ArrowForwardIosIcon color="inherit" />
       </ButtonIcon>
     </Stack>
-  );
+  )
 }

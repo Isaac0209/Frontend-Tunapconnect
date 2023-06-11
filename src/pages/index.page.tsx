@@ -1,6 +1,6 @@
-import { GetServerSideProps } from "next";
+import { GetServerSideProps } from 'next'
 
-import { getSession } from "next-auth/react";
+import { getSession } from 'next-auth/react'
 
 export default function Home() {
   // const { data: session } = useSession()
@@ -23,21 +23,21 @@ export default function Home() {
 // }
 export const getServerSideProps: GetServerSideProps = async (ctx: any) => {
   // const { 'next-auth.session-token': token } = parseCookies(ctx)
-  const session = await getSession(ctx);
-  console.log(session);
+  const session = await getSession(ctx)
+  console.log(session)
   if (session) {
     return {
       redirect: {
-        destination: "/company",
+        destination: '/company',
         permanent: false,
       },
-    };
+    }
   } else {
     return {
       redirect: {
-        destination: "/auth/login",
+        destination: '/auth/login',
         permanent: false,
       },
-    };
+    }
   }
-};
+}

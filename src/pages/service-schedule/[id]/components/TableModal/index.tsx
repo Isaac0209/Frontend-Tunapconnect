@@ -1,30 +1,30 @@
-import * as React from "react";
-import { useContext, useMemo } from "react";
+import * as React from 'react'
+import { useContext, useMemo } from 'react'
 
 import {
   GridColDef,
   GridRenderCellParams,
   GridValueFormatterParams,
   useGridApiRef,
-} from "@mui/x-data-grid";
+} from '@mui/x-data-grid'
 
-import { BoxContainer, StyledGridOverlay, TableDataGrid } from "./styles";
+import { BoxContainer, StyledGridOverlay, TableDataGrid } from './styles'
 // import { CustomNoRowsOverlay } from './NoRows'
 // import { CustomFooterStatusComponent } from './FooterPaginate'
 
 // import { useTheme } from '@mui/material/styles'
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
 
-import DialogTitle from "@mui/material/DialogTitle";
+import DialogTitle from '@mui/material/DialogTitle'
 // import useMediaQuery from '@mui/material/useMediaQuery'
-import { MoreOptionsButtonSelect } from "./MoreOptionsButtonSelect";
-import { ApiCore } from "@/lib/api";
-import { useQuery } from "react-query";
-import { formatDateTime } from "@/ultis/formatDate";
-import { CompanyContext } from "@/contexts/CompanyContext";
-import { Box } from "@mui/material";
+import { MoreOptionsButtonSelect } from './MoreOptionsButtonSelect'
+import { ApiCore } from '@/lib/api'
+import { useQuery } from 'react-query'
+import { formatDateTime } from '@/ultis/formatDate'
+import { CompanyContext } from '@/contexts/CompanyContext'
+import { Box } from '@mui/material'
 
 interface TableAppProps {
   // columns: GridColDef[]
@@ -32,29 +32,29 @@ interface TableAppProps {
   // handlePages?: (nextPage: string) => void
   // pages?: { current: number, next: boolean, previous: boolean }
   // loading: boolean
-  isOpen: boolean;
-  title: string;
-  serviceScheduleId: string;
-  closeChecklistModal: () => void;
+  isOpen: boolean
+  title: string
+  serviceScheduleId: string
+  closeChecklistModal: () => void
 }
 
-declare module "@mui/x-data-grid" {
+declare module '@mui/x-data-grid' {
   // eslint-disable-next-line no-unused-vars
   interface FooterPropsOverrides {
     // @ts-ignore
     // handlePages: (nextPage: string) => void
-    nextPage: boolean;
-    previousPage: boolean;
+    nextPage: boolean
+    previousPage: boolean
   }
 }
 
-const api = new ApiCore();
+const api = new ApiCore()
 
 type RowsProps = {
-  id: number;
-  checklistModel: string;
-  createAt: string;
-};
+  id: number
+  checklistModel: string
+  createAt: string
+}
 
 function CustomNoRowsOverlay() {
   return (
@@ -100,7 +100,7 @@ function CustomNoRowsOverlay() {
       </svg>
       <Box sx={{ mt: 2, mb: 1 }}>Nenhum checklist encontrado</Box>
     </StyledGridOverlay>
-  );
+  )
 }
 
 export function TableModal({
@@ -112,81 +112,81 @@ export function TableModal({
   // const theme = useTheme()
   // const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
-  const { companySelected } = useContext(CompanyContext);
+  const { companySelected } = useContext(CompanyContext)
 
   const columns: GridColDef[] = useMemo(
     () => [
       {
-        field: "id",
-        headerName: "Código",
-        headerClassName: "super-app-theme--header",
+        field: 'id',
+        headerName: 'Código',
+        headerClassName: 'super-app-theme--header',
         width: 90,
-        type: "number",
-        align: "center",
+        type: 'number',
+        align: 'center',
         sortable: false,
       },
       {
-        field: "createAt",
-        headerName: "Data",
-        headerClassName: "super-app-theme--header",
+        field: 'createAt',
+        headerName: 'Data',
+        headerClassName: 'super-app-theme--header',
         // flex: 1,
         maxWidth: 280,
         minWidth: 180,
         sortable: false,
         valueFormatter: (params: GridValueFormatterParams) => {
           if (params.value == null) {
-            return "Não informado";
+            return 'Não informado'
           }
 
-          const dateFormatted = formatDateTime(params.value);
-          return `${dateFormatted}`;
+          const dateFormatted = formatDateTime(params.value)
+          return `${dateFormatted}`
         },
       },
       {
-        field: "status",
-        headerName: "Status",
-        headerClassName: "super-app-theme--header",
+        field: 'status',
+        headerName: 'Status',
+        headerClassName: 'super-app-theme--header',
         width: 120,
         sortable: false,
       },
       {
-        field: "action",
-        headerName: "Ação",
-        headerClassName: "super-app-theme--header",
+        field: 'action',
+        headerName: 'Ação',
+        headerClassName: 'super-app-theme--header',
         sortable: false,
         width: 80,
-        align: "left",
+        align: 'left',
         renderCell: (params: GridRenderCellParams) => {
           // const onClick = (e:React.MouseEvent<HTMLElement>) => {
           //   e.stopPropagation();
           //   const id = params.id;
           // }
-          const idCell = params.id;
+          const idCell = params.id
           return (
             <MoreOptionsButtonSelect
               checklistId={idCell as number}
               status={params.row.status}
               handleDeleteChecklist={handleDeleteChecklist}
             />
-          );
+          )
         },
       },
     ],
     []
-  );
+  )
 
   // const router = useRouter()
 
-  const apiRef = useGridApiRef();
+  const apiRef = useGridApiRef()
 
   async function handleDeleteChecklist(checklistId: number) {
-    console.log(checklistId);
+    console.log(checklistId)
     try {
-      await api.delete("/checklist/" + checklistId);
-      refetch();
+      await api.delete('/checklist/' + checklistId)
+      refetch()
     } catch (err) {
-      console.log(err);
-      throw new Error(`Falha ao excluir`);
+      console.log(err)
+      throw new Error(`Falha ao excluir`)
       // alert(`Falha ao excluir`)
     }
   }
@@ -197,15 +197,15 @@ export function TableModal({
     isSuccess,
     refetch,
   } = useQuery<RowsProps[]>(
-    ["checklist", "service_schedule", "by_id", "modal"],
+    ['checklist', 'service_schedule', 'by_id', 'modal'],
     () => {
       return api
         .get(
           `/checklist/list?company_id=${companySelected}&service_schedule_id=${serviceScheduleId}&orderby=updated_at desc`
         )
         .then((response) => {
-          const { data } = response.data;
-          localStorage.setItem("checklist-list", JSON.stringify(data));
+          const { data } = response.data
+          localStorage.setItem('checklist-list', JSON.stringify(data))
           return data.map((item: any) => {
             return {
               id: item?.id,
@@ -213,12 +213,12 @@ export function TableModal({
               status: `${item?.status[0].toUpperCase()}${item?.status.substring(
                 1
               )}`,
-            };
-          });
-        });
+            }
+          })
+        })
     },
     { enabled: isOpen && !!companySelected }
-  );
+  )
 
   return (
     <>
@@ -281,5 +281,5 @@ export function TableModal({
         </DialogActions>
       </Dialog>
     </>
-  );
+  )
 }

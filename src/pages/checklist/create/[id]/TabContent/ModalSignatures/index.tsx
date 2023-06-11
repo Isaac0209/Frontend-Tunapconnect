@@ -1,34 +1,28 @@
-import {
-  Box,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Stack,
-} from "@mui/material";
-import { MyButton } from "./styles";
+import { Box, Dialog, DialogActions, DialogContent, Stack } from '@mui/material'
+import { MyButton } from './styles'
 
-import SignaturePad from "react-signature-canvas";
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import SignaturePad from 'react-signature-canvas'
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 
 interface Signature {
-  name: string;
+  name: string
   rules: {
-    required: boolean;
-  };
-  image: any[];
+    required: boolean
+  }
+  image: any[]
 }
 
 interface ModalInspectCarProps {
   isOpen: {
-    id: number | null;
-    open: boolean;
-  };
-  closeModalSignatures: () => void;
-  stageName: string;
-  signaturesData: Signature[] | undefined;
-  stageData: Signature[] | undefined;
-  handleSaveSignatures: (data: Signature[]) => void;
+    id: number | null
+    open: boolean
+  }
+  closeModalSignatures: () => void
+  stageName: string
+  signaturesData: Signature[] | undefined
+  stageData: Signature[] | undefined
+  handleSaveSignatures: (data: Signature[]) => void
 }
 
 export default function ModalSignatures({
@@ -39,22 +33,22 @@ export default function ModalSignatures({
   handleSaveSignatures,
   stageData,
 }: ModalInspectCarProps) {
-  const signatureRef = useRef<SignaturePad>(null);
-  const [isSignature, setIsSignature] = useState<string | null>(null);
+  const signatureRef = useRef<SignaturePad>(null)
+  const [isSignature, setIsSignature] = useState<string | null>(null)
 
   const handleClose = () => {
-    closeModalSignatures();
-  };
+    closeModalSignatures()
+  }
   const handleClear = () => {
-    if (signatureRef.current) signatureRef.current?.clear();
-    setIsSignature(null);
-  };
+    if (signatureRef.current) signatureRef.current?.clear()
+    setIsSignature(null)
+  }
 
   function handleSave() {
     if (signatureRef.current) {
       const signature = signatureRef.current
         .getTrimmedCanvas()
-        .toDataURL("image/png");
+        .toDataURL('image/png')
       if (signaturesData) {
         if (signaturesData?.length > 0) {
           const newArraySignatures = signaturesData.map((item, index) => {
@@ -62,11 +56,11 @@ export default function ModalSignatures({
               return {
                 ...item,
                 image: [signature],
-              };
+              }
             }
-            return item;
-          });
-          handleSaveSignatures(newArraySignatures);
+            return item
+          })
+          handleSaveSignatures(newArraySignatures)
         } else {
           if (stageData) {
             const newArraySignatures = stageData.map((item, index) => {
@@ -74,11 +68,11 @@ export default function ModalSignatures({
                 return {
                   ...item,
                   image: [signature],
-                };
+                }
               }
-              return item;
-            });
-            handleSaveSignatures(newArraySignatures);
+              return item
+            })
+            handleSaveSignatures(newArraySignatures)
           }
         }
       } else {
@@ -88,11 +82,11 @@ export default function ModalSignatures({
               return {
                 ...item,
                 image: [signature],
-              };
+              }
             }
-            return item;
-          });
-          handleSaveSignatures(newArraySignatures);
+            return item
+          })
+          handleSaveSignatures(newArraySignatures)
         }
       }
     }
@@ -102,30 +96,30 @@ export default function ModalSignatures({
     if (isOpen?.id !== null) {
       if (signaturesData) {
         if (signaturesData[isOpen.id]?.image.length > 0) {
-          setIsSignature(signaturesData[isOpen.id].image[0]);
+          setIsSignature(signaturesData[isOpen.id].image[0])
         } else {
           if (stageData) {
             if (stageData?.length > 0) {
               if (stageData[isOpen.id].image.length > 0) {
-                console.log(stageData[isOpen.id].image[0]);
-                setIsSignature(stageData[isOpen.id].image[0]);
+                console.log(stageData[isOpen.id].image[0])
+                setIsSignature(stageData[isOpen.id].image[0])
               }
             } else {
-              setIsSignature(null);
+              setIsSignature(null)
             }
           }
         }
       }
     }
-  }, [isOpen?.id]);
+  }, [isOpen?.id])
   useEffect(() => {
     if (isOpen?.id) {
       if (stageData && !signaturesData) {
         if (stageData[isOpen.id].image[0])
-          setIsSignature(stageData[isOpen.id].image[0]);
+          setIsSignature(stageData[isOpen.id].image[0])
       }
     }
-  }, []);
+  }, [])
 
   return (
     <Dialog
@@ -142,7 +136,7 @@ export default function ModalSignatures({
       >
         <Box
           sx={{
-            border: "1px solid",
+            border: '1px solid',
             borderRadius: 1,
             width: 400,
             height: 200,
@@ -150,7 +144,7 @@ export default function ModalSignatures({
         >
           {!isSignature && (
             <SignaturePad
-              canvasProps={{ width: 400, height: 200, className: "sigCanvas" }}
+              canvasProps={{ width: 400, height: 200, className: 'sigCanvas' }}
               ref={signatureRef}
             />
           )}
@@ -171,8 +165,8 @@ export default function ModalSignatures({
           <MyButton
             variant="contained"
             onClick={() => {
-              handleSave();
-              handleClose();
+              handleSave()
+              handleClose()
             }}
           >
             salvar
@@ -186,5 +180,5 @@ export default function ModalSignatures({
         </Stack>
       </DialogActions>
     </Dialog>
-  );
+  )
 }

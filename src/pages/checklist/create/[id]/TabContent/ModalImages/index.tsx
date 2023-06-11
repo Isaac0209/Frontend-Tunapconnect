@@ -11,41 +11,41 @@ import {
   ListItemText,
   Paper,
   Stack,
-} from "@mui/material";
+} from '@mui/material'
 
-import DeleteIcon from "@mui/icons-material/Delete";
-import { MyDropzone } from "./DropZone";
-import Image from "next/image";
-import { MyButton } from "./styles";
+import DeleteIcon from '@mui/icons-material/Delete'
+import { MyDropzone } from './DropZone'
+import Image from 'next/image'
+import { MyButton } from './styles'
 
 type ListImages = {
   [key: string]: {
-    id: number;
+    id: number
     images: {
-      id: number;
-      name: string;
-      url: string;
-      size: string;
-    }[];
-  }[];
-};
+      id: number
+      name: string
+      url: string
+      size: string
+    }[]
+  }[]
+}
 
 interface IModalImageProps {
-  isOpen: { id: number | null; open: boolean };
-  closeModalImage: () => void;
+  isOpen: { id: number | null; open: boolean }
+  closeModalImage: () => void
   handleAddImageInListImage: (
     index: number,
     images: {
-      id: number;
-      name: string;
-      url: string;
-      size: string;
+      id: number
+      name: string
+      url: string
+      size: string
     }
-  ) => void;
-  handleRemoveImageInListImage: (index: number, idImage: number) => void;
-  listImage: ListImages;
-  stageName: string;
-  idModal: number | null;
+  ) => void
+  handleRemoveImageInListImage: (index: number, idImage: number) => void
+  listImage: ListImages
+  stageName: string
+  idModal: number | null
 }
 
 export default function ModalImages({
@@ -58,28 +58,28 @@ export default function ModalImages({
   idModal,
 }: IModalImageProps) {
   async function handleAddImageUrlList(imageData: {
-    id: number;
-    name: string;
-    url: string;
-    size: string;
+    id: number
+    name: string
+    url: string
+    size: string
   }) {
     if (isOpen.id) {
-      handleAddImageInListImage(isOpen.id, imageData);
+      handleAddImageInListImage(isOpen.id, imageData)
     }
   }
-  console.log(listImage);
+  console.log(listImage)
   const indexImageFind = listImage[stageName]?.findIndex((item) => {
-    return item.id === idModal;
-  });
+    return item.id === idModal
+  })
 
-  let imagesActual;
+  let imagesActual
   if (indexImageFind >= 0) {
-    imagesActual = listImage[stageName][indexImageFind];
+    imagesActual = listImage[stageName][indexImageFind]
   }
 
   const handleClose = () => {
-    closeModalImage();
-  };
+    closeModalImage()
+  }
 
   return (
     <Dialog
@@ -88,7 +88,7 @@ export default function ModalImages({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{"Imagens"}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{'Imagens'}</DialogTitle>
       <DialogContent>
         <Box>
           <MyDropzone handleAddImageUrlList={handleAddImageUrlList} />
@@ -97,9 +97,9 @@ export default function ModalImages({
           <Paper
             style={{
               maxHeight: 300,
-              overflow: "auto",
+              overflow: 'auto',
               marginTop: 10,
-              padding: "5px 10px 0px 10px",
+              padding: '5px 10px 0px 10px',
             }}
           >
             <List>
@@ -107,11 +107,11 @@ export default function ModalImages({
                 ? imagesActual?.images.map((item) => (
                     <ListItem
                       sx={{
-                        border: "1px solid #e1e1e1",
-                        borderRadius: "2px",
+                        border: '1px solid #e1e1e1',
+                        borderRadius: '2px',
                         px: 1,
-                        marginBottom: "5px",
-                        overflowY: "",
+                        marginBottom: '5px',
+                        overflowY: '',
                         maxHeight: 100,
                       }}
                       key={item.id}
@@ -122,7 +122,7 @@ export default function ModalImages({
                           aria-label="delete"
                           onClick={() => {
                             if (isOpen?.id) {
-                              handleRemoveImageInListImage(isOpen?.id, item.id);
+                              handleRemoveImageInListImage(isOpen?.id, item.id)
                             }
                           }}
                         >
@@ -137,10 +137,10 @@ export default function ModalImages({
                           width={50}
                           height={60}
                           style={{
-                            maxWidth: "50px",
-                            maxHeight: "60px",
-                            objectFit: "scale-down",
-                            display: "flex",
+                            maxWidth: '50px',
+                            maxHeight: '60px',
+                            objectFit: 'scale-down',
+                            display: 'flex',
                           }}
                         />
                       </ListItemAvatar>
@@ -160,7 +160,7 @@ export default function ModalImages({
           <MyButton
             variant="contained"
             onClick={() => {
-              handleClose();
+              handleClose()
             }}
           >
             cancelar
@@ -171,5 +171,5 @@ export default function ModalImages({
         </Stack>
       </DialogActions>
     </Dialog>
-  );
+  )
 }

@@ -8,7 +8,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-} from "react";
+} from 'react'
 // import Image from 'next/image'
 import {
   AppBar,
@@ -20,8 +20,8 @@ import {
   Stack,
   Tab,
   useMediaQuery,
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+} from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import {
   ButtonLeft,
   ButtonMarkup,
@@ -36,144 +36,139 @@ import {
   TabsContainer,
   TextAreaField,
   Title,
-} from "./styles";
-import { InspectionDropzone } from "./DropZone";
+} from './styles'
+import { InspectionDropzone } from './DropZone'
 // import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
-import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
-import dayjs from "dayjs";
-import { StagesDataProps } from "@/pages/checklist/types";
-import { toPng } from "html-to-image";
-import { useRouter } from "next/router";
+import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded'
+import dayjs from 'dayjs'
+import { StagesDataProps } from '@/pages/checklist/types'
+import { toPng } from 'html-to-image'
+import { useRouter } from 'next/router'
 // import { ApiCore } from '@/lib/api'
 
 // import carroFrenteImg from '@/assets/images/inspection/carro-frente.svg'
 
-type markupTypesEnum =
-  | "amassado"
-  | "riscado"
-  | "quebrado"
-  | "faltando"
-  | "none";
+type markupTypesEnum = 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
 
 interface TabPanelProps {
-  children?: ReactNode;
-  dir?: string;
-  index: number;
-  value: number;
+  children?: ReactNode
+  dir?: string
+  index: number
+  value: number
 }
 
 interface imageData {
-  id: number;
-  name: string;
-  url: string;
-  size: string;
+  id: number
+  name: string
+  url: string
+  size: string
 }
 
 interface imagemList {
-  frente: imageData[];
-  lateralEsquerdo: imageData[];
-  lateralDireito: imageData[];
-  traseira: imageData[];
-  teto: imageData[];
+  frente: imageData[]
+  lateralEsquerdo: imageData[]
+  lateralDireito: imageData[]
+  traseira: imageData[]
+  teto: imageData[]
 }
 
 type MarkupType = {
-  id: number;
-  type: markupTypesEnum;
+  id: number
+  type: markupTypesEnum
   positions: {
     web: {
-      top: number;
-      left: number;
-    };
+      top: number
+      left: number
+    }
     mobile: {
-      top: number;
-      left: number;
-    };
-  };
-};
+      top: number
+      left: number
+    }
+  }
+}
 
 const markupTagTypes: { [key: string]: string } = {
-  amassado: "A",
-  riscado: "R",
-  quebrado: "Q",
-  faltando: "F",
-};
+  amassado: 'A',
+  riscado: 'R',
+  quebrado: 'Q',
+  faltando: 'F',
+}
 
 type MarkupListType = {
-  frente: MarkupType[];
-  lateralEsquerdo: MarkupType[];
-  lateralDireito: MarkupType[];
-  traseira: MarkupType[];
-  teto: MarkupType[];
-};
+  frente: MarkupType[]
+  lateralEsquerdo: MarkupType[]
+  lateralDireito: MarkupType[]
+  traseira: MarkupType[]
+  teto: MarkupType[]
+}
 type ObservationsType = {
-  frente: string;
-  lateralEsquerdo: string;
-  lateralDireito: string;
-  traseira: string;
-  teto: string;
-};
+  frente: string
+  lateralEsquerdo: string
+  lateralDireito: string
+  traseira: string
+  teto: string
+}
 type ImgPositionCarUrlType = {
-  frente: string;
-  lateralEsquerdo: string;
-  lateralDireito: string;
-  traseira: string;
-  teto: string;
-};
+  frente: string
+  lateralEsquerdo: string
+  lateralDireito: string
+  traseira: string
+  teto: string
+}
 type screenShotsType = {
-  frente: string;
-  lateralEsquerdo: string;
-  lateralDireito: string;
-  traseira: string;
-  teto: string;
-};
+  frente: string
+  lateralEsquerdo: string
+  lateralDireito: string
+  traseira: string
+  teto: string
+}
 
 type positionsTypes =
-  | "frente"
-  | "lateralEsquerdo"
-  | "lateralDireito"
-  | "traseira"
-  | "teto";
+  | 'frente'
+  | 'lateralEsquerdo'
+  | 'lateralDireito'
+  | 'traseira'
+  | 'teto'
 
 type formattedDataType = {
-  name: string;
-  url_image: string;
-  value: MarkupType[];
-  comment: string;
-  images: imageData[];
-};
+  name: string
+  url_image: string
+  value: MarkupType[]
+  comment: string
+  images: imageData[]
+}
 
 export type getValuesInspectionReturnType = {
-  name: string;
-  url_image: string;
-  value: MarkupType[];
-  comment: string;
-  images: imageData[];
-  screenShot: string;
-}[];
+  name: string
+  url_image: string
+  value: MarkupType[]
+  comment: string
+  images: imageData[]
+  screenShot: string
+}[]
 
 interface ModalInspectCarProps {
-  isOpen: boolean;
-  closeModalInspectCar: () => void;
-  stageData: StagesDataProps | undefined;
-  handleInspectionData: (data: formattedDataType[]) => void;
+  isOpen: boolean
+  closeModalInspectCar: () => void
+  stageData: StagesDataProps | undefined
+  handleInspectionData: (data: formattedDataType[]) => void
   // handleSaveInspectionCarData: (data: formattedDataType[]) => void
 }
 
 interface RefType {
-  getValuesInspection: () => getValuesInspectionReturnType;
+  getValuesInspection: () => getValuesInspectionReturnType
 }
 
 const positionsCar: Array<positionsTypes> = [
-  "frente",
-  "lateralEsquerdo",
-  "lateralDireito",
-  "traseira",
-  "teto",
-];
+  'frente',
+  'lateralEsquerdo',
+  'lateralDireito',
+  'traseira',
+  'teto',
+]
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, ...other } = props
 
   return (
     <div
@@ -187,14 +182,14 @@ function TabPanel(props: TabPanelProps) {
         <ContainerClickableArea>{children}</ContainerClickableArea>
       )}
     </div>
-  );
+  )
 }
 
 function a11yProps(index: number) {
   return {
     id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
-  };
+    'aria-controls': `full-width-tabpanel-${index}`,
+  }
 }
 
 const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
@@ -207,78 +202,78 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
     }: ModalInspectCarProps,
     ref
   ) {
-    const theme = useTheme();
-    const [tabsValue, setTabsValue] = useState(0);
-    const [markupValue, setMarkupValue] = useState<markupTypesEnum>("none");
+    const theme = useTheme()
+    const [tabsValue, setTabsValue] = useState(0)
+    const [markupValue, setMarkupValue] = useState<markupTypesEnum>('none')
     const [markups, setMarkups] = useState<MarkupListType>({
       frente: [],
       lateralEsquerdo: [],
       lateralDireito: [],
       traseira: [],
       teto: [],
-    });
+    })
     const [listImagesUpload, setListImagesUpload] = useState<imagemList>({
       frente: [],
       lateralEsquerdo: [],
       lateralDireito: [],
       traseira: [],
       teto: [],
-    });
+    })
     const [observations, setObservations] = useState<ObservationsType>({
-      frente: "",
-      lateralEsquerdo: "",
-      lateralDireito: "",
-      traseira: "",
-      teto: "",
-    });
+      frente: '',
+      lateralEsquerdo: '',
+      lateralDireito: '',
+      traseira: '',
+      teto: '',
+    })
     const [imgPositionCarUrl, setImgPositionCarUrl] =
       useState<ImgPositionCarUrlType>({
-        frente: "",
-        lateralEsquerdo: "",
-        lateralDireito: "",
-        traseira: "",
-        teto: "",
-      });
+        frente: '',
+        lateralEsquerdo: '',
+        lateralDireito: '',
+        traseira: '',
+        teto: '',
+      })
     const [screenShots, setScreenShots] = useState<screenShotsType>({
-      frente: "",
-      lateralEsquerdo: "",
-      lateralDireito: "",
-      traseira: "",
-      teto: "",
-    });
+      frente: '',
+      lateralEsquerdo: '',
+      lateralDireito: '',
+      traseira: '',
+      teto: '',
+    })
 
-    const router = useRouter();
+    const router = useRouter()
 
     // const api = new ApiCore()
-    const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-    const isMobile = useMediaQuery("(max-width:600px)");
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
+    const isMobile = useMediaQuery('(max-width:600px)')
 
-    const containerImageCarFrenteRef = useRef(null);
-    const containerImageCarTraseiraRef = useRef(null);
-    const containerImageCarLateralEsquerdaRef = useRef(null);
-    const containerImageCarLateralDireitaRef = useRef(null);
-    const containerImageCarTetoRef = useRef(null);
+    const containerImageCarFrenteRef = useRef(null)
+    const containerImageCarTraseiraRef = useRef(null)
+    const containerImageCarLateralEsquerdaRef = useRef(null)
+    const containerImageCarLateralDireitaRef = useRef(null)
+    const containerImageCarTetoRef = useRef(null)
 
     const screenShotToPng = useCallback(
       async (tabPosition: number) => {
         switch (tabPosition) {
           case 0:
             if (containerImageCarFrenteRef.current === null) {
-              break;
+              break
             } else {
               try {
                 const result = await toPng(containerImageCarFrenteRef.current, {
                   cacheBust: true,
-                });
-                return result;
+                })
+                return result
               } catch (error) {
-                console.log(error);
+                console.log(error)
               }
             }
-            break;
+            break
           case 1:
             if (containerImageCarLateralEsquerdaRef.current === null) {
-              break;
+              break
             } else {
               try {
                 const result = await toPng(
@@ -286,16 +281,16 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                   {
                     cacheBust: true,
                   }
-                );
-                return result;
+                )
+                return result
               } catch (error) {
-                console.log(error);
+                console.log(error)
               }
             }
-            break;
+            break
           case 2:
             if (containerImageCarLateralDireitaRef.current === null) {
-              break;
+              break
             } else {
               try {
                 const result = await toPng(
@@ -303,16 +298,16 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                   {
                     cacheBust: true,
                   }
-                );
-                return result;
+                )
+                return result
               } catch (error) {
-                console.log(error);
+                console.log(error)
               }
             }
-            break;
+            break
           case 3:
             if (containerImageCarTraseiraRef.current === null) {
-              break;
+              break
             } else {
               try {
                 const result = await toPng(
@@ -320,29 +315,29 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                   {
                     cacheBust: true,
                   }
-                );
-                return result;
+                )
+                return result
               } catch (error) {
-                console.log(error);
+                console.log(error)
               }
             }
-            break;
+            break
           case 4:
             if (containerImageCarTetoRef.current === null) {
-              break;
+              break
             } else {
               try {
                 const result = await toPng(containerImageCarTetoRef.current, {
                   cacheBust: true,
-                });
-                return result;
+                })
+                return result
               } catch (error) {
-                console.log(error);
+                console.log(error)
               }
             }
-            break;
+            break
           default:
-            return "";
+            return ''
         }
       },
       [
@@ -352,7 +347,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
         containerImageCarTraseiraRef,
         containerImageCarTetoRef,
       ]
-    );
+    )
 
     const handleChange = async (event: SyntheticEvent, newValue: number) => {
       // const result = await screenShotToPng(tabsValue)
@@ -374,23 +369,23 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
       //   }))
       // }
 
-      setTabsValue(newValue);
-    };
+      setTabsValue(newValue)
+    }
 
     const handleClose = () => {
-      closeModalInspectCar();
-    };
+      closeModalInspectCar()
+    }
 
     useImperativeHandle(ref, () => ({
       getValuesInspection,
-    }));
+    }))
 
     function getClickCoords(event: any) {
-      const e = event.target;
-      const dim = e.getBoundingClientRect();
-      const x = event.clientX - dim.left;
-      const y = event.clientY - dim.top;
-      return [x, y];
+      const e = event.target
+      const dim = e.getBoundingClientRect()
+      const x = event.clientX - dim.left
+      const y = event.clientY - dim.top
+      return [x, y]
     }
 
     const removeMarkup = (id: number) => {
@@ -399,22 +394,22 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           ...prevState,
           [positionsCar[tabsValue]]: prevState[positionsCar[tabsValue]].filter(
             (m) => {
-              return m.id !== id;
+              return m.id !== id
             }
           ),
-        };
-      });
-    };
+        }
+      })
+    }
 
     async function addMarkup(event: any) {
-      const [x, y] = getClickCoords(event);
-      const positionTop = y;
-      const positionLeft = x;
+      const [x, y] = getClickCoords(event)
+      const positionTop = y
+      const positionLeft = x
       if (!Object.hasOwn(markupTagTypes, markupValue)) {
-        return;
+        return
       }
 
-      const idByTimestamp = dayjs(new Date()).valueOf();
+      const idByTimestamp = dayjs(new Date()).valueOf()
       setMarkups((prevState) => {
         return {
           ...prevState,
@@ -443,9 +438,9 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
               },
             },
           ],
-        };
-      });
-      const result = await screenShotToPng(tabsValue);
+        }
+      })
+      const result = await screenShotToPng(tabsValue)
       if (result) {
         setScreenShots((prevState) => ({
           frente: tabsValue === 0 ? result : prevState.frente,
@@ -453,13 +448,13 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           lateralDireito: tabsValue === 2 ? result : prevState.lateralDireito,
           traseira: tabsValue === 3 ? result : prevState.traseira,
           teto: tabsValue === 4 ? result : prevState.teto,
-        }));
+        }))
       }
     }
 
     const handleChangeMarkupValue = (value: markupTypesEnum) => {
-      setMarkupValue(value);
-    };
+      setMarkupValue(value)
+    }
 
     function handleAddImageUrlList(
       images: imageData[],
@@ -469,8 +464,8 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
         return {
           ...prevState,
           [position]: [...prevState[position], ...images],
-        };
-      });
+        }
+      })
     }
 
     function handleObservation(event: ChangeEvent<HTMLInputElement>) {
@@ -478,8 +473,8 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
         return {
           ...prevState,
           [positionsCar[tabsValue]]: event.target.value,
-        };
-      });
+        }
+      })
     }
 
     // async function uploadImg(file: string) {
@@ -529,7 +524,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
     function getValuesInspection() {
       const formattedData = [
         {
-          name: "Frente",
+          name: 'Frente',
           url_image: imgPositionCarUrl.frente,
           value: markups.frente,
           comment: observations.frente,
@@ -537,7 +532,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: screenShots.frente,
         },
         {
-          name: "Lateral esquerda",
+          name: 'Lateral esquerda',
           url_image: imgPositionCarUrl.lateralEsquerdo,
           value: markups.lateralEsquerdo,
           comment: observations.lateralEsquerdo,
@@ -545,7 +540,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: screenShots.lateralEsquerdo,
         },
         {
-          name: "Lateral direita",
+          name: 'Lateral direita',
           url_image: imgPositionCarUrl.lateralDireito,
           value: markups.lateralDireito,
           comment: observations.lateralDireito,
@@ -553,7 +548,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: screenShots.lateralDireito,
         },
         {
-          name: "Traseira",
+          name: 'Traseira',
           url_image: imgPositionCarUrl.traseira,
           value: markups.traseira,
           comment: observations.traseira,
@@ -561,21 +556,21 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: screenShots.traseira,
         },
         {
-          name: "Teto",
+          name: 'Teto',
           url_image: imgPositionCarUrl.teto,
           value: markups.teto,
           comment: observations.teto,
           images: listImagesUpload.teto,
           screenShot: screenShots.teto,
         },
-      ];
+      ]
 
-      return formattedData;
+      return formattedData
     }
 
     async function handleSave() {
       // await uploadScreenshots()
-      const newScreenShot = await screenShotToPng(tabsValue);
+      const newScreenShot = await screenShotToPng(tabsValue)
       const newScreenShots = {
         frente: tabsValue === 0 ? newScreenShot : screenShots.frente,
         lateralEsquerdo:
@@ -584,11 +579,11 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           tabsValue === 2 ? newScreenShot : screenShots.lateralDireito,
         traseira: tabsValue === 3 ? newScreenShot : screenShots.traseira,
         teto: tabsValue === 4 ? newScreenShot : screenShots.teto,
-      };
+      }
 
       const formattedData = [
         {
-          name: "Frente",
+          name: 'Frente',
           url_image: imgPositionCarUrl.frente,
           value: markups.frente,
           comment: observations.frente,
@@ -596,7 +591,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: newScreenShots.frente,
         },
         {
-          name: "Lateral esquerda",
+          name: 'Lateral esquerda',
           url_image: imgPositionCarUrl.lateralEsquerdo,
           value: markups.lateralEsquerdo,
           comment: observations.lateralEsquerdo,
@@ -604,7 +599,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: newScreenShots.lateralEsquerdo,
         },
         {
-          name: "Lateral direita",
+          name: 'Lateral direita',
           url_image: imgPositionCarUrl.lateralDireito,
           value: markups.lateralDireito,
           comment: observations.lateralDireito,
@@ -612,7 +607,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: newScreenShots.lateralDireito,
         },
         {
-          name: "Traseira",
+          name: 'Traseira',
           url_image: imgPositionCarUrl.traseira,
           value: markups.traseira,
           comment: observations.traseira,
@@ -620,142 +615,142 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           screenShot: newScreenShots.traseira,
         },
         {
-          name: "Teto",
+          name: 'Teto',
           url_image: imgPositionCarUrl.teto,
           value: markups.teto,
           comment: observations.teto,
           images: listImagesUpload.teto,
           screenShot: newScreenShots.teto,
         },
-      ];
-      handleInspectionData(formattedData);
-      handleClose();
+      ]
+      handleInspectionData(formattedData)
+      handleClose()
     }
 
     useEffect(() => {
-      setMarkupValue("none");
-    }, [tabsValue]);
+      setMarkupValue('none')
+    }, [tabsValue])
 
     useEffect(() => {
-      let positonsCarData;
+      let positonsCarData
 
       // StagesDataProps[]
 
       const sessionStorageData = sessionStorage.getItem(
         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`
-      );
+      )
 
       if (sessionStorageData) {
         const sessionStorageStage: StagesDataProps[] =
-          JSON.parse(sessionStorageData);
+          JSON.parse(sessionStorageData)
         const sessionStorageStageActual = sessionStorageStage.filter(
           (item) => item.name === stageData?.name
-        )[0];
+        )[0]
         if (sessionStorageStageActual) {
           positonsCarData = sessionStorageStageActual.itens.filter(
-            (itens) => itens.rules.type === "visual_inspect"
-          );
+            (itens) => itens.rules.type === 'visual_inspect'
+          )
         } else {
           positonsCarData = stageData?.itens.filter(
-            (itens) => itens.rules.type === "visual_inspect"
-          );
+            (itens) => itens.rules.type === 'visual_inspect'
+          )
         }
       } else {
         positonsCarData = stageData?.itens.filter(
-          (itens) => itens.rules.type === "visual_inspect"
-        );
+          (itens) => itens.rules.type === 'visual_inspect'
+        )
       }
 
       const newPositionsUrl = {
-        frente: "",
-        lateralEsquerdo: "",
-        lateralDireito: "",
-        traseira: "",
-        teto: "",
-      };
+        frente: '',
+        lateralEsquerdo: '',
+        lateralDireito: '',
+        traseira: '',
+        teto: '',
+      }
       const newPositionsMarkups: MarkupListType = {
         frente: [],
         lateralEsquerdo: [],
         lateralDireito: [],
         traseira: [],
         teto: [],
-      };
+      }
       const newPositionsImageList: imagemList = {
         frente: [],
         lateralEsquerdo: [],
         lateralDireito: [],
         traseira: [],
         teto: [],
-      };
+      }
       const newPositionsObservations: ObservationsType = {
-        frente: "",
-        lateralEsquerdo: "",
-        lateralDireito: "",
-        traseira: "",
-        teto: "",
-      };
+        frente: '',
+        lateralEsquerdo: '',
+        lateralDireito: '',
+        traseira: '',
+        teto: '',
+      }
       const newScreenShots: ObservationsType = {
-        frente: "",
-        lateralEsquerdo: "",
-        lateralDireito: "",
-        traseira: "",
-        teto: "",
-      };
+        frente: '',
+        lateralEsquerdo: '',
+        lateralDireito: '',
+        traseira: '',
+        teto: '',
+      }
 
       if (positonsCarData) {
         positonsCarData[0]?.values?.labels?.forEach((item) => {
           switch (item.name) {
-            case "Frente":
-              newPositionsUrl.frente = item.url_image ?? [];
+            case 'Frente':
+              newPositionsUrl.frente = item.url_image ?? []
               // @ts-ignore
-              newPositionsMarkups.frente = item.value ?? [];
-              newPositionsObservations.frente = item.comment ?? "";
-              newPositionsImageList.frente = item.images ?? [];
-              newScreenShots.frente = item.screenShot ?? "";
-              break;
-            case "Lateral esquerda":
-              newPositionsUrl.lateralEsquerdo = item.url_image;
+              newPositionsMarkups.frente = item.value ?? []
+              newPositionsObservations.frente = item.comment ?? ''
+              newPositionsImageList.frente = item.images ?? []
+              newScreenShots.frente = item.screenShot ?? ''
+              break
+            case 'Lateral esquerda':
+              newPositionsUrl.lateralEsquerdo = item.url_image
               // @ts-ignore
-              newPositionsMarkups.lateralEsquerdo = item.value ?? [];
-              newPositionsObservations.lateralEsquerdo = item.comment ?? "";
-              newPositionsImageList.lateralEsquerdo = item.images ?? [];
-              newScreenShots.lateralEsquerdo = item.screenShot ?? "";
-              break;
-            case "Lateral direita":
-              newPositionsUrl.lateralDireito = item.url_image;
+              newPositionsMarkups.lateralEsquerdo = item.value ?? []
+              newPositionsObservations.lateralEsquerdo = item.comment ?? ''
+              newPositionsImageList.lateralEsquerdo = item.images ?? []
+              newScreenShots.lateralEsquerdo = item.screenShot ?? ''
+              break
+            case 'Lateral direita':
+              newPositionsUrl.lateralDireito = item.url_image
               // @ts-ignore
-              newPositionsMarkups.lateralDireito = item.value ?? [];
-              newPositionsObservations.lateralDireito = item.comment ?? "";
-              newPositionsImageList.lateralDireito = item.images ?? [];
-              newScreenShots.lateralDireito = item.screenShot ?? "";
-              break;
-            case "Traseira":
-              newPositionsUrl.traseira = item.url_image;
+              newPositionsMarkups.lateralDireito = item.value ?? []
+              newPositionsObservations.lateralDireito = item.comment ?? ''
+              newPositionsImageList.lateralDireito = item.images ?? []
+              newScreenShots.lateralDireito = item.screenShot ?? ''
+              break
+            case 'Traseira':
+              newPositionsUrl.traseira = item.url_image
               // @ts-ignore
-              newPositionsMarkups.traseira = item.value ?? [];
-              newPositionsObservations.traseira = item.comment ?? "";
-              newPositionsImageList.traseira = item.images ?? [];
-              newScreenShots.traseira = item.screenShot ?? "";
-              break;
-            case "Teto":
-              newPositionsUrl.teto = item.url_image;
+              newPositionsMarkups.traseira = item.value ?? []
+              newPositionsObservations.traseira = item.comment ?? ''
+              newPositionsImageList.traseira = item.images ?? []
+              newScreenShots.traseira = item.screenShot ?? ''
+              break
+            case 'Teto':
+              newPositionsUrl.teto = item.url_image
               // @ts-ignore
-              newPositionsMarkups.teto = item.value ?? [];
-              newPositionsObservations.teto = item.comment ?? "";
-              newPositionsImageList.teto = item.images ?? [];
-              newScreenShots.teto = item.screenShot ?? "";
-              break;
+              newPositionsMarkups.teto = item.value ?? []
+              newPositionsObservations.teto = item.comment ?? ''
+              newPositionsImageList.teto = item.images ?? []
+              newScreenShots.teto = item.screenShot ?? ''
+              break
             default:
-              break;
+              break
           }
-        });
-        setImgPositionCarUrl(newPositionsUrl);
-        setMarkups(newPositionsMarkups);
-        setListImagesUpload(newPositionsImageList);
-        setObservations(newPositionsObservations);
-        setScreenShots(newScreenShots);
+        })
+        setImgPositionCarUrl(newPositionsUrl)
+        setMarkups(newPositionsMarkups)
+        setListImagesUpload(newPositionsImageList)
+        setObservations(newPositionsObservations)
+        setScreenShots(newScreenShots)
       }
-    }, []);
+    }, [])
 
     return (
       <Dialog
@@ -764,7 +759,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
         onClose={handleClose}
         fullWidth={true}
         maxWidth="md"
-        scroll={"paper"}
+        scroll={'paper'}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -789,12 +784,12 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
               <Tab label="Frente" {...a11yProps(0)} />
               <Tab
                 label="Lateral esquerdo"
-                sx={{ whiteSpace: "nowrap", px: 5 }}
+                sx={{ whiteSpace: 'nowrap', px: 5 }}
                 {...a11yProps(1)}
               />
               <Tab
                 label="Lateral direita"
-                sx={{ whiteSpace: "nowrap", px: 4 }}
+                sx={{ whiteSpace: 'nowrap', px: 4 }}
                 {...a11yProps(2)}
               />
               <Tab label="Traseira" {...a11yProps(3)} />
@@ -823,9 +818,9 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
               <ContainerButtonsMarkupType
                 gap={2}
                 direction={{
-                  xs: "row",
-                  md: "column",
-                  lg: "column",
+                  xs: 'row',
+                  md: 'column',
+                  lg: 'column',
                 }}
               >
                 {Object.keys(markupTagTypes).map((item) => (
@@ -833,7 +828,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                     <ButtonMarkupType
                       selectedActual={markupValue === item}
                       onClick={() => {
-                        handleChangeMarkupValue(item as markupTypesEnum);
+                        handleChangeMarkupValue(item as markupTypesEnum)
                       }}
                     >
                       {markupTagTypes[item]}
@@ -871,10 +866,10 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                       >
                         <span>{markupTagTypes[m.type]}</span>
                         <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: "fixed" }}
+                          sx={{ zIndex: 10, position: 'fixed' }}
                         />
                       </ButtonMarkup>
-                    );
+                    )
                   })}
                 </div>
                 {/* </ClickableSVG> */}
@@ -901,10 +896,10 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                       >
                         <span>{markupTagTypes[m.type]}</span>
                         <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: "fixed" }}
+                          sx={{ zIndex: 10, position: 'fixed' }}
                         />
                       </ButtonMarkup>
-                    );
+                    )
                   })}
                 </div>
               </TabPanel>
@@ -930,10 +925,10 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                       >
                         <span>{markupTagTypes[m.type]}</span>
                         <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: "fixed" }}
+                          sx={{ zIndex: 10, position: 'fixed' }}
                         />
                       </ButtonMarkup>
-                    );
+                    )
                   })}
                 </div>
               </TabPanel>
@@ -959,10 +954,10 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                       >
                         <span>{markupTagTypes[m.type]}</span>
                         <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: "fixed" }}
+                          sx={{ zIndex: 10, position: 'fixed' }}
                         />
                       </ButtonMarkup>
-                    );
+                    )
                   })}
                 </div>
               </TabPanel>
@@ -988,10 +983,10 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                       >
                         <span>{markupTagTypes[m.type]}</span>
                         <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: "fixed" }}
+                          sx={{ zIndex: 10, position: 'fixed' }}
                         />
                       </ButtonMarkup>
-                    );
+                    )
                   })}
                 </div>
               </TabPanel>
@@ -1046,7 +1041,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                 <ButtonLeft
                   variant="contained"
                   onClick={() => {
-                    handleSave();
+                    handleSave()
                   }}
                 >
                   salvar
@@ -1059,7 +1054,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
           </Grid>
         </DialogContent>
       </Dialog>
-    );
+    )
   }
-);
-export default ModalInspectCar;
+)
+export default ModalInspectCar

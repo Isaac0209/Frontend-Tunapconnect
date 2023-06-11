@@ -1,9 +1,9 @@
-import Radio, { RadioProps } from "@mui/material/Radio";
-import { BpCheckedIcon, BpIcon } from "./styles";
+import Radio, { RadioProps } from '@mui/material/Radio'
+import { BpCheckedIcon, BpIcon } from './styles'
 
 interface RadioPersonalizedProps extends RadioProps {
-  title: string;
-  checkedTitle?: string;
+  title: string
+  checkedTitle?: string
 }
 
 export function RadioPersonalized(props: RadioPersonalizedProps) {
@@ -15,5 +15,5 @@ export function RadioPersonalized(props: RadioPersonalizedProps) {
       icon={<BpIcon>{props.title}</BpIcon>}
       {...props}
     />
-  );
+  )
 }

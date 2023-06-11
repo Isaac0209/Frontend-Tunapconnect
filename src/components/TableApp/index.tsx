@@ -1,34 +1,34 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
+import * as React from 'react'
+import { useEffect, useState } from 'react'
 
-import { GridColDef, useGridApiRef } from "@mui/x-data-grid";
-import Box from "@mui/material/Box";
+import { GridColDef, useGridApiRef } from '@mui/x-data-grid'
+import Box from '@mui/material/Box'
 
-import Paper from "@mui/material/Paper";
+import Paper from '@mui/material/Paper'
 
-import { ServiceSchedulesListProps } from "@/types/service-schedule";
+import { ServiceSchedulesListProps } from '@/types/service-schedule'
 
-import { useRouter } from "next/router";
-import { TableDataGrid } from "./styles";
-import { CustomNoRowsOverlay } from "./NoRows";
-import { CustomFooterStatusComponent } from "./FooterPaginate";
-import { Loading } from "../Loading";
+import { useRouter } from 'next/router'
+import { TableDataGrid } from './styles'
+import { CustomNoRowsOverlay } from './NoRows'
+import { CustomFooterStatusComponent } from './FooterPaginate'
+import { Loading } from '../Loading'
 
 interface TableAppProps {
-  columns: GridColDef[];
-  rowsData: ServiceSchedulesListProps[] | [];
-  handlePages: (nextPage: string) => void;
-  pages: { next: boolean; previous: boolean };
-  loading: boolean;
-  companyId: number | null | undefined;
+  columns: GridColDef[]
+  rowsData: ServiceSchedulesListProps[] | []
+  handlePages: (nextPage: string) => void
+  pages: { next: boolean; previous: boolean }
+  loading: boolean
+  companyId: number | null | undefined
 }
 
-declare module "@mui/x-data-grid" {
+declare module '@mui/x-data-grid' {
   // eslint-disable-next-line no-unused-vars
   interface FooterPropsOverrides {
-    handlePages: (nextPage: string) => void;
-    nextPage: boolean;
-    previousPage: boolean;
+    handlePages: (nextPage: string) => void
+    nextPage: boolean
+    previousPage: boolean
   }
 }
 
@@ -40,26 +40,26 @@ export function TableApp({
   loading,
   companyId,
 }: TableAppProps) {
-  const [rows, setRows] = useState<ServiceSchedulesListProps[]>([]);
+  const [rows, setRows] = useState<ServiceSchedulesListProps[]>([])
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const apiRef = useGridApiRef();
+  const apiRef = useGridApiRef()
 
   useEffect(() => {
-    setRows(rowsData);
-  }, [rowsData]);
+    setRows(rowsData)
+  }, [rowsData])
 
   return (
     <>
       {rows ? (
         <Paper
-          sx={{ p: 2, display: "flex", flexDirection: "column", marginTop: 9 }}
+          sx={{ p: 2, display: 'flex', flexDirection: 'column', marginTop: 9 }}
         >
           <Box
             sx={{
-              width: "100%",
-              marginTop: "-105px",
+              width: '100%',
+              marginTop: '-105px',
             }}
           >
             <TableDataGrid
@@ -84,41 +84,41 @@ export function TableApp({
               onRowClick={(id) => {
                 try {
                   const listSession = localStorage.getItem(
-                    "service-schedule-list"
-                  );
+                    'service-schedule-list'
+                  )
                   if (listSession) {
-                    const items = JSON.parse(listSession);
-                    console.log(items);
-                    const item = items.filter((i: any) => i.id === id.id);
+                    const items = JSON.parse(listSession)
+                    console.log(items)
+                    const item = items.filter((i: any) => i.id === id.id)
                     localStorage.setItem(
-                      "service-schedule-by-id",
+                      'service-schedule-by-id',
                       JSON.stringify(item)
-                    );
-                    router.push(`/service-schedule/${id.id}`);
+                    )
+                    router.push(`/service-schedule/${id.id}`)
                   }
                 } catch (e) {
-                  console.log(e);
+                  console.log(e)
                 }
               }}
               pageSizeOptions={[7]}
               // disableRowSelectionOnClick
               disableColumnFilter
               getRowClassName={(params) =>
-                params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
               }
             />
           </Box>
         </Paper>
       ) : (
         <Paper
-          sx={{ p: 2, display: "flex", flexDirection: "column", marginTop: 9 }}
+          sx={{ p: 2, display: 'flex', flexDirection: 'column', marginTop: 9 }}
         >
           <Box
             sx={{
-              width: "100%",
-              marginTop: "-105px",
-              display: "flex",
-              justifyContent: "center",
+              width: '100%',
+              marginTop: '-105px',
+              display: 'flex',
+              justifyContent: 'center',
             }}
           >
             <Loading />
@@ -126,5 +126,5 @@ export function TableApp({
         </Paper>
       )}
     </>
-  );
+  )
 }

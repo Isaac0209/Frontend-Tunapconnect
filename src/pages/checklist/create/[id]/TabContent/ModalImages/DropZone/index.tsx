@@ -1,48 +1,48 @@
-import { useCallback, useMemo } from "react";
-import { useDropzone } from "react-dropzone";
-import PhotoSizeSelectActualOutlinedIcon from "@mui/icons-material/PhotoSizeSelectActualOutlined";
+import { useCallback, useMemo } from 'react'
+import { useDropzone } from 'react-dropzone'
+import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
 // import axios from 'axios'
-import { ApiCore } from "@/lib/api";
+import { ApiCore } from '@/lib/api'
 // import { GetServerSideProps } from 'next/types'
 // import path from 'path'
 // import fs from 'fs/promises'
 
 const baseStyle = {
   flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  padding: "20px",
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '20px',
   borderWidth: 2,
   borderRadius: 2,
-  borderColor: "#eeeeee",
-  borderStyle: "dashed",
-  backgroundColor: "#fafafa",
-  color: "#bdbdbd",
-  outline: "none",
-  transition: "border .24s ease-in-out",
-};
+  borderColor: '#eeeeee',
+  borderStyle: 'dashed',
+  backgroundColor: '#fafafa',
+  color: '#bdbdbd',
+  outline: 'none',
+  transition: 'border .24s ease-in-out',
+}
 
 const focusedStyle = {
-  borderColor: "#2196f3",
-};
+  borderColor: '#2196f3',
+}
 
 const acceptStyle = {
-  borderColor: "#00e676",
-};
+  borderColor: '#00e676',
+}
 
 const rejectStyle = {
-  borderColor: "#ff1744",
-};
+  borderColor: '#ff1744',
+}
 
 interface MyDropzoneProps {
   // dirs?: string[]
   handleAddImageUrlList: (value: {
-    id: number;
-    name: string;
-    url: string;
-    size: string;
-  }) => void;
+    id: number
+    name: string
+    url: string
+    size: string
+  }) => void
 }
 
 // async function savePathTemp(filesList = []) {
@@ -56,31 +56,31 @@ interface MyDropzoneProps {
 // }
 
 export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
-  const api = new ApiCore();
+  const api = new ApiCore()
 
   const onDrop = useCallback(async (acceptedFiles: any) => {
-    const formData = new FormData();
+    const formData = new FormData()
     // eslint-disable-next-line no-unused-vars
     acceptedFiles.map((file: File) => {
-      formData.append("file", file);
-      return file;
-    });
+      formData.append('file', file)
+      return file
+    })
 
     api
-      .create("/uploads", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      .create('/uploads', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {
-        console.log(response);
+        console.log(response)
         handleAddImageUrlList({
           id: response.data.data.id,
           name: response.data.data.original_name,
           url: response.data.data.url,
           size: response.data.data.size,
-        });
+        })
       })
-      .catch((error) => console.error(error));
-  }, []);
+      .catch((error) => console.error(error))
+  }, [])
 
   // async function postUploadFile(data: any) {
   //   const session = await getSession()
@@ -105,10 +105,10 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
       onDrop,
       maxFiles: 1,
       accept: {
-        "image/png": [".png"],
-        "image/jpg": [".jpg"],
+        'image/png': ['.png'],
+        'image/jpg': ['.jpg'],
       },
-    });
+    })
 
   const style = useMemo(
     () => ({
@@ -118,7 +118,7 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
       ...(isDragReject ? rejectStyle : {}),
     }),
     [isFocused, isDragAccept, isDragReject]
-  );
+  )
 
   return (
     // @ts-ignore
@@ -127,7 +127,7 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
       <PhotoSizeSelectActualOutlinedIcon />
       <p>Clique ou arraste para enviar as imagens</p>
     </div>
-  );
+  )
 }
 
 // export const getServerSideProps: GetServerSideProps = async () => {

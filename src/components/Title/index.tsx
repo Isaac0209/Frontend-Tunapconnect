@@ -1,8 +1,8 @@
-import { TitleTypography } from "./styles";
-import { ReactNode } from "react";
+import { TitleTypography } from './styles'
+import { ReactNode } from 'react'
 
 interface TitleProps {
-  children?: ReactNode;
+  children?: ReactNode
 }
 
 export default function Title(props: TitleProps) {
@@ -10,5 +10,5 @@ export default function Title(props: TitleProps) {
     <TitleTypography variant="h6" gutterBottom>
       {props.children}
     </TitleTypography>
-  );
+  )
 }

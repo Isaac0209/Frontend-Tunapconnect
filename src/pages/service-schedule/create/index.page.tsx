@@ -1,11 +1,11 @@
-import * as React from "react";
+import * as React from 'react'
 // import { useForm, SubmitHandler } from 'react-hook-form'
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from 'react'
 
-import Container from "@mui/material/Container";
+import Container from '@mui/material/Container'
 
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
 
 import {
   ClientInfor,
@@ -13,14 +13,14 @@ import {
   ClientVehicle,
   // ServiceSchedulesListProps,
   TechnicalConsultant,
-} from "@/types/service-schedule";
-import { ApiCore } from "@/lib/api";
+} from '@/types/service-schedule'
+import { ApiCore } from '@/lib/api'
 
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router'
 
-import List from "@mui/material/List";
+import List from '@mui/material/List'
 
-import Stack from "@mui/material/Stack";
+import Stack from '@mui/material/Stack'
 
 import {
   ButtonAdd,
@@ -30,133 +30,133 @@ import {
   InfoCardText,
   ListItemCard,
   TitleCard,
-} from "./styles";
+} from './styles'
 
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from 'dayjs'
 // import * as locale from 'date-fns/locale/pt-BR';
 
-import MenuItem from "@mui/material/MenuItem";
-import { MoreOptionsButtonSelect } from "@/components/MoreOptionsButtonSelect";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import { formatDateTimeTimezone } from "@/ultis/formatDate";
-import ActionAlerts from "@/components/ActionAlerts";
-import { DataTimeInput } from "@/components/DataTimeInput";
-import { ActionAlertsStateProps } from "@/components/ActionAlerts/ActionAlerts";
-import HeaderBreadcrumb from "@/components/HeaderBreadcrumb";
-import { listBreadcrumb } from "@/components/HeaderBreadcrumb/types";
+import MenuItem from '@mui/material/MenuItem'
+import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
+import TextField from '@mui/material/TextField'
+import Box from '@mui/material/Box'
+import { formatDateTimeTimezone } from '@/ultis/formatDate'
+import ActionAlerts from '@/components/ActionAlerts'
+import { DataTimeInput } from '@/components/DataTimeInput'
+import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
+import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
+import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
-import { useQuery } from "react-query";
-import { formatCPF } from "@/ultis/formatCPF";
-import { formatPlate } from "@/ultis/formatPlate";
+import { useQuery } from 'react-query'
+import { formatCPF } from '@/ultis/formatCPF'
+import { formatPlate } from '@/ultis/formatPlate'
 
-import { CompanyContext } from "@/contexts/CompanyContext";
+import { CompanyContext } from '@/contexts/CompanyContext'
 
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import ModalSearchClientVehicle from "./components/ModalSearchClientVehicle";
-import ModalSearchClient from "./components/ModalSearchClient";
-import { ClientVehicleResponseType } from "./components/ModalSearchClientVehicle/type";
+import AddCircleIcon from '@mui/icons-material/AddCircle'
+import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
+import ModalSearchClient from './components/ModalSearchClient'
+import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
-const api = new ApiCore();
+const api = new ApiCore()
 
 type isEditSelectedCardType =
-  | "client"
-  | "clientVehicle"
-  | "schedule"
-  | "technicalConsultant"
-  | null;
+  | 'client'
+  | 'clientVehicle'
+  | 'schedule'
+  | 'technicalConsultant'
+  | null
 
 type updateData = {
-  code: null;
-  promised_date: string;
-  technical_consultant_id: number | undefined;
-  client_id: number | undefined;
-  client_vehicle_id: number | undefined;
-  company_id: string | undefined;
+  code: null
+  promised_date: string
+  technical_consultant_id: number | undefined
+  client_id: number | undefined
+  client_vehicle_id: number | undefined
+  company_id: string | undefined
   // chasis: string | undefined
-  plate: string | undefined;
-  claims_service: any[];
-  checklist_version_id: number | undefined;
-};
+  plate: string | undefined
+  claims_service: any[]
+  checklist_version_id: number | undefined
+}
 
 const HeaderBreadcrumbData: listBreadcrumb[] = [
   {
-    label: "Tunap",
-    href: "/company",
+    label: 'Tunap',
+    href: '/company',
   },
   {
-    label: "Edição de agendamento",
-    href: "/service-schedule/edit",
+    label: 'Edição de agendamento',
+    href: '/service-schedule/edit',
   },
-];
+]
 
 export default function ServiceSchedulesCreate() {
-  const [client, setClient] = useState<ClientInfor | null>();
-  const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>();
-  const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()));
+  const [client, setClient] = useState<ClientInfor | null>()
+  const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
+  const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [technicalConsultant, setTechnicalConsultant] =
     useState<TechnicalConsultant | null>({
       id: 0,
-      name: "-",
-    });
+      name: '-',
+    })
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
     TechnicalConsultant[]
-  >([]);
+  >([])
   const [isEditSelectedCard, setIsEditSelectedCard] =
-    useState<isEditSelectedCardType>(null);
-  const [wasEdited, setWasEdited] = useState(false);
+    useState<isEditSelectedCardType>(null)
+  const [wasEdited, setWasEdited] = useState(false)
 
   const [actionAlerts, setActionAlerts] =
-    useState<ActionAlertsStateProps | null>(null);
-  const [openModalClientSearch, setOpenModalClientSearch] = useState(false);
+    useState<ActionAlertsStateProps | null>(null)
+  const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
-    useState(false);
+    useState(false)
   // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
   //   useState(false)
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const { companySelected } = useContext(CompanyContext);
+  const { companySelected } = useContext(CompanyContext)
 
   function handleCloseModalClienteSearch() {
-    setOpenModalClientSearch(false);
+    setOpenModalClientSearch(false)
   }
   function handleCloseModalClientVehicleSearch() {
-    setOpenModalClientVehicleSearch(false);
+    setOpenModalClientVehicleSearch(false)
   }
   // function handleCloseModalClaimServiceVehicleSearch() {
   //   setOpenModalClaimServiceSearch(false)
   // }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
-    setIsEditSelectedCard(value);
-    setWasEdited(true);
+    setIsEditSelectedCard(value)
+    setWasEdited(true)
   }
 
   function handleTechnicalConsultant(id: number) {
     setTechnicalConsultant((prevState) => {
-      return technicalConsultantsList.filter((c) => c.id === id)[0];
-    });
+      return technicalConsultantsList.filter((c) => c.id === id)[0]
+    })
   }
 
   function handleCancelled() {
-    setWasEdited(false);
-    setIsEditSelectedCard(null);
+    setWasEdited(false)
+    setIsEditSelectedCard(null)
   }
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts({
       isOpen,
-      title: "",
-      type: "success",
-    });
+      title: '',
+      type: 'success',
+    })
   }
 
   function handleDateSchedule(data: Dayjs | null) {
-    setVisitDate(data);
+    setVisitDate(data)
   }
 
   async function onSave() {
@@ -170,56 +170,56 @@ export default function ServiceSchedulesCreate() {
       plate: clientVehicle?.plate,
       claims_service: [],
       checklist_version_id: 14,
-    };
-    console.log(dataFormatted);
+    }
+    console.log(dataFormatted)
     try {
       const respCreate: any = await api.create(
-        "/service-schedule",
+        '/service-schedule',
         dataFormatted
-      );
-      const idCreatedResponse = respCreate.data.data.id;
+      )
+      const idCreatedResponse = respCreate.data.data.id
 
-      router.push("/service-schedule/" + idCreatedResponse);
+      router.push('/service-schedule/' + idCreatedResponse)
 
-      setIsEditSelectedCard(null);
+      setIsEditSelectedCard(null)
       setActionAlerts({
         isOpen: true,
-        title: `${respCreate.data.msg ?? "Salvo com sucesso!"}!`,
-        type: "success",
-      });
+        title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
+        type: 'success',
+      })
     } catch (e: any) {
       setActionAlerts({
         isOpen: true,
-        title: `${e.response.data.msg ?? "Error inesperado"}!`,
-        type: "error",
-      });
+        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        type: 'error',
+      })
     }
   }
 
   function handleAddClient(client: ClientResponseType) {
-    console.log(client);
+    console.log(client)
     setClient({
       id: client.id,
-      name: client.name ?? "Não informado",
-      cpf: client.document ?? "Não informado",
-      email: client.email ?? ["Não informado"],
-      telefone: client.phone ?? ["Não informado"],
-      address: client.address ?? ["Não informado"],
-    });
+      name: client.name ?? 'Não informado',
+      cpf: client.document ?? 'Não informado',
+      email: client.email ?? ['Não informado'],
+      telefone: client.phone ?? ['Não informado'],
+      address: client.address ?? ['Não informado'],
+    })
   }
   function handleAddClientVehicle(client_vehicle: ClientVehicleResponseType) {
-    setClientVehicle(null);
+    setClientVehicle(null)
     setClientVehicle({
       id: client_vehicle.id,
-      brand: client_vehicle?.vehicle?.model?.brand?.name ?? "Não informado",
-      chassis: client_vehicle?.chasis ?? "Não informado",
-      vehicle: client_vehicle?.vehicle?.name ?? "Não informado",
+      brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+      chassis: client_vehicle?.chasis ?? 'Não informado',
+      vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
       model:
         `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-        "Não informado",
-      color: client_vehicle?.color ?? "Não informado",
-      plate: client_vehicle?.plate ?? "Não informado",
-    });
+        'Não informado',
+      color: client_vehicle?.color ?? 'Não informado',
+      plate: client_vehicle?.plate ?? 'Não informado',
+    })
   }
   // function handleAddClainServiceVehicle(client_vehicle: any) {
   //   console.log(client_vehicle)
@@ -242,31 +242,31 @@ export default function ServiceSchedulesCreate() {
     status: dataTechnicalConsultantListStatus,
   } = useQuery<TechnicalConsultant[]>(
     [
-      "service_schedule",
-      "by_id",
-      "edit",
-      "technical-consultant-list",
-      "options",
+      'service_schedule',
+      'by_id',
+      'edit',
+      'technical-consultant-list',
+      'options',
     ],
     async () => {
       const resp = await api.get(
         `/technical-consultant?company_id=${companySelected}`
-      );
-      return resp.data.data;
+      )
+      return resp.data.data
     },
     { enabled: !!companySelected }
-  );
+  )
 
   useEffect(() => {
-    if (dataTechnicalConsultantListStatus === "success") {
+    if (dataTechnicalConsultantListStatus === 'success') {
       setTechnicalConsultantsList(
         dataTechnicalConsultantList.map((item: TechnicalConsultant) => ({
           id: item.id,
           name: item.name,
         }))
-      );
+      )
     }
-  }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList]);
+  }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
 
   // useEffect(() => {
   //   if (dataServiceScheduleStatus === 'success') {
@@ -303,8 +303,8 @@ export default function ServiceSchedulesCreate() {
   // }, [dataServiceScheduleStatus, dataServiceSchedule])
 
   useEffect(() => {
-    localStorage.removeItem("service-schedule-list");
-  }, []);
+    localStorage.removeItem('service-schedule-list')
+  }, [])
 
   return (
     <>
@@ -322,8 +322,8 @@ export default function ServiceSchedulesCreate() {
               <Paper
                 sx={{
                   p: 2,
-                  display: "flex",
-                  flexDirection: "column",
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <Stack
@@ -342,13 +342,13 @@ export default function ServiceSchedulesCreate() {
                 <DividerCard />
                 <List dense={false}>
                   <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Nome:</InfoCardName>{" "}
+                    <InfoCardName>Nome:</InfoCardName>{' '}
                     {client?.name && (
                       <InfoCardText>{client?.name}</InfoCardText>
                     )}
                   </ListItemCard>
                   <ListItemCard alignItems="flex-start">
-                    <InfoCardName>CPF:</InfoCardName>{" "}
+                    <InfoCardName>CPF:</InfoCardName>{' '}
                     {client?.cpf && (
                       <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
                     )}
@@ -356,48 +356,48 @@ export default function ServiceSchedulesCreate() {
                   {client?.telefone ? (
                     client?.telefone.map((phone, index) => (
                       <ListItemCard
-                        key={index + "-" + phone}
+                        key={index + '-' + phone}
                         alignItems="flex-start"
                       >
-                        <InfoCardName>Telefone:</InfoCardName>{" "}
+                        <InfoCardName>Telefone:</InfoCardName>{' '}
                         <InfoCardText>{phone}</InfoCardText>
                       </ListItemCard>
                     ))
                   ) : (
                     <ListItemCard>
-                      <InfoCardName>Telefone:</InfoCardName>{" "}
+                      <InfoCardName>Telefone:</InfoCardName>{' '}
                       <InfoCardText width="100%"></InfoCardText>
                     </ListItemCard>
                   )}
                   {client?.email ? (
                     client?.email.map((email, index) => (
                       <ListItemCard
-                        key={index + "-" + email}
+                        key={index + '-' + email}
                         alignItems="flex-start"
                       >
-                        <InfoCardName>E-mail:</InfoCardName>{" "}
+                        <InfoCardName>E-mail:</InfoCardName>{' '}
                         <InfoCardText>{email}</InfoCardText>
                       </ListItemCard>
                     ))
                   ) : (
                     <ListItemCard alignItems="flex-start">
-                      <InfoCardName>E-mail:</InfoCardName>{" "}
+                      <InfoCardName>E-mail:</InfoCardName>{' '}
                       <InfoCardText width="100%"></InfoCardText>
                     </ListItemCard>
                   )}
                   {client?.address ? (
                     client?.address.map((address, index) => (
                       <ListItemCard
-                        key={index + "-" + address}
+                        key={index + '-' + address}
                         alignItems="flex-start"
                       >
-                        <InfoCardName>Endereço:</InfoCardName>{" "}
+                        <InfoCardName>Endereço:</InfoCardName>{' '}
                         <InfoCardText>{address}</InfoCardText>
                       </ListItemCard>
                     ))
                   ) : (
                     <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Endereço:</InfoCardName>{" "}
+                      <InfoCardName>Endereço:</InfoCardName>{' '}
                       <InfoCardText width="100%"></InfoCardText>
                     </ListItemCard>
                   )}
@@ -407,8 +407,8 @@ export default function ServiceSchedulesCreate() {
               <Paper
                 sx={{
                   p: 2,
-                  display: "flex",
-                  flexDirection: "column",
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <Stack
@@ -420,7 +420,7 @@ export default function ServiceSchedulesCreate() {
                   <ButtonAdd
                     aria-label="add to client"
                     onClick={() => {
-                      setOpenModalClientVehicleSearch(true);
+                      setOpenModalClientVehicleSearch(true)
                     }}
                   >
                     <AddCircleIcon />
@@ -429,7 +429,7 @@ export default function ServiceSchedulesCreate() {
                 <DividerCard />
                 <List dense={false}>
                   <ListItemCard>
-                    <InfoCardName>Marca:</InfoCardName>{" "}
+                    <InfoCardName>Marca:</InfoCardName>{' '}
                     {clientVehicle?.brand ? (
                       <InfoCardText>{clientVehicle?.brand}</InfoCardText>
                     ) : (
@@ -437,7 +437,7 @@ export default function ServiceSchedulesCreate() {
                     )}
                   </ListItemCard>
                   <ListItemCard>
-                    <InfoCardName>Modelo:</InfoCardName>{" "}
+                    <InfoCardName>Modelo:</InfoCardName>{' '}
                     {clientVehicle?.model ? (
                       <InfoCardText>{clientVehicle?.model}</InfoCardText>
                     ) : (
@@ -445,7 +445,7 @@ export default function ServiceSchedulesCreate() {
                     )}
                   </ListItemCard>
                   <ListItemCard>
-                    <InfoCardName>Veículo:</InfoCardName>{" "}
+                    <InfoCardName>Veículo:</InfoCardName>{' '}
                     {clientVehicle?.vehicle ? (
                       <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
                     ) : (
@@ -453,7 +453,7 @@ export default function ServiceSchedulesCreate() {
                     )}
                   </ListItemCard>
                   <ListItemCard>
-                    <InfoCardName>Cor:</InfoCardName>{" "}
+                    <InfoCardName>Cor:</InfoCardName>{' '}
                     {clientVehicle?.color ? (
                       <InfoCardText>{clientVehicle?.color}</InfoCardText>
                     ) : (
@@ -461,7 +461,7 @@ export default function ServiceSchedulesCreate() {
                     )}
                   </ListItemCard>
                   <ListItemCard>
-                    <InfoCardName>Chassi:</InfoCardName>{" "}
+                    <InfoCardName>Chassi:</InfoCardName>{' '}
                     {clientVehicle?.chassis ? (
                       <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
                     ) : (
@@ -469,7 +469,7 @@ export default function ServiceSchedulesCreate() {
                     )}
                   </ListItemCard>
                   <ListItemCard>
-                    <InfoCardName>Placa:</InfoCardName>{" "}
+                    <InfoCardName>Placa:</InfoCardName>{' '}
                     {clientVehicle?.plate ? (
                       <InfoCardText>
                         {formatPlate(clientVehicle?.plate)}
@@ -566,8 +566,8 @@ export default function ServiceSchedulesCreate() {
               <Paper
                 sx={{
                   p: 2,
-                  display: "flex",
-                  flexDirection: "column",
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <Stack
@@ -593,14 +593,14 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                 </List>
               </Paper>
-              {wasEdited && isEditSelectedCard === "schedule" && (
+              {wasEdited && isEditSelectedCard === 'schedule' && (
                 <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                   <Paper
                     sx={{
-                      p: "0 2",
-                      display: "flex",
-                      flexDirection: "column",
-                      background: "transparent",
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
                     }}
                     elevation={0}
                   >
@@ -631,8 +631,8 @@ export default function ServiceSchedulesCreate() {
               <Paper
                 sx={{
                   p: 2,
-                  display: "flex",
-                  flexDirection: "column",
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <Stack
@@ -645,13 +645,13 @@ export default function ServiceSchedulesCreate() {
                 <DividerCard />
                 <List dense={false}>
                   <ListItemCard>
-                    <InfoCardName>Nome:</InfoCardName>{" "}
+                    <InfoCardName>Nome:</InfoCardName>{' '}
                     <Box width="100%">
                       <TextField
                         id="standard-select-currency"
                         select
                         sx={{
-                          width: "100%",
+                          width: '100%',
                         }}
                         value={technicalConsultant?.id}
                         variant="standard"
@@ -660,7 +660,7 @@ export default function ServiceSchedulesCreate() {
                         }
                       >
                         <MenuItem value={technicalConsultant?.id}>
-                          {"Selecione um Consultor"}
+                          {'Selecione um Consultor'}
                         </MenuItem>
                         {technicalConsultantsList.map((option) => (
                           <MenuItem
@@ -674,7 +674,7 @@ export default function ServiceSchedulesCreate() {
                     </Box>
                   </ListItemCard>
                   <ListItemCard>
-                    <InfoCardName>Código consultor:</InfoCardName>{" "}
+                    <InfoCardName>Código consultor:</InfoCardName>{' '}
                     <InfoCardText>
                       {technicalConsultant?.id === 0
                         ? null
@@ -687,10 +687,10 @@ export default function ServiceSchedulesCreate() {
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
-                    p: "0 2",
-                    display: "flex",
-                    flexDirection: "column",
-                    background: "transparent",
+                    p: '0 2',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'transparent',
                   }}
                   elevation={0}
                 >
@@ -740,7 +740,7 @@ export default function ServiceSchedulesCreate() {
         handleAddClaimService={handleAddClainServiceVehicle}
       /> */}
     </>
-  );
+  )
 }
 
-ServiceSchedulesCreate.auth = true;
+ServiceSchedulesCreate.auth = true

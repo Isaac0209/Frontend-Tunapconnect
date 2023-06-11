@@ -1,11 +1,11 @@
-import * as React from "react";
+import * as React from 'react'
 
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import SearchIcon from "@mui/icons-material/Search";
-import DialogTitle from "@mui/material/DialogTitle";
+import TextField from '@mui/material/TextField'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import SearchIcon from '@mui/icons-material/Search'
+import DialogTitle from '@mui/material/DialogTitle'
 import {
   Box,
   List,
@@ -13,32 +13,32 @@ import {
   ListItemText,
   Stack,
   Typography,
-} from "@mui/material";
-import { useForm } from "react-hook-form";
-import { ButtonIcon, ButtonModalDialog } from "../../styles";
-import { ApiCore } from "@/lib/api";
-import { useContext, useState } from "react";
-import { CompanyContext } from "@/contexts/CompanyContext";
-import { ClientResponseType } from "@/types/service-schedule";
+} from '@mui/material'
+import { useForm } from 'react-hook-form'
+import { ButtonIcon, ButtonModalDialog } from '../../styles'
+import { ApiCore } from '@/lib/api'
+import { useContext, useState } from 'react'
+import { CompanyContext } from '@/contexts/CompanyContext'
+import { ClientResponseType } from '@/types/service-schedule'
 
 interface ModalSearchClienteProps {
-  openMolal: boolean;
-  handleClose: () => void;
-  handleAddClient: (data: ClientResponseType) => void;
+  openMolal: boolean
+  handleClose: () => void
+  handleAddClient: (data: ClientResponseType) => void
 }
 
 type SearchFormProps = {
-  search: string;
-};
+  search: string
+}
 
 export default function ModalSearchClient({
   openMolal,
   handleClose,
   handleAddClient,
 }: ModalSearchClienteProps) {
-  const [clientList, setClientList] = useState<ClientResponseType[] | []>([]);
+  const [clientList, setClientList] = useState<ClientResponseType[] | []>([])
   const [clientSelected, setClientSelected] =
-    useState<ClientResponseType | null>(null);
+    useState<ClientResponseType | null>(null)
 
   const {
     register,
@@ -46,24 +46,24 @@ export default function ModalSearchClient({
     // formState: { errors },
   } = useForm({
     defaultValues: {
-      search: "",
+      search: '',
     },
-  });
+  })
 
-  const api = new ApiCore();
+  const api = new ApiCore()
 
-  const { companySelected } = useContext(CompanyContext);
+  const { companySelected } = useContext(CompanyContext)
 
   async function onSubmitSearch(data: SearchFormProps) {
-    console.log(data);
+    console.log(data)
     try {
       const result = await api.get(
         `/client?company_id=${companySelected}&search=${data.search}`
-      );
-      console.log(result.data.data);
-      setClientList(result.data.data);
+      )
+      console.log(result.data.data)
+      setClientList(result.data.data)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
@@ -76,18 +76,18 @@ export default function ModalSearchClient({
             component="form"
             onSubmit={handleSubmit(onSubmitSearch)}
             sx={{
-              flexWrap: "nowrap",
-              display: "flex",
+              flexWrap: 'nowrap',
+              display: 'flex',
               flex: 1,
-              flexDirection: "column",
+              flexDirection: 'column',
             }}
           >
             <Stack flexDirection="row" sx={{ marginY: 2 }}>
               <TextField
                 id="outlined-size-small"
                 size="small"
-                sx={{ flex: 1, width: "100%" }}
-                {...register("search")}
+                sx={{ flex: 1, width: '100%' }}
+                {...register('search')}
               />
 
               <ButtonIcon
@@ -101,13 +101,13 @@ export default function ModalSearchClient({
             </Stack>
             <List
               sx={{
-                width: "100%",
+                width: '100%',
                 maxWidth: 360,
-                bgcolor: "background.paper",
-                position: "relative",
-                overflow: "auto",
+                bgcolor: 'background.paper',
+                position: 'relative',
+                overflow: 'auto',
                 maxHeight: 300,
-                "& ul": { padding: 0 },
+                '& ul': { padding: 0 },
               }}
               // subheader={<li />}
             >
@@ -118,18 +118,18 @@ export default function ModalSearchClient({
                     onClick={() => setClientSelected(item)}
                     selected={item.id === clientSelected?.id}
                     sx={{
-                      "&.Mui-selected": {
-                        background: "#1C4961",
-                        color: "#fff",
-                        "&:hover": {
-                          background: "#1C4961",
-                          color: "#fff",
+                      '&.Mui-selected': {
+                        background: '#1C4961',
+                        color: '#fff',
+                        '&:hover': {
+                          background: '#1C4961',
+                          color: '#fff',
                           opacity: 0.7,
                         },
-                        "& span": {
-                          color: "#fff",
-                          "&:hover": {
-                            color: "#fff",
+                        '& span': {
+                          color: '#fff',
+                          '&:hover': {
+                            color: '#fff',
                             opacity: 0.7,
                           },
                         },
@@ -141,7 +141,7 @@ export default function ModalSearchClient({
                       secondary={
                         <>
                           <Typography
-                            sx={{ display: "inline" }}
+                            sx={{ display: 'inline' }}
                             component="span"
                             variant="body2"
                             color="text.primary"
@@ -160,9 +160,9 @@ export default function ModalSearchClient({
         <DialogActions sx={{ pr: 3, pb: 2 }}>
           <ButtonModalDialog
             onClick={() => {
-              handleClose();
-              setClientList([]);
-              setClientSelected(null);
+              handleClose()
+              setClientList([])
+              setClientSelected(null)
             }}
           >
             Cancel
@@ -171,10 +171,10 @@ export default function ModalSearchClient({
             // disabled={clientSelected === null}
             onClick={() => {
               if (clientSelected) {
-                handleAddClient(clientSelected);
-                handleClose();
-                setClientList([]);
-                setClientSelected(null);
+                handleAddClient(clientSelected)
+                handleClose()
+                setClientList([])
+                setClientSelected(null)
               }
             }}
           >
@@ -183,5 +183,5 @@ export default function ModalSearchClient({
         </DialogActions>
       </Dialog>
     </div>
-  );
+  )
 }

@@ -1,18 +1,18 @@
-import * as React from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
+import * as React from 'react'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 
 interface AlertDialogProps {
   isOpen: {
-    isOpen: boolean;
-    newTab: null | number;
-  };
-  handleClose: () => void;
-  handleOpenAlertDialogIsSave: (value: boolean, newTab: null | number) => void;
+    isOpen: boolean
+    newTab: null | number
+  }
+  handleClose: () => void
+  handleOpenAlertDialogIsSave: (value: boolean, newTab: null | number) => void
 }
 
 export function AlertDialog({
@@ -29,7 +29,7 @@ export function AlertDialog({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Deseja continuar ?"}
+          {'Deseja continuar ?'}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -39,16 +39,16 @@ export function AlertDialog({
         <DialogActions>
           <Button
             onClick={() => {
-              handleOpenAlertDialogIsSave(false, isOpen.newTab);
-              handleClose();
+              handleOpenAlertDialogIsSave(false, isOpen.newTab)
+              handleClose()
             }}
           >
             descartar
           </Button>
           <Button
             onClick={() => {
-              handleOpenAlertDialogIsSave(true, isOpen.newTab);
-              handleClose();
+              handleOpenAlertDialogIsSave(true, isOpen.newTab)
+              handleClose()
             }}
             autoFocus
           >
@@ -60,5 +60,5 @@ export function AlertDialog({
         </DialogActions>
       </Dialog>
     </div>
-  );
+  )
 }

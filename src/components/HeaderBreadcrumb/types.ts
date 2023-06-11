@@ -1,8 +1,8 @@
 export type listBreadcrumb = {
-  label: string;
-  href: string;
-};
+  label: string
+  href: string
+}
 export type HeaderBreadcrumbProps = {
-  data: listBreadcrumb[];
-  title?: string;
-};
+  data: listBreadcrumb[]
+  title?: string
+}

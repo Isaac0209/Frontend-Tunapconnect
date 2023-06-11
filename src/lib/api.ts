@@ -1,58 +1,58 @@
-import { getSession } from "next-auth/react";
-import axios from "axios";
+import { getSession } from 'next-auth/react'
+import axios from 'axios'
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_APP_API_URL,
-  responseType: "json",
+  responseType: 'json',
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
-});
+})
 
 export class ApiCore {
   constructor() {
     api.interceptors.request.use(
       async function (config) {
-        const session = await getSession();
-        const token = session?.user.accessToken;
-        config.headers.Authorization = token ? ` Bearer ${token}` : "";
+        const session = await getSession()
+        const token = session?.user.accessToken
+        config.headers.Authorization = token ? ` Bearer ${token}` : ''
 
-        return config;
+        return config
       },
       function (error) {
-        return Promise.reject(error);
+        return Promise.reject(error)
       }
-    );
+    )
   }
 
   get = (url: string, params?: any) => {
-    let response;
+    let response
     if (params) {
       const queryString = params
         ? Object.keys(params)
-            .map((key) => key + "=" + params[key])
-            .join("&")
-        : "";
-      response = api.get(`${url}?${queryString}`, params);
+            .map((key) => key + '=' + params[key])
+            .join('&')
+        : ''
+      response = api.get(`${url}?${queryString}`, params)
     } else {
-      response = api.get(`${url}`, params);
+      response = api.get(`${url}`, params)
     }
-    return response;
-  };
+    return response
+  }
 
   delete(data: string) {
-    return api.delete(data);
+    return api.delete(data)
   }
 
   create(url: string, data: any, opts?: any) {
     if (opts) {
-      return api.post(url, data, opts);
+      return api.post(url, data, opts)
     }
 
-    return api.post(url, data);
+    return api.post(url, data)
   }
 
   update(url: string, data: any) {
-    return api.put(url, data);
+    return api.put(url, data)
   }
 }

@@ -1,11 +1,11 @@
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Typography from "@mui/material/Typography";
-import LinkMaterial from "@mui/material/Link";
-import Stack from "@mui/material/Stack";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import Link from "next/link";
-import { HeaderBreadcrumbProps } from "./types";
-import Title from "../Title";
+import Breadcrumbs from '@mui/material/Breadcrumbs'
+import Typography from '@mui/material/Typography'
+import LinkMaterial from '@mui/material/Link'
+import Stack from '@mui/material/Stack'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import Link from 'next/link'
+import { HeaderBreadcrumbProps } from './types'
+import Title from '../Title'
 
 // function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
 //   event.preventDefault()
@@ -64,7 +64,7 @@ export default function HeaderBreadcrumb({
                   <Typography key={item.label + index} color="text.primary">
                     {item.label}
                   </Typography>
-                );
+                )
               }
               return (
                 <LinkMaterial
@@ -76,10 +76,10 @@ export default function HeaderBreadcrumb({
                 >
                   {item.label}
                 </LinkMaterial>
-              );
+              )
             })}
         </Breadcrumbs>
       )}
     </>
-  );
+  )
 }

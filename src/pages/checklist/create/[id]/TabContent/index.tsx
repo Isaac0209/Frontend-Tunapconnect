@@ -1,13 +1,13 @@
-import { AlertDialog } from "@/components/AlertDialog";
-import { IconButton, Stack, Typography } from "@mui/material";
+import { AlertDialog } from '@/components/AlertDialog'
+import { IconButton, Stack, Typography } from '@mui/material'
 
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
 
-import TableRow from "@mui/material/TableRow";
-import { useRouter } from "next/router";
+import TableRow from '@mui/material/TableRow'
+import { useRouter } from 'next/router'
 
 import {
   forwardRef,
@@ -15,136 +15,136 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-} from "react";
+} from 'react'
 
-import { useFieldArray, useForm } from "react-hook-form";
-import { Itens, StagesDataProps } from "../../../types";
+import { useFieldArray, useForm } from 'react-hook-form'
+import { Itens, StagesDataProps } from '../../../types'
 import {
   ImageUploadBadge,
   ImageUploadImg,
   InputContainer,
   InputLabelRow,
   InputText,
-} from "../styles";
-import { genereteInput } from "./GenereteInputs";
-import ModalImages from "./ModalImages";
+} from '../styles'
+import { genereteInput } from './GenereteInputs'
+import ModalImages from './ModalImages'
 import ModalInspectCar, {
   getValuesInspectionReturnType,
-} from "./ModalInspectCar";
-import ModalSignatures from "./ModalSignatures";
+} from './ModalInspectCar'
+import ModalSignatures from './ModalSignatures'
 import {
   ButtonsFinalized,
   ButtonSignatures,
   ButtonsSave,
   MarginBottomHack,
-} from "./styles";
+} from './styles'
 
 type ImageProps = {
-  id: number;
+  id: number
   images: {
-    id: number;
-    name: string;
-    url: string;
-    size: string;
-  }[];
-};
+    id: number
+    name: string
+    url: string
+    size: string
+  }[]
+}
 
 type ImageListProps = {
-  [key: string]: ImageProps[] | [];
-};
+  [key: string]: ImageProps[] | []
+}
 
 type OpenModalImage = {
-  id: number | null;
-  open: boolean;
-};
+  id: number | null
+  open: boolean
+}
 type openModalSignatureType = {
-  id: number | null;
-  open: boolean;
-};
+  id: number | null
+  open: boolean
+}
 
 type OnSubmitData = {
   [x: string]:
     | (
         | {
-            inputs: string | boolean;
-            observation: string | undefined;
+            inputs: string | boolean
+            observation: string | undefined
           }
         | {
-            observation: string | undefined;
-            inputs?: undefined;
+            observation: string | undefined
+            inputs?: undefined
           }
       )[]
-    | undefined;
-};
+    | undefined
+}
 
 type CheckListSignatures = {
-  name: string;
+  name: string
   rules: {
-    required: boolean;
-  };
-  image: string[];
-};
+    required: boolean
+  }
+  image: string[]
+}
 
 type InspectionCarData = {
-  name: string;
-  url_image: string;
+  name: string
+  url_image: string
   value: {
-    id: number;
-    type: "amassado" | "riscado" | "quebrado" | "faltando" | "none";
+    id: number
+    type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
     positions: {
       web: {
-        top: number;
-        left: number;
-      };
+        top: number
+        left: number
+      }
       mobile: {
-        top: number;
-        left: number;
-      };
-    };
-  }[];
-  comment: string;
+        top: number
+        left: number
+      }
+    }
+  }[]
+  comment: string
   images: {
-    id: number;
-    name: string;
-    url: string;
-    size: string;
-  }[];
-};
+    id: number
+    name: string
+    url: string
+    size: string
+  }[]
+}
 
 type TabContentProps = {
-  stageData: StagesDataProps | undefined;
+  stageData: StagesDataProps | undefined
   // checklistModel: ReponseGetCheckList | undefined
-  stageName: string;
-  stageItems: Itens[];
-  formIDSubmit: string;
-  isClosed: boolean;
-  stageSaved?: boolean;
-  handleAddListCheckList: (data: StagesDataProps) => void;
-  handleChangeTabContent: (newValue: number) => void;
-};
+  stageName: string
+  stageItems: Itens[]
+  formIDSubmit: string
+  isClosed: boolean
+  stageSaved?: boolean
+  handleAddListCheckList: (data: StagesDataProps) => void
+  handleChangeTabContent: (newValue: number) => void
+}
 
 export type handleGetValuesFormReturnType = {
   [x: string]:
     | (
         | {
-            inputs: string | boolean;
-            observation: string | undefined;
+            inputs: string | boolean
+            observation: string | undefined
           }
         | {
-            observation: string | undefined;
-            inputs?: undefined;
+            observation: string | undefined
+            inputs?: undefined
           }
       )[]
-    | undefined;
-};
+    | undefined
+}
 
 interface RefType {
-  handleOpenAlertDialog: (value: number) => void;
-  handleGetValuesForm: () => Promise<StagesDataProps>;
+  handleOpenAlertDialog: (value: number) => void
+  handleGetValuesForm: () => Promise<StagesDataProps>
 }
 
 interface modalInspectionCarRefType {
-  getValuesInspection: () => getValuesInspectionReturnType;
+  getValuesInspection: () => getValuesInspectionReturnType
 }
 
 const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
@@ -159,58 +159,58 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     handleAddListCheckList,
     isClosed,
     handleChangeTabContent,
-  } = props;
-  const [openModalInspectCar, setOpenModalInspectCar] = useState(false);
+  } = props
+  const [openModalInspectCar, setOpenModalInspectCar] = useState(false)
   const [openModalImage, setOpenModalImage] = useState<OpenModalImage>({
     id: null,
     open: false,
-  });
+  })
   const [openModalSignature, setOpenModalSignature] =
     useState<openModalSignatureType>({
       id: null,
       open: false,
-    });
-  const [listImage, setListImage] = useState<ImageListProps>({});
+    })
+  const [listImage, setListImage] = useState<ImageListProps>({})
   const [typeSubmitForm, setTypeSubmitForm] = useState<
-    "salvo" | "finalizado" | "rascunho"
-  >("rascunho");
+    'salvo' | 'finalizado' | 'rascunho'
+  >('rascunho')
 
   const [dataModals, setDataModals] = useState<{
-    signatures: CheckListSignatures[];
-    inspection: InspectionCarData[];
+    signatures: CheckListSignatures[]
+    inspection: InspectionCarData[]
   }>({
     signatures: [],
     inspection: [],
-  });
+  })
   const [alertDialog, setAlertDialog] = useState<{
-    isOpen: boolean;
-    newTab: null | number;
+    isOpen: boolean
+    newTab: null | number
   }>({
     isOpen: false,
     newTab: null,
-  });
+  })
 
-  const [isAlteredForm, setIsAlteredForm] = useState(false);
-  const router = useRouter();
+  const [isAlteredForm, setIsAlteredForm] = useState(false)
+  const router = useRouter()
 
-  const modalCarRef = useRef<modalInspectionCarRefType>(null);
+  const modalCarRef = useRef<modalInspectionCarRefType>(null)
 
   const defaultValues = {
     [stageName]: stageData?.itens.map((item, index) => {
-      if (item.rules.type === "select") {
+      if (item.rules.type === 'select') {
         return {
-          inputs: item.values.value ?? "-",
+          inputs: item.values.value ?? '-',
           observation: item.comment,
-        };
+        }
       }
-      if (item.rules.type === "visual_inspect") {
+      if (item.rules.type === 'visual_inspect') {
         return {
           observation: item.comment,
-        };
+        }
       }
-      return { inputs: item.values.value, observation: item.comment };
+      return { inputs: item.values.value, observation: item.comment }
     }),
-  };
+  }
 
   const {
     control,
@@ -221,25 +221,25 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     formState: { isDirty },
   } = useForm({
     defaultValues,
-  });
+  })
 
   // eslint-disable-next-line no-unused-vars
   const { update, fields } = useFieldArray({
     control,
     name: stageName,
-  });
+  })
 
   useImperativeHandle(ref, () => ({
     handleOpenAlertDialog,
     // @ts-ignore
     handleGetValuesForm, // arrumar
-  }));
+  }))
 
   function handleOpenModalInspectCar(value: boolean) {
-    setOpenModalInspectCar(value);
+    setOpenModalInspectCar(value)
   }
   function closeModalInspectCar() {
-    setOpenModalInspectCar(false);
+    setOpenModalInspectCar(false)
   }
 
   // function getIndexStageNameInListImage() {
@@ -247,31 +247,29 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   // }
 
   function closeModalImage() {
-    setOpenModalImage({ id: null, open: false });
+    setOpenModalImage({ id: null, open: false })
   }
 
   function getBagdeAmountImages(index: number) {
     if (Object.hasOwn(listImage, stageName)) {
-      const imgs = listImage[stageName].filter(
-        (image) => image.id === index
-      )[0];
-      return imgs?.images.length ?? 0;
+      const imgs = listImage[stageName].filter((image) => image.id === index)[0]
+      return imgs?.images.length ?? 0
     }
-    return 0;
+    return 0
   }
 
   function handleAddImageInListImage(
     index: number,
     image: {
-      id: number;
-      name: string;
-      url: string;
-      size: string;
+      id: number
+      name: string
+      url: string
+      size: string
     }
   ) {
-    console.log(image);
+    console.log(image)
     setListImage((prevState) => {
-      const stageActual = prevState[stageName];
+      const stageActual = prevState[stageName]
       if (!Object.hasOwn(prevState, stageName)) {
         return {
           ...prevState,
@@ -281,9 +279,9 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
               images: [image],
             },
           ],
-        };
+        }
       }
-      const isImagesInList = stageActual.findIndex((img) => img.id === index);
+      const isImagesInList = stageActual.findIndex((img) => img.id === index)
 
       if (isImagesInList >= 0) {
         const valueFormatted = {
@@ -293,13 +291,13 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
               return {
                 id: index,
                 images: [...i.images, image],
-              };
+              }
             }
-            return i;
+            return i
           }),
-        };
-        console.log(valueFormatted);
-        return valueFormatted;
+        }
+        console.log(valueFormatted)
+        return valueFormatted
       }
 
       if (isImagesInList < 0) {
@@ -313,7 +311,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                 images: [{ ...image }],
               },
             ],
-          };
+          }
         }
       }
       return {
@@ -324,36 +322,36 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
             images: [{ ...image }],
           },
         ],
-      };
-    });
+      }
+    })
   }
 
   function handleRemoveImageInListImage(index: number, imageId: number) {
     const findIndexListImage = listImage[stageName].findIndex(
       (item) => item.id === index
-    );
+    )
 
     setListImage((prevState) => {
-      const stageActual = prevState[stageName];
+      const stageActual = prevState[stageName]
       prevState[stageName][findIndexListImage].images = prevState[stageName][
         findIndexListImage
-      ].images.filter((item) => item.id !== imageId);
-      console.log(stageActual);
+      ].images.filter((item) => item.id !== imageId)
+      console.log(stageActual)
 
       return {
         ...prevState,
         [stageName]: stageActual,
-      };
-    });
+      }
+    })
 
-    setIsAlteredForm(true);
+    setIsAlteredForm(true)
   }
 
   function handleCloseModalSignature() {
     setOpenModalSignature({
       id: null,
       open: false,
-    });
+    })
   }
 
   function handleSaveSignatures(signatures: CheckListSignatures[]) {
@@ -361,9 +359,9 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       return {
         ...prevState,
         signatures,
-      };
-    });
-    setIsAlteredForm(true);
+      }
+    })
+    setIsAlteredForm(true)
   }
 
   function handleInspectionData(data: InspectionCarData[]) {
@@ -371,51 +369,51 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       return {
         ...prevState,
         inspection: data,
-      };
-    });
-    console.log(data);
-    setIsAlteredForm(true);
+      }
+    })
+    console.log(data)
+    setIsAlteredForm(true)
   }
 
   // console.log(listImage[stageName])
 
   async function handleOpenAlertDialog(value: number) {
     if (!isDirty && !isAlteredForm) {
-      handleChangeTabContent(value);
+      handleChangeTabContent(value)
     } else {
-      setAlertDialog({ isOpen: true, newTab: value });
+      setAlertDialog({ isOpen: true, newTab: value })
     }
   }
 
   async function getValueInspectionCar() {
     if (modalCarRef.current && modalCarRef.current.getValuesInspection) {
-      const result = await modalCarRef.current.getValuesInspection();
-      console.log(result);
-      return result;
+      const result = await modalCarRef.current.getValuesInspection()
+      console.log(result)
+      return result
     }
   }
 
   async function handleGetValuesForm() {
-    const inspectionCarValues = await getValueInspectionCar();
-    console.log(dataModals?.signatures);
-    const data = getValues();
+    const inspectionCarValues = await getValueInspectionCar()
+    console.log(dataModals?.signatures)
+    const data = getValues()
 
     const dataFormatted = {
       ...stageData,
-      status: "Rascunho",
+      status: 'Rascunho',
       signatures:
         dataModals?.signatures.length > 0
           ? dataModals?.signatures
           : stageData?.signatures,
       itens: stageItems.map((item, index) => {
-        if (item.rules.type === "visual_inspect") {
+        if (item.rules.type === 'visual_inspect') {
           return {
             ...item,
             comment: data[stageName]?.[index]?.observation,
             values: {
               labels: inspectionCarValues,
             },
-          };
+          }
         }
 
         return {
@@ -426,10 +424,10 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
             images: listImage[stageName].filter((i) => i.id === index),
             value: data[stageName]?.[index]?.inputs,
           },
-        };
+        }
       }),
-    };
-    return dataFormatted;
+    }
+    return dataFormatted
   }
 
   function handleOpenAlertDialogIsSave(isSave: boolean, newTap: null | number) {
@@ -450,14 +448,14 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   function onSubmitData(data: OnSubmitData) {
     const isAlreadyInspections = stageData?.itens.filter(
-      (item) => item.rules.type === "visual_inspect"
-    );
+      (item) => item.rules.type === 'visual_inspect'
+    )
 
-    let defaultLabel: any;
+    let defaultLabel: any
 
     if (isAlreadyInspections) {
       defaultLabel = isAlreadyInspections[0].values
-        .labels as InspectionCarData[];
+        .labels as InspectionCarData[]
     }
 
     const dataFormatted = {
@@ -468,7 +466,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           ? dataModals?.signatures
           : stageData?.signatures,
       itens: stageItems.map((item, index) => {
-        if (item.rules.type === "visual_inspect") {
+        if (item.rules.type === 'visual_inspect') {
           return {
             ...item,
             comment: data[stageName]?.[index]?.observation,
@@ -478,7 +476,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                   ? dataModals?.inspection
                   : defaultLabel,
             },
-          };
+          }
         }
         return {
           ...item,
@@ -488,62 +486,61 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
             images: listImage[stageName].filter((i) => i.id === index),
             value: data[stageName]?.[index]?.inputs,
           },
-        };
+        }
       }),
-    };
+    }
 
-    handleAddListCheckList(dataFormatted as StagesDataProps);
+    handleAddListCheckList(dataFormatted as StagesDataProps)
   }
 
   function handleCloseAlertDialog() {
     setAlertDialog({
       isOpen: false,
       newTab: null,
-    });
+    })
   }
 
   useEffect(() => {
     const sessionStorageData = sessionStorage.getItem(
       `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`
-    );
+    )
 
     const dataSessionStorage: StagesDataProps[] = sessionStorageData
       ? JSON.parse(sessionStorageData)
-      : null;
+      : null
 
-    const listImageSessionStorage: ImageProps[] = [];
+    const listImageSessionStorage: ImageProps[] = []
 
     if (dataSessionStorage) {
       const stageLocalSession = dataSessionStorage.filter(
         (data) => data.name === stageName
-      )[0];
+      )[0]
       if (stageLocalSession) {
-        console.log(stageLocalSession);
-        dataModals?.signatures.push();
+        console.log(stageLocalSession)
+        dataModals?.signatures.push()
         setDataModals((prevState) => {
           return {
             ...prevState,
             signatures: stageLocalSession.signatures as CheckListSignatures[],
-          };
-        });
+          }
+        })
         stageLocalSession.itens.forEach((item, index) => {
-          const img =
-            item.values.images === undefined ? [] : item.values.images;
+          const img = item.values.images === undefined ? [] : item.values.images
           // @ts-ignore
-          listImageSessionStorage.push(...img);
+          listImageSessionStorage.push(...img)
           const valueSelectedFormatted =
-            item.rules.type === "select" && item.values.value === null
-              ? "-"
-              : item.values.value;
+            item.rules.type === 'select' && item.values.value === null
+              ? '-'
+              : item.values.value
           setValue(
             `${stageName}.${index}.inputs`,
-            item.rules.type === "select"
+            item.rules.type === 'select'
               ? valueSelectedFormatted
               : item.values.value
-          );
-          setValue(`${stageName}.${index}.observation`, item.comment);
-        });
-        console.log(listImageSessionStorage);
+          )
+          setValue(`${stageName}.${index}.observation`, item.comment)
+        })
+        console.log(listImageSessionStorage)
       }
 
       setListImage((prevState) => {
@@ -551,20 +548,20 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           return {
             ...prevState,
             [stageName]: listImageSessionStorage,
-          };
+          }
         }
         return {
           [stageName]: listImageSessionStorage,
-        };
-      });
+        }
+      })
     } else {
-      console.log("não exists");
+      console.log('não exists')
       sessionStorage.setItem(
         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
         JSON.stringify([stageData])
-      );
+      )
     }
-  }, []);
+  }, [])
 
   return (
     <>
@@ -580,7 +577,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                 return (
                   <TableRow
                     key={`${Math.random() * 20000}-${item.name}-${index}`}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell>
                       {genereteInput(
@@ -598,7 +595,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                       {<Typography>{item.name}</Typography>}
                     </TableCell>
                     <TableCell>
-                      {item?.rules?.type !== "visual_inspect" && (
+                      {item?.rules?.type !== 'visual_inspect' && (
                         <IconButton
                           color="primary"
                           aria-label="upload picture"
@@ -606,15 +603,15 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                           size="small"
                           disabled={isClosed}
                           onClick={() => {
-                            console.log(index);
+                            console.log(index)
                             setOpenModalImage({
                               id: index,
                               open: true,
-                            });
+                            })
                           }}
                         >
                           <ImageUploadBadge
-                            badgeContent={getBagdeAmountImages(index) ?? ""}
+                            badgeContent={getBagdeAmountImages(index) ?? ''}
                             color="warning"
                           >
                             <ImageUploadImg />
@@ -635,7 +632,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                       </InputContainer>
                     </TableCell>
                   </TableRow>
-                );
+                )
               })}
             <TableRow>
               <TableCell colSpan={5}>
@@ -664,7 +661,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           type="submit"
           variant="contained"
           // form={`form-${data?.stages[painelValue].name ?? ''}-${painelValue}`}
-          onClick={() => setTypeSubmitForm("salvo")}
+          onClick={() => setTypeSubmitForm('salvo')}
         >
           Salvar
         </ButtonsSave>
@@ -673,7 +670,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           variant="contained"
           // form={`form-${data?.stages[painelValue].name ?? ''}-${painelValue}`}
           onClick={() => {
-            setTypeSubmitForm("finalizado");
+            setTypeSubmitForm('finalizado')
           }}
         >
           Finalizar
@@ -711,9 +708,9 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         handleOpenAlertDialogIsSave={handleOpenAlertDialogIsSave}
       />
     </>
-  );
-});
+  )
+})
 
-export default TabContent;
+export default TabContent
 
 // export default TabContent

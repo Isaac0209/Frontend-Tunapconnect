@@ -1,15 +1,15 @@
-import * as React from "react";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import ListItemText from "@mui/material/ListItemText";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Checkbox from "@mui/material/Checkbox";
-import { useEffect, useState } from "react";
+import * as React from 'react'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import ListItemText from '@mui/material/ListItemText'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Checkbox from '@mui/material/Checkbox'
+import { useEffect, useState } from 'react'
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
+const ITEM_HEIGHT = 48
+const ITEM_PADDING_TOP = 8
 const MenuProps = {
   PaperProps: {
     style: {
@@ -17,33 +17,33 @@ const MenuProps = {
       width: 250,
     },
   },
-};
+}
 
 interface MultipleSelectCheckmarksProps {
-  checkNames: string[];
-  handleChecked: (value: string[] | []) => void;
+  checkNames: string[]
+  handleChecked: (value: string[] | []) => void
 }
 export function MultipleSelectCheckmarks({
   checkNames,
   handleChecked,
 }: MultipleSelectCheckmarksProps) {
-  const [checked, setChecked] = useState<string[]>([]);
-  const [checkList, setCheckList] = useState<string[]>([]);
+  const [checked, setChecked] = useState<string[]>([])
+  const [checkList, setCheckList] = useState<string[]>([])
 
   const handleChange = (event: SelectChangeEvent<typeof checkList>) => {
     const {
       target: { value },
-    } = event;
+    } = event
     setChecked(
       // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
-    handleChecked(value as string[]);
-  };
+      typeof value === 'string' ? value.split(',') : value
+    )
+    handleChecked(value as string[])
+  }
 
   useEffect(() => {
-    setCheckList(checkNames);
-  }, []);
+    setCheckList(checkNames)
+  }, [])
 
   return (
     <>
@@ -56,7 +56,7 @@ export function MultipleSelectCheckmarks({
           value={checked}
           onChange={handleChange}
           input={<OutlinedInput label="Tag" size="small" />}
-          renderValue={(selected) => selected.join(", ")}
+          renderValue={(selected) => selected.join(', ')}
           MenuProps={MenuProps}
         >
           {checkList.map((name) => (
@@ -68,5 +68,5 @@ export function MultipleSelectCheckmarks({
         </Select>
       </FormControl>
     </>
-  );
+  )
 }

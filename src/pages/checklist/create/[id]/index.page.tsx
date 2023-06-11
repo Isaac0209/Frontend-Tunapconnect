@@ -1,22 +1,22 @@
-import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
+import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react'
+import Container from '@mui/material/Container'
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
+import Box from '@mui/material/Box'
 
-import { LinkNext, TabItem, TabsContainer, Title } from "./styles";
-import TabContent from "./TabContent";
-import { ApiCore } from "@/lib/api";
-import { Backdrop, CircularProgress, Skeleton } from "@mui/material";
+import { LinkNext, TabItem, TabsContainer, Title } from './styles'
+import TabContent from './TabContent'
+import { ApiCore } from '@/lib/api'
+import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import {
   ChecklistProps,
   ResponseGetCheckList,
   StagesDataProps,
-} from "../../types";
+} from '../../types'
 
-import { useRouter } from "next/router";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import ActionAlerts from "@/components/ActionAlerts";
+import { useRouter } from 'next/router'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import ActionAlerts from '@/components/ActionAlerts'
 
 // import { useForm } from 'react-hook-form'
 
@@ -55,32 +55,32 @@ import ActionAlerts from "@/components/ActionAlerts";
 // }
 
 interface TabPanelProps {
-  children?: ReactNode;
-  index: number;
-  value: number;
+  children?: ReactNode
+  index: number
+  value: number
 }
 
 interface RefTabContentRefType {
-  handleOpenAlertDialog: (value: number) => void;
-  handleGetValuesForm: () => Promise<StagesDataProps>;
+  handleOpenAlertDialog: (value: number) => void
+  handleGetValuesForm: () => Promise<StagesDataProps>
 }
 
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
+    'aria-controls': `simple-tabpanel-${index}`,
+  }
 }
 
 export type ActionAlertsStateProps = {
-  isOpen: boolean;
-  title: string;
-  type: "error" | "warning" | "success";
-  redirectTo?: string | undefined;
-};
+  isOpen: boolean
+  title: string
+  type: 'error' | 'warning' | 'success'
+  redirectTo?: string | undefined
+}
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, ...other } = props
 
   return (
     <div
@@ -90,35 +90,35 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ position: "relative" }}>{children}</Box>}
+      {value === index && <Box sx={{ position: 'relative' }}>{children}</Box>}
     </div>
-  );
+  )
 }
 
 export default function ChecklistCreateById() {
-  const [painelValue, setPainelValue] = useState(0);
+  const [painelValue, setPainelValue] = useState(0)
   // const [typeSubmitForm, setTypeSubmitForm] = useState<
   //   'salvo' | 'finalizado' | 'rascunho'
   // >('rascunho')
 
   const [actionAlerts, setActionAlerts] = useState<ActionAlertsStateProps>({
     isOpen: false,
-    title: "",
-    type: "success",
-  });
-  const queryClient = useQueryClient();
-  const api = new ApiCore();
-  const router = useRouter();
+    title: '',
+    type: 'success',
+  })
+  const queryClient = useQueryClient()
+  const api = new ApiCore()
+  const router = useRouter()
 
-  const tabContentRef = useRef<RefTabContentRefType>(null);
+  const tabContentRef = useRef<RefTabContentRefType>(null)
 
   const updateChecklistmutations = useMutation(
     (newDataChecklist: ChecklistProps) => {
       return api
         .update(`/checklist/${router?.query?.id}`, newDataChecklist)
         .then((resp) => {
-          return resp.data.data[0];
-        });
+          return resp.data.data[0]
+        })
     },
 
     {
@@ -127,56 +127,54 @@ export default function ChecklistCreateById() {
         // queryClient.setQueryData(['checklist-createByID'], data)
         setActionAlerts({
           isOpen: true,
-          title: "Salvo com sucesso",
-          type: "success",
-        });
-        queryClient.invalidateQueries("checklist-createByID");
-        return data;
+          title: 'Salvo com sucesso',
+          type: 'success',
+        })
+        queryClient.invalidateQueries('checklist-createByID')
+        return data
       },
       onError: (err: any) => {
         setActionAlerts({
           isOpen: true,
-          title: "Salvo com sucesso",
-          type: "error",
-        });
-        console.log(err);
+          title: 'Salvo com sucesso',
+          type: 'error',
+        })
+        console.log(err)
       },
     }
-  );
+  )
 
   const { data, isSuccess, isLoading, isFetching } =
     useQuery<ResponseGetCheckList>(
-      ["checklist-createByID"],
+      ['checklist-createByID'],
       () =>
         api
           .get(`/checklist/${router?.query?.id}?company_id=`)
           .then((response) => {
-            return response.data.data;
+            return response.data.data
           }),
       {
         refetchOnWindowFocus: false,
         enabled: !!router?.query?.id,
       }
-    );
+    )
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts((previState) => ({
       ...previState,
       isOpen,
-    }));
+    }))
   }
 
   async function handleAddListCheckList(stageData: StagesDataProps) {
     const isFinalizedArray = data?.stages.map((item) => {
       if (item.name === stageData.name) {
-        return stageData.status;
+        return stageData.status
       }
 
-      return item.status;
-    });
-    const isFinalized = isFinalizedArray?.every(
-      (item) => item === "finalizado"
-    );
+      return item.status
+    })
+    const isFinalized = isFinalizedArray?.every((item) => item === 'finalizado')
     const dataForPost = {
       company_id: data?.company_id,
       brand_id: data?.brand_id,
@@ -188,7 +186,7 @@ export default function ChecklistCreateById() {
       client_id: data?.client_id,
       service_schedule_id: data?.service_schedule_id,
       checklist_model: data?.checklist_model,
-      status: isFinalized ? "finalizado" : "pendente",
+      status: isFinalized ? 'finalizado' : 'pendente',
       stages: data?.stages.map((item) => {
         // if (item.name === stageData.name) {
         //   return {
@@ -197,12 +195,12 @@ export default function ChecklistCreateById() {
         //   }
         // }
 
-        return item.name === stageData.name ? stageData : item;
+        return item.name === stageData.name ? stageData : item
       }),
-    };
+    }
 
     // @ts-ignore
-    updateChecklistmutations.mutate(dataForPost);
+    updateChecklistmutations.mutate(dataForPost)
   }
 
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
@@ -212,57 +210,57 @@ export default function ChecklistCreateById() {
     //   tabContentRef.current.handleOpenAlertDialog(newValue)
     // }
     if (tabContentRef.current && tabContentRef.current.handleGetValuesForm) {
-      const result = await tabContentRef.current.handleGetValuesForm();
-      console.log(result);
+      const result = await tabContentRef.current.handleGetValuesForm()
+      console.log(result)
       const sessionStorageData = sessionStorage.getItem(
         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`
-      );
+      )
 
       if (sessionStorageData) {
-        const storageStage: StagesDataProps[] = JSON.parse(sessionStorageData);
+        const storageStage: StagesDataProps[] = JSON.parse(sessionStorageData)
         const storageStageActualIndex = storageStage.findIndex(
           (item: any) => item.name === result.name
-        );
+        )
 
         if (storageStageActualIndex >= 0) {
           const newStorageSessionFiltered = storageStage.filter(
             (item) => item.name !== result.name
-          );
+          )
 
           sessionStorage.setItem(
             `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
             JSON.stringify([...newStorageSessionFiltered, result])
-          );
+          )
         } else {
           sessionStorage.setItem(
             `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
             JSON.stringify([...storageStage, result])
-          );
+          )
         }
       } else {
         sessionStorage.setItem(
           `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
           JSON.stringify([result])
-        );
+        )
       }
     }
-    setPainelValue(newValue);
-  };
+    setPainelValue(newValue)
+  }
 
   function handleChangeTabContent(newValue: number) {
-    setPainelValue(newValue);
+    setPainelValue(newValue)
   }
   useEffect(() => {
-    console.log("rendering");
+    console.log('rendering')
     if (data?.stages) {
       if (data?.stages.length > 0) {
         sessionStorage.setItem(
           `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
           JSON.stringify(data?.stages)
-        );
+        )
       }
     }
-  }, []);
+  }, [])
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -273,7 +271,7 @@ export default function ChecklistCreateById() {
           sx={{ borderRadius: 2 }}
         />
       </Container>
-    );
+    )
   }
 
   if (isSuccess) {
@@ -283,7 +281,7 @@ export default function ChecklistCreateById() {
         <Box sx={{ mt: 2, ml: 2 }}>
           <LinkNext href={`/service-schedule/${data.service_schedule_id}`}>
             <Title variant="h6">
-              Agenda:{router.query.id} - {data?.client?.name ?? "Não informado"}
+              Agenda:{router.query.id} - {data?.client?.name ?? 'Não informado'}
             </Title>
           </LinkNext>
         </Box>
@@ -291,16 +289,16 @@ export default function ChecklistCreateById() {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper
-                sx={{ p: 2, display: "flex", flexDirection: "column", pb: 1 }}
+                sx={{ p: 2, display: 'flex', flexDirection: 'column', pb: 1 }}
               >
                 <Box
                   sx={{
                     borderBottom: 1,
-                    borderColor: "divider",
-                    display: "flex",
-                    width: "100%",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    borderColor: 'divider',
+                    display: 'flex',
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
                   <TabsContainer
@@ -321,7 +319,7 @@ export default function ChecklistCreateById() {
                             {...a11yProps(index)}
                             // disabled={isDisabled}
                           />
-                        );
+                        )
                       })}
                   </TabsContainer>
                 </Box>
@@ -341,11 +339,11 @@ export default function ChecklistCreateById() {
                           stageName={stage.name}
                           formIDSubmit={`form-${stage.name}-${index}`}
                           handleAddListCheckList={handleAddListCheckList}
-                          isClosed={stage.status === "finalizado"}
+                          isClosed={stage.status === 'finalizado'}
                           handleChangeTabContent={handleChangeTabContent}
                         />
                       </TabPanel>
-                    );
+                    )
                   })}
               </Paper>
               <Grid
@@ -354,9 +352,9 @@ export default function ChecklistCreateById() {
                 justifyContent="flex-end"
                 sx={{
                   marginTop: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  alignContent: "center",
+                  display: 'flex',
+                  alignItems: 'center',
+                  alignContent: 'center',
                 }}
               ></Grid>
             </Grid>
@@ -364,7 +362,7 @@ export default function ChecklistCreateById() {
         </Container>
 
         <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={isFetching}
           onClick={() => {}}
         >
@@ -372,13 +370,13 @@ export default function ChecklistCreateById() {
         </Backdrop>
         <ActionAlerts
           isOpen={actionAlerts?.isOpen && !isFetching}
-          title={"salvo"}
-          type={"success"}
+          title={'salvo'}
+          type={'success'}
           handleAlert={handleAlert}
         />
       </>
-    );
+    )
   }
 }
 
-ChecklistCreateById.auth = true;
+ChecklistCreateById.auth = true

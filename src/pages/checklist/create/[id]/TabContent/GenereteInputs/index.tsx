@@ -3,37 +3,37 @@ import {
   Controller,
   FieldValues,
   UseFormRegister,
-} from "react-hook-form";
+} from 'react-hook-form'
 
-import { MenuItem, Select, Switch, TextField } from "@mui/material";
-import { Value } from "../../../../types";
+import { MenuItem, Select, Switch, TextField } from '@mui/material'
+import { Value } from '../../../../types'
 
-import { ButtonItemChecklist } from "./styles";
+import { ButtonItemChecklist } from './styles'
 
 type registerInputProps = {
-  register: UseFormRegister<FieldValues>;
-  nameRegister: string;
-  indexRegister: number;
-  isClosed: boolean;
-  control?: Control;
-};
+  register: UseFormRegister<FieldValues>
+  nameRegister: string
+  indexRegister: number
+  isClosed: boolean
+  control?: Control
+}
 
 type InputButtonProps = {
-  labelName: string;
-  register: UseFormRegister<FieldValues>;
-  nameRegister: string;
-  indexRegister: number;
-  isClosed: boolean;
-  onClick?: () => void;
-};
+  labelName: string
+  register: UseFormRegister<FieldValues>
+  nameRegister: string
+  indexRegister: number
+  isClosed: boolean
+  onClick?: () => void
+}
 type InputSelectProps = {
-  opts: string[] | [];
-  register: UseFormRegister<FieldValues>;
-  nameRegister: string;
-  indexRegister: number;
-  isClosed: boolean;
-  control?: Control;
-};
+  opts: string[] | []
+  register: UseFormRegister<FieldValues>
+  nameRegister: string
+  indexRegister: number
+  isClosed: boolean
+  control?: Control
+}
 
 function InputButton({ labelName, isClosed, onClick }: InputButtonProps) {
   return (
@@ -46,7 +46,7 @@ function InputButton({ labelName, isClosed, onClick }: InputButtonProps) {
     >
       {labelName}
     </ButtonItemChecklist>
-  );
+  )
 }
 function InputSwitch({
   register,
@@ -65,12 +65,12 @@ function InputSwitch({
             checked={field.value}
             disabled={isClosed}
             {...field}
-            inputProps={{ "aria-label": "controlled" }}
+            inputProps={{ 'aria-label': 'controlled' }}
           />
-        );
+        )
       }}
     />
-  );
+  )
 }
 // function InputSwitch({
 //   register,
@@ -100,7 +100,7 @@ function InputText({
       disabled={isClosed}
       {...register(`${nameRegister}.${indexRegister}.inputs`)}
     />
-  );
+  )
 }
 function InputNumber({
   register,
@@ -116,7 +116,7 @@ function InputNumber({
       disabled={isClosed}
       {...register(`${nameRegister}.${indexRegister}.inputs`)}
     />
-  );
+  )
 }
 
 function InputSelect({
@@ -147,10 +147,10 @@ function InputSelect({
               </MenuItem>
             ))}
           </Select>
-        );
+        )
       }}
     />
-  );
+  )
 }
 
 export function genereteInput(
@@ -163,9 +163,9 @@ export function genereteInput(
   control: Control,
   handleOpenModalInspectCar: (value: boolean) => void
 ) {
-  const optionsSelect = itemValues ? itemValues?.options : [];
+  const optionsSelect = itemValues ? itemValues?.options : []
   switch (type) {
-    case "number":
+    case 'number':
       return (
         <InputNumber
           indexRegister={indexRegister}
@@ -173,8 +173,8 @@ export function genereteInput(
           nameRegister={nameRegister}
           isClosed={isClosed}
         />
-      );
-    case "text":
+      )
+    case 'text':
       return (
         <InputText
           indexRegister={indexRegister}
@@ -182,8 +182,8 @@ export function genereteInput(
           nameRegister={nameRegister}
           isClosed={isClosed}
         />
-      );
-    case "select":
+      )
+    case 'select':
       return (
         <InputSelect
           opts={optionsSelect || []}
@@ -193,8 +193,8 @@ export function genereteInput(
           isClosed={isClosed}
           control={control}
         />
-      );
-    case "boolean":
+      )
+    case 'boolean':
       return (
         <InputSwitch
           indexRegister={indexRegister}
@@ -203,8 +203,8 @@ export function genereteInput(
           isClosed={isClosed}
           control={control}
         />
-      );
-    case "visual_inspect":
+      )
+    case 'visual_inspect':
       return (
         <InputButton
           labelName="inspeção"
@@ -214,7 +214,7 @@ export function genereteInput(
           isClosed={isClosed}
           onClick={() => handleOpenModalInspectCar(true)}
         />
-      );
+      )
     // case 'signature':
     //   return (
     //     <InputButton
@@ -227,6 +227,6 @@ export function genereteInput(
     //   )
 
     default:
-      return null;
+      return null
   }
 }

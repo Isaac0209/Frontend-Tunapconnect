@@ -1,25 +1,25 @@
-import * as React from "react";
+import * as React from 'react'
 // import { useForm, SubmitHandler } from 'react-hook-form'
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from 'react'
 
-import Container from "@mui/material/Container";
+import Container from '@mui/material/Container'
 
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
 
 import {
   ClientInfor,
   ClientVehicle,
   // ServiceSchedulesListProps,
   TechnicalConsultant,
-} from "@/types/service-schedule";
-import { ApiCore } from "@/lib/api";
+} from '@/types/service-schedule'
+import { ApiCore } from '@/lib/api'
 
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router'
 
-import List from "@mui/material/List";
+import List from '@mui/material/List'
 
-import Stack from "@mui/material/Stack";
+import Stack from '@mui/material/Stack'
 
 import {
   ButtonCenter,
@@ -31,132 +31,132 @@ import {
   InfoCardText,
   ListItemCard,
   TitleCard,
-} from "./styles";
-import Skeleton from "@mui/material/Skeleton";
-import PrintIcon from "@mui/icons-material/Print";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+} from './styles'
+import Skeleton from '@mui/material/Skeleton'
+import PrintIcon from '@mui/icons-material/Print'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from 'dayjs'
 // import * as locale from 'date-fns/locale/pt-BR';
 
-import MenuItem from "@mui/material/MenuItem";
-import { MoreOptionsButtonSelect } from "@/components/MoreOptionsButtonSelect";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import { formatDateTime, formatDateTimeTimezone } from "@/ultis/formatDate";
-import ActionAlerts from "@/components/ActionAlerts";
-import { DataTimeInput } from "@/components/DataTimeInput";
-import { ActionAlertsStateProps } from "@/components/ActionAlerts/ActionAlerts";
-import HeaderBreadcrumb from "@/components/HeaderBreadcrumb";
-import { listBreadcrumb } from "@/components/HeaderBreadcrumb/types";
+import MenuItem from '@mui/material/MenuItem'
+import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
+import TextField from '@mui/material/TextField'
+import Box from '@mui/material/Box'
+import { formatDateTime, formatDateTimeTimezone } from '@/ultis/formatDate'
+import ActionAlerts from '@/components/ActionAlerts'
+import { DataTimeInput } from '@/components/DataTimeInput'
+import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
+import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
+import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
-import { PrintInspectionModal } from "./components/PrintInspectionModal";
-import { TableModal } from "./components/TableModal";
-import { useQuery } from "react-query";
-import { formatCPF } from "@/ultis/formatCPF";
-import { formatPlate } from "@/ultis/formatPlate";
+import { PrintInspectionModal } from './components/PrintInspectionModal'
+import { TableModal } from './components/TableModal'
+import { useQuery } from 'react-query'
+import { formatCPF } from '@/ultis/formatCPF'
+import { formatPlate } from '@/ultis/formatPlate'
 
-import { CompanyContext } from "@/contexts/CompanyContext";
-import { ChecklistProps } from "@/pages/checklist/types";
+import { CompanyContext } from '@/contexts/CompanyContext'
+import { ChecklistProps } from '@/pages/checklist/types'
 
-const api = new ApiCore();
+const api = new ApiCore()
 
 type isEditSelectedCardType =
-  | "client"
-  | "clientVehicle"
-  | "schedule"
-  | "technicalConsultant"
-  | null;
+  | 'client'
+  | 'clientVehicle'
+  | 'schedule'
+  | 'technicalConsultant'
+  | null
 
 type updateData = {
-  code: null;
-  promised_date: string;
-  technical_consultant_id: number | undefined;
-  client_id: number | undefined;
-  client_vehicle_id: number | undefined;
-  company_id: string | undefined;
-  chasis: string | undefined;
-  plate: string | undefined;
-  claims_service: any[];
-};
+  code: null
+  promised_date: string
+  technical_consultant_id: number | undefined
+  client_id: number | undefined
+  client_vehicle_id: number | undefined
+  company_id: string | undefined
+  chasis: string | undefined
+  plate: string | undefined
+  claims_service: any[]
+}
 
 const HeaderBreadcrumbData: listBreadcrumb[] = [
   {
-    label: "Tunap",
-    href: "/company",
+    label: 'Tunap',
+    href: '/company',
   },
   {
-    label: "Edição de agendamento",
-    href: "/service-schedule/edit",
+    label: 'Edição de agendamento',
+    href: '/service-schedule/edit',
   },
-];
+]
 
 export default function ServiceSchedulesEdit() {
-  const [client, setClient] = useState<ClientInfor | null>();
-  const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>();
-  const [visitDate, setVisitDate] = useState<Dayjs | null>(null);
+  const [client, setClient] = useState<ClientInfor | null>()
+  const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
+  const [visitDate, setVisitDate] = useState<Dayjs | null>(null)
   const [technicalConsultant, setTechnicalConsultant] =
-    useState<TechnicalConsultant | null>(null);
+    useState<TechnicalConsultant | null>(null)
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
     TechnicalConsultant[]
-  >([]);
+  >([])
   const [isEditSelectedCard, setIsEditSelectedCard] =
-    useState<isEditSelectedCardType>(null);
-  const [wasEdited, setWasEdited] = useState(false);
+    useState<isEditSelectedCardType>(null)
+  const [wasEdited, setWasEdited] = useState(false)
   const [defaultCheckListPrint, setDefaultCheckListPrint] = useState<
     number | null
-  >(null);
+  >(null)
   const [actionAlerts, setActionAlerts] =
-    useState<ActionAlertsStateProps | null>(null);
+    useState<ActionAlertsStateProps | null>(null)
 
   // const [rows, setRows] = useState<ServiceSchedulesListProps[]>([])
 
-  const [openChecklistModal, setOpenChecklistModal] = useState(false);
+  const [openChecklistModal, setOpenChecklistModal] = useState(false)
   const [openPrintInspectionModal, setOpenPrintInspectionModal] =
-    useState(false);
+    useState(false)
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const { companySelected } = useContext(CompanyContext);
+  const { companySelected } = useContext(CompanyContext)
 
   // const handleDelete = (id: number) => {
   //   setRows(rows.filter((row) => row.id !== id))
   // }
   const closeChecklistModal = () => {
-    setOpenChecklistModal(false);
-  };
+    setOpenChecklistModal(false)
+  }
   const closePrintInspectionModalModal = () => {
-    setOpenPrintInspectionModal(false);
-  };
+    setOpenPrintInspectionModal(false)
+  }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
-    setIsEditSelectedCard(value);
-    setWasEdited(true);
+    setIsEditSelectedCard(value)
+    setWasEdited(true)
   }
 
   function handleTechnicalConsultant(id: number) {
     setTechnicalConsultant((prevState) => {
-      return technicalConsultantsList.filter((c) => c.id === id)[0];
-    });
+      return technicalConsultantsList.filter((c) => c.id === id)[0]
+    })
   }
 
   function handleCancelled() {
-    setWasEdited(false);
-    setIsEditSelectedCard(null);
+    setWasEdited(false)
+    setIsEditSelectedCard(null)
   }
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts({
       isOpen,
-      title: "",
-      type: "success",
-    });
+      title: '',
+      type: 'success',
+    })
   }
 
   function handleDateSchedule(data: Dayjs | null) {
-    setVisitDate(data);
+    setVisitDate(data)
   }
 
   async function onSave() {
@@ -171,24 +171,24 @@ export default function ServiceSchedulesEdit() {
       chasis: clientVehicle?.chassis,
       plate: clientVehicle?.plate,
       claims_service: [],
-    };
+    }
     try {
       const respUpdate: any = await api.update(
-        "/service-schedule/" + router.query.id,
+        '/service-schedule/' + router.query.id,
         dataFormatted
-      );
-      setIsEditSelectedCard(null);
+      )
+      setIsEditSelectedCard(null)
       setActionAlerts({
         isOpen: true,
-        title: `${respUpdate.data.msg ?? "Salvo com sucesso!"}!`,
-        type: "success",
-      });
+        title: `${respUpdate.data.msg ?? 'Salvo com sucesso!'}!`,
+        type: 'success',
+      })
     } catch (e: any) {
       setActionAlerts({
         isOpen: true,
-        title: `${e.response.data.msg ?? "Error inesperado"}!`,
-        type: "error",
-      });
+        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        type: 'error',
+      })
     }
   }
 
@@ -266,7 +266,7 @@ export default function ServiceSchedulesEdit() {
 
   async function createCheckListBase() {
     try {
-      const modelChecklist = await api.get("/checklist_model/list");
+      const modelChecklist = await api.get('/checklist_model/list')
       const dataCreateChecklist = {
         company_id: companySelected,
         brand_id:
@@ -282,18 +282,18 @@ export default function ServiceSchedulesEdit() {
           ? parseInt(router?.query?.id as string)
           : null,
         checklist_model: 1,
-        status: "rascunho", // finalizado // pendente // rascunho
+        status: 'rascunho', // finalizado // pendente // rascunho
         stages: modelChecklist.data.data[0].stages,
-      };
+      }
       if (modelChecklist.data.data.length > 0) {
         const createdDefault = await api.create(
-          "/checklist",
+          '/checklist',
           dataCreateChecklist
-        );
-        router.replace(`/checklist/create/${createdDefault?.data?.data?.id}`);
+        )
+        router.replace(`/checklist/create/${createdDefault?.data?.data?.id}`)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
@@ -302,110 +302,110 @@ export default function ServiceSchedulesEdit() {
     status: dataTechnicalConsultantListStatus,
   } = useQuery<TechnicalConsultant[]>(
     [
-      "service_schedule",
-      "by_id",
-      "edit",
-      "technical-consultant-list",
-      "options",
+      'service_schedule',
+      'by_id',
+      'edit',
+      'technical-consultant-list',
+      'options',
     ],
     async () => {
       const resp = await api.get(
         `/technical-consultant?company_id=${companySelected}`
-      );
-      return resp.data.data;
+      )
+      return resp.data.data
     },
     { enabled: !!companySelected && wasEdited }
-  );
+  )
 
   const { data: dataServiceSchedule, status: dataServiceScheduleStatus } =
     useQuery({
-      queryKey: ["service_schedule", "by_id", "edit"],
+      queryKey: ['service_schedule', 'by_id', 'edit'],
       queryFn: async () => {
-        const { id } = router.query;
-        const resp = await api.get(`/service-schedule/${id}`);
+        const { id } = router.query
+        const resp = await api.get(`/service-schedule/${id}`)
 
-        return resp.data.data;
+        return resp.data.data
       },
       enabled: !!router?.query?.id && !!companySelected && !wasEdited,
-    });
+    })
 
   useEffect(() => {
-    if (dataTechnicalConsultantListStatus === "success") {
+    if (dataTechnicalConsultantListStatus === 'success') {
       setTechnicalConsultantsList(
         dataTechnicalConsultantList.map((item: TechnicalConsultant) => ({
           id: item.id,
           name: item.name,
         }))
-      );
+      )
     }
-  }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList]);
+  }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
 
   useEffect(() => {
-    if (dataServiceScheduleStatus === "success") {
+    if (dataServiceScheduleStatus === 'success') {
       const { client, client_vehicle, technical_consultant, promised_date } =
-        dataServiceSchedule;
+        dataServiceSchedule
       setClient({
         id: client.id,
-        name: client.name ?? "Não informado",
-        cpf: client.document ?? "Não informado",
-        email: client.email ?? "Não informado",
-        telefone: client.phone ?? "Não informado",
-        address: client.address ?? "Não informado",
-      });
+        name: client.name ?? 'Não informado',
+        cpf: client.document ?? 'Não informado',
+        email: client.email ?? 'Não informado',
+        telefone: client.phone ?? 'Não informado',
+        address: client.address ?? 'Não informado',
+      })
 
       setClientVehicle({
         id: client_vehicle.id,
-        brand: client_vehicle?.vehicle?.model?.brand?.name ?? "Não informado",
-        chassis: client_vehicle?.chasis ?? "Não informado",
-        vehicle: client_vehicle?.vehicle?.name ?? "Não informado",
+        brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+        chassis: client_vehicle?.chasis ?? 'Não informado',
+        vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
         model:
           `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-          "Não informado",
-        color: client_vehicle?.color ?? "Não informado",
-        plate: client_vehicle?.plate ?? "Não informado",
-      });
-      const promisedDate = dayjs(new Date(promised_date));
-      setVisitDate(promisedDate);
+          'Não informado',
+        color: client_vehicle?.color ?? 'Não informado',
+        plate: client_vehicle?.plate ?? 'Não informado',
+      })
+      const promisedDate = dayjs(new Date(promised_date))
+      setVisitDate(promisedDate)
 
       setTechnicalConsultant({
-        id: technical_consultant?.id ?? "Não informado",
-        name: technical_consultant?.name ?? "Não informado",
-      });
+        id: technical_consultant?.id ?? 'Não informado',
+        name: technical_consultant?.name ?? 'Não informado',
+      })
     }
-  }, [dataServiceScheduleStatus, dataServiceSchedule]);
+  }, [dataServiceScheduleStatus, dataServiceSchedule])
 
   const { data: serviceScheduleDefault, status: serviceScheduleDefaultStatus } =
     useQuery<ChecklistProps>(
       [
-        "service_schedule",
-        "by_id",
-        "edit",
-        "openModal",
-        "default",
+        'service_schedule',
+        'by_id',
+        'edit',
+        'openModal',
+        'default',
         companySelected,
         router.query.id,
       ],
       async () => {
         const resp = await api.get(
           `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`
-        );
+        )
         if (resp.data.data.length > 0) {
-          setDefaultCheckListPrint(resp.data.data[0].id);
+          setDefaultCheckListPrint(resp.data.data[0].id)
         } else {
-          setDefaultCheckListPrint(null);
+          setDefaultCheckListPrint(null)
         }
-        return resp.data.data;
+        return resp.data.data
       },
       {
         enabled: openPrintInspectionModal,
       }
-    );
+    )
 
-  console.log(serviceScheduleDefaultStatus);
+  console.log(serviceScheduleDefaultStatus)
 
   useEffect(() => {
-    localStorage.removeItem("service-schedule-list");
-  }, []);
+    localStorage.removeItem('service-schedule-list')
+  }, [])
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -422,8 +422,8 @@ export default function ServiceSchedulesEdit() {
             <Paper
               sx={{
                 p: 2,
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               <Stack
@@ -441,28 +441,28 @@ export default function ServiceSchedulesEdit() {
               <DividerCard />
               <List dense={false}>
                 <ListItemCard alignItems="flex-start">
-                  <InfoCardName>Nome:</InfoCardName>{" "}
+                  <InfoCardName>Nome:</InfoCardName>{' '}
                   {client?.name ? (
                     <InfoCardText>{client?.name}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
                   )}
                 </ListItemCard>
                 <ListItemCard alignItems="flex-start">
-                  <InfoCardName>CPF:</InfoCardName>{" "}
+                  <InfoCardName>CPF:</InfoCardName>{' '}
                   {client?.cpf ? (
                     <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -471,20 +471,20 @@ export default function ServiceSchedulesEdit() {
                 {client?.telefone ? (
                   client?.telefone.map((phone, index) => (
                     <ListItemCard
-                      key={index + "-" + phone}
+                      key={index + '-' + phone}
                       alignItems="flex-start"
                     >
-                      <InfoCardName>Telefone:</InfoCardName>{" "}
+                      <InfoCardName>Telefone:</InfoCardName>{' '}
                       <InfoCardText>{phone}</InfoCardText>
                     </ListItemCard>
                   ))
                 ) : (
                   <ListItemCard>
-                    <InfoCardName>Telefone:</InfoCardName>{" "}
+                    <InfoCardName>Telefone:</InfoCardName>{' '}
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -493,20 +493,20 @@ export default function ServiceSchedulesEdit() {
                 {client?.email ? (
                   client?.email.map((email, index) => (
                     <ListItemCard
-                      key={index + "-" + email}
+                      key={index + '-' + email}
                       alignItems="flex-start"
                     >
-                      <InfoCardName>E-mail:</InfoCardName>{" "}
+                      <InfoCardName>E-mail:</InfoCardName>{' '}
                       <InfoCardText>{email}</InfoCardText>
                     </ListItemCard>
                   ))
                 ) : (
                   <ListItemCard alignItems="flex-start">
-                    <InfoCardName>E-mail:</InfoCardName>{" "}
+                    <InfoCardName>E-mail:</InfoCardName>{' '}
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -515,20 +515,20 @@ export default function ServiceSchedulesEdit() {
                 {client?.address ? (
                   client?.address.map((address, index) => (
                     <ListItemCard
-                      key={index + "-" + address}
+                      key={index + '-' + address}
                       alignItems="flex-start"
                     >
-                      <InfoCardName>Endereço:</InfoCardName>{" "}
+                      <InfoCardName>Endereço:</InfoCardName>{' '}
                       <InfoCardText>{address}</InfoCardText>
                     </ListItemCard>
                   ))
                 ) : (
                   <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Endereço:</InfoCardName>{" "}
+                    <InfoCardName>Endereço:</InfoCardName>{' '}
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -540,8 +540,8 @@ export default function ServiceSchedulesEdit() {
             <Paper
               sx={{
                 p: 2,
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               <Stack
@@ -559,77 +559,77 @@ export default function ServiceSchedulesEdit() {
               <DividerCard />
               <List dense={false}>
                 <ListItemCard>
-                  <InfoCardName>Marca:</InfoCardName>{" "}
+                  <InfoCardName>Marca:</InfoCardName>{' '}
                   {clientVehicle?.brand ? (
                     <InfoCardText>{clientVehicle?.brand}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
                   )}
                 </ListItemCard>
                 <ListItemCard>
-                  <InfoCardName>Modelo:</InfoCardName>{" "}
+                  <InfoCardName>Modelo:</InfoCardName>{' '}
                   {clientVehicle?.model ? (
                     <InfoCardText>{clientVehicle?.model}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
                   )}
                 </ListItemCard>
                 <ListItemCard>
-                  <InfoCardName>Veículo:</InfoCardName>{" "}
+                  <InfoCardName>Veículo:</InfoCardName>{' '}
                   {clientVehicle?.vehicle ? (
                     <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
                   )}
                 </ListItemCard>
                 <ListItemCard>
-                  <InfoCardName>Cor:</InfoCardName>{" "}
+                  <InfoCardName>Cor:</InfoCardName>{' '}
                   {clientVehicle?.color ? (
                     <InfoCardText>{clientVehicle?.color}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
                   )}
                 </ListItemCard>
                 <ListItemCard>
-                  <InfoCardName>Chassi:</InfoCardName>{" "}
+                  <InfoCardName>Chassi:</InfoCardName>{' '}
                   {clientVehicle?.chassis ? (
                     <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
                   )}
                 </ListItemCard>
                 <ListItemCard>
-                  <InfoCardName>Placa:</InfoCardName>{" "}
+                  <InfoCardName>Placa:</InfoCardName>{' '}
                   {clientVehicle?.plate ? (
                     <InfoCardText>
                       {formatPlate(clientVehicle?.plate)}
@@ -638,7 +638,7 @@ export default function ServiceSchedulesEdit() {
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -663,7 +663,7 @@ export default function ServiceSchedulesEdit() {
               <ButtonCenter
                 // disabled={defaultCheckListPrint === null}
                 onClick={() => {
-                  setOpenPrintInspectionModal(true);
+                  setOpenPrintInspectionModal(true)
                 }}
               >
                 <PrintIcon />
@@ -693,8 +693,8 @@ export default function ServiceSchedulesEdit() {
             <Paper
               sx={{
                 p: 2,
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               <Stack
@@ -711,14 +711,14 @@ export default function ServiceSchedulesEdit() {
               <DividerCard />
               <List dense={false}>
                 <ListItemCard>
-                  <InfoCardName>Número do atendimento:</InfoCardName>{" "}
+                  <InfoCardName>Número do atendimento:</InfoCardName>{' '}
                   {router.query.id ? (
                     <InfoCardText>{router.query.id}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -726,13 +726,13 @@ export default function ServiceSchedulesEdit() {
                 </ListItemCard>
                 <ListItemCard>
                   <InfoCardName>Data da visita:</InfoCardName>
-                  {isEditSelectedCard === "schedule" && (
+                  {isEditSelectedCard === 'schedule' && (
                     <DataTimeInput
                       dateSchedule={visitDate}
                       handleDateSchedule={handleDateSchedule}
                     />
                   )}
-                  {isEditSelectedCard !== "schedule" && visitDate && (
+                  {isEditSelectedCard !== 'schedule' && visitDate && (
                     <InfoCardText>
                       {formatDateTime(`${visitDate}`)}
                     </InfoCardText>
@@ -741,7 +741,7 @@ export default function ServiceSchedulesEdit() {
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -749,14 +749,14 @@ export default function ServiceSchedulesEdit() {
                 </ListItemCard>
               </List>
             </Paper>
-            {wasEdited && isEditSelectedCard === "schedule" && (
+            {wasEdited && isEditSelectedCard === 'schedule' && (
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
-                    p: "0 2",
-                    display: "flex",
-                    flexDirection: "column",
-                    background: "transparent",
+                    p: '0 2',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'transparent',
                   }}
                   elevation={0}
                 >
@@ -783,8 +783,8 @@ export default function ServiceSchedulesEdit() {
             <Paper
               sx={{
                 p: 2,
-                display: "flex",
-                flexDirection: "column",
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               <Stack
@@ -801,28 +801,28 @@ export default function ServiceSchedulesEdit() {
               <DividerCard />
               <List dense={false}>
                 <ListItemCard>
-                  <InfoCardName>Nome:</InfoCardName>{" "}
-                  {isEditSelectedCard !== "technicalConsultant" &&
+                  <InfoCardName>Nome:</InfoCardName>{' '}
+                  {isEditSelectedCard !== 'technicalConsultant' &&
                   technicalConsultant?.name ? (
                     <InfoCardText>{technicalConsultant?.name}</InfoCardText>
                   ) : (
-                    isEditSelectedCard !== "technicalConsultant" && (
+                    isEditSelectedCard !== 'technicalConsultant' && (
                       <InfoCardText width="100%">
                         <Skeleton
                           variant="text"
-                          sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                          sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                           width="100%"
                         />
                       </InfoCardText>
                     )
                   )}
-                  {isEditSelectedCard === "technicalConsultant" && (
+                  {isEditSelectedCard === 'technicalConsultant' && (
                     <Box width="100%">
                       <TextField
                         id="standard-select-currency"
                         select
                         sx={{
-                          width: "100%",
+                          width: '100%',
                         }}
                         value={technicalConsultant?.id}
                         variant="standard"
@@ -843,14 +843,14 @@ export default function ServiceSchedulesEdit() {
                   )}
                 </ListItemCard>
                 <ListItemCard>
-                  <InfoCardName>Código consultor:</InfoCardName>{" "}
+                  <InfoCardName>Código consultor:</InfoCardName>{' '}
                   {technicalConsultant?.id ? (
                     <InfoCardText>{technicalConsultant?.id}</InfoCardText>
                   ) : (
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
-                        sx={{ fontSize: "1rem", lineHeight: 1.5 }}
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
                         width="100%"
                       />
                     </InfoCardText>
@@ -858,14 +858,14 @@ export default function ServiceSchedulesEdit() {
                 </ListItemCard>
               </List>
             </Paper>
-            {wasEdited && isEditSelectedCard === "technicalConsultant" && (
+            {wasEdited && isEditSelectedCard === 'technicalConsultant' && (
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
-                    p: "0 2",
-                    display: "flex",
-                    flexDirection: "column",
-                    background: "transparent",
+                    p: '0 2',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'transparent',
                   }}
                   elevation={0}
                 >
@@ -905,7 +905,7 @@ export default function ServiceSchedulesEdit() {
         serviceScheduleId={router?.query?.id as string}
         closeChecklistModal={closeChecklistModal}
       />
-      {serviceScheduleDefaultStatus === "success" &&
+      {serviceScheduleDefaultStatus === 'success' &&
         defaultCheckListPrint !== null && (
           <PrintInspectionModal
             isOpen={openPrintInspectionModal}
@@ -915,7 +915,7 @@ export default function ServiceSchedulesEdit() {
           />
         )}
     </Container>
-  );
+  )
 }
 
-ServiceSchedulesEdit.auth = true;
+ServiceSchedulesEdit.auth = true

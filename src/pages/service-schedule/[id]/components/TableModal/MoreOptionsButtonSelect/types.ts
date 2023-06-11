@@ -1,13 +1,13 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
 export type MoreOptionsButtonSelectProps = {
-  disabledButton?: boolean;
+  disabledButton?: boolean
   buttons?: {
-    label: string;
-    icon?: ReactNode;
-    action?: (value?: any) => void;
-  }[];
-  checklistId?: number | undefined;
-  status: string;
-  handleDeleteChecklist: (id: number) => Promise<void>;
-};
+    label: string
+    icon?: ReactNode
+    action?: (value?: any) => void
+  }[]
+  checklistId?: number | undefined
+  status: string
+  handleDeleteChecklist: (id: number) => Promise<void>
+}

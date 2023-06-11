@@ -1,5 +1,5 @@
-import { styled } from "@mui/material/styles";
-import MenuItem from "@mui/material/MenuItem";
+import { styled } from '@mui/material/styles'
+import MenuItem from '@mui/material/MenuItem'
 // import IconButton from "@mui/material/IconButton";
 
 export const MenuItemButton = styled(MenuItem)(({ theme }) => ({
@@ -10,8 +10,8 @@ export const MenuItemButton = styled(MenuItem)(({ theme }) => ({
   // borderBottomRightRadius: 0,
   // flex: 1,
   // textTransform: 'none',
-  "&:hover": {
-    background: "#1ACABA",
-    color: "white",
+  '&:hover': {
+    background: '#1ACABA',
+    color: 'white',
   },
-}));
+}))

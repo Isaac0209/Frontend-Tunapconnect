@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
-import { DashboardContent } from "./DashboardContent";
+import { ReactNode } from 'react'
+import { DashboardContent } from './DashboardContent'
 
 interface LayoutProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -10,5 +10,5 @@ export default function Layout({ children }: LayoutProps) {
     <>
       <DashboardContent>{children}</DashboardContent>
     </>
-  );
+  )
 }

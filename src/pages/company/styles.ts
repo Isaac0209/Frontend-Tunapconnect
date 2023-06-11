@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
-import Paper from "@mui/material/Paper";
+import styled from '@emotion/styled'
+import Paper from '@mui/material/Paper'
 
 export const ContainerItem = styled(Paper)`
   &:hover {
@@ -8,4 +8,4 @@ export const ContainerItem = styled(Paper)`
     cursor: pointer;
     transition: all 0.3s;
   }
-`;
+`

@@ -1,15 +1,15 @@
-import styled from "@emotion/styled";
-import ButtonBase from "@mui/material/ButtonBase";
-import { Box, Button, Stack, Tabs, TextField, Typography } from "@mui/material";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import styled from '@emotion/styled'
+import ButtonBase from '@mui/material/ButtonBase'
+import { Box, Button, Stack, Tabs, TextField, Typography } from '@mui/material'
+import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 
 interface LabelButtonMarkupTypeProps {
-  selectedActual: boolean;
+  selectedActual: boolean
 }
 
 interface ClickableAreaProps {
-  urlImg?: string;
+  urlImg?: string
 }
 // interface ButtonMarkupProps {
 //   topmarkup: number
@@ -17,47 +17,47 @@ interface ClickableAreaProps {
 // }
 interface ButtonMarkupProps {
   mobile: {
-    top: number;
-    left: number;
-  };
+    top: number
+    left: number
+  }
   web: {
-    top: number;
-    left: number;
-  };
+    top: number
+    left: number
+  }
 }
 
 export const TabsContainer = styled(Tabs)(({ theme }) => ({
-  color: "black",
-  fontWeight: "bold",
-  background: "#d5d5d5",
+  color: 'black',
+  fontWeight: 'bold',
+  background: '#d5d5d5',
   // borderTopRightRadius: 0,
   // borderBottomRightRadius: 0,
   // padding: '5px 16px',
-  textTransform: "none",
-  "& .Mui-selected": {
-    background: "#93BE0F",
-    color: "#FFFFFF",
+  textTransform: 'none',
+  '& .Mui-selected': {
+    background: '#93BE0F',
+    color: '#FFFFFF',
   },
-  "& .MuiTabs-indicator": {
-    backgroundColor: "#ffffff",
+  '& .MuiTabs-indicator': {
+    backgroundColor: '#ffffff',
   },
-}));
+}))
 
-export const LabelButtonMarkupType = styled("label")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "5px",
-  "& > span": {
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    fontSize: "12px",
+export const LabelButtonMarkupType = styled('label')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '5px',
+  '& > span': {
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    fontSize: '12px',
   },
-  "&:hover": {
-    cursor: "pointer",
+  '&:hover': {
+    cursor: 'pointer',
   },
-}));
+}))
 
 export const ButtonMarkupType = styled.button<LabelButtonMarkupTypeProps>`
   color: #707070;
@@ -72,16 +72,16 @@ export const ButtonMarkupType = styled.button<LabelButtonMarkupTypeProps>`
   justify-content: center;
 
   line-height: 25px;
-  border: 3px solid ${(props) => (props.selectedActual ? "#93BE0F" : "#1acaba")};
+  border: 3px solid ${(props) => (props.selectedActual ? '#93BE0F' : '#1acaba')};
 
   border-radius: 50%;
   padding: 0;
   &:hover {
-    background: ${(props) => (props.selectedActual ? "#93BE0F" : "#1acaba")};
+    background: ${(props) => (props.selectedActual ? '#93BE0F' : '#1acaba')};
     color: #fff;
     cursor: pointer;
   }
-`;
+`
 export const ContainerButtonsMarkupType = styled(Stack)`
   @media (max-width: 600px) {
     /* width: 330px; */
@@ -93,7 +93,7 @@ export const ContainerButtonsMarkupType = styled(Stack)`
     margin-right: -230px;
     z-index: 1000;
   }
-`;
+`
 
 export const ButtonMarkup = styled(ButtonBase)<ButtonMarkupProps>`
   color: #707070;
@@ -138,7 +138,7 @@ export const ButtonMarkup = styled(ButtonBase)<ButtonMarkupProps>`
     height: 30px;
     font-size: 20px;
   }
-`;
+`
 
 export const ContainerClickableArea = styled(Box)`
   width: 470px;
@@ -155,9 +155,9 @@ export const ContainerClickableArea = styled(Box)`
   /* @media (min-width: 601px) and (max-width: 960px) {
     margin: 0;
   } */
-`;
+`
 
-export const ClickableArea = styled("img")<ClickableAreaProps>`
+export const ClickableArea = styled('img')<ClickableAreaProps>`
   /* width: 490px; */
   width: 470px;
   height: 350px;
@@ -180,47 +180,47 @@ export const ClickableArea = styled("img")<ClickableAreaProps>`
     width: calc(470px - (470px * 0.3));
     height: calc(350px - (350px * 0.3));
   }
-`;
+`
 
 export const MyButton = styled(Button)(({ theme }) => ({
-  color: "white",
-  background: "#0E948B",
+  color: 'white',
+  background: '#0E948B',
   borderRadius: 4,
   // borderTopRightRadius: 0,
   // borderBottomRightRadius: 0,
   // padding: '5px 16px',
   flex: 1,
-  textTransform: "none",
-  "&:hover": {
-    background: "#1ACABA",
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
   },
-}));
+}))
 export const ButtonLeft = styled(Button)(({ theme }) => ({
-  color: "white",
-  background: "#93BE0F",
+  color: 'white',
+  background: '#93BE0F',
   borderRadius: 0,
   borderTopLeftRadius: 6,
   borderBottomLeftRadius: 6,
   // padding: '5px 16px',
   flex: 1,
-  textTransform: "none",
-  "&:hover": {
-    background: "#1ACABA",
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
   },
-}));
+}))
 export const ButtonRight = styled(Button)(({ theme }) => ({
-  color: "white",
-  background: "#93BE0F",
+  color: 'white',
+  background: '#93BE0F',
   borderRadius: 0,
   borderTopRightRadius: 6,
   borderBottomRightRadius: 6,
   // padding: '5px 16px',
   flex: 1,
-  textTransform: "none",
-  "&:hover": {
-    background: "#1ACABA",
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
   },
-}));
+}))
 
 export const ContainerInformation = styled(Stack)`
   border: 1px solid #acaaaa;
@@ -241,7 +241,7 @@ export const ContainerInformation = styled(Stack)`
     width: 560px;
     margin: 0 auto;
   }
-`;
+`
 export const ContainerButtonsInformation = styled(Stack)`
   width: 100%;
   margin: 10px auto 0 auto;
@@ -254,23 +254,23 @@ export const ContainerButtonsInformation = styled(Stack)`
   @media (min-width: 901px) and (max-width: 1200px) {
     width: 560px;
   }
-`;
+`
 export const IconUpload = styled(FileUploadOutlinedIcon)(({ theme }) => ({
-  fontSize: "16px",
-}));
+  fontSize: '16px',
+}))
 export const IconClose = styled(CloseOutlinedIcon)(({ theme }) => ({
-  fontSize: "16px",
-}));
+  fontSize: '16px',
+}))
 
 export const Title = styled(Typography)(({ theme }) => ({
-  fontSize: "10px",
-  textTransform: "uppercase",
-  display: "flex",
-}));
+  fontSize: '10px',
+  textTransform: 'uppercase',
+  display: 'flex',
+}))
 
 export const TextAreaField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
+  '& .MuiOutlinedInput-root': {
     padding: 6,
     fontSize: 10,
   },
-}));
+}))

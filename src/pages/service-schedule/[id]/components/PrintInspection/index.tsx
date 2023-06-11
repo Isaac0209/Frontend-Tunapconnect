@@ -1,42 +1,42 @@
 // import { ApiCore } from '@/lib/api'
-import classNames from "classnames";
-import style from "@/sass/styles/printInspection.module.scss";
-import { ApiCore } from "@/lib/api";
-import { useRouter } from "next/router";
+import classNames from 'classnames'
+import style from '@/sass/styles/printInspection.module.scss'
+import { ApiCore } from '@/lib/api'
+import { useRouter } from 'next/router'
 import {
   Itens,
   ResponseGetCheckList,
   StagesDataProps,
-} from "@/pages/checklist/types";
-import { useQuery } from "react-query";
-import { useState } from "react";
-import { Paper, Stack, Typography } from "@mui/material";
-import Image from "next/image";
+} from '@/pages/checklist/types'
+import { useQuery } from 'react-query'
+import { useState } from 'react'
+import { Paper, Stack, Typography } from '@mui/material'
+import Image from 'next/image'
 
-const SquareCheck = ({ type = "success", checked = false }) => (
-  <div className={classNames(style["square-check"], style[`bg-${type}`])}>
-    <div className={checked ? style.checked : ""}></div>
+const SquareCheck = ({ type = 'success', checked = false }) => (
+  <div className={classNames(style['square-check'], style[`bg-${type}`])}>
+    <div className={checked ? style.checked : ''}></div>
   </div>
-);
+)
 
 const TripleSquareCheck = ({
   first = { checked: false },
   second = { checked: false },
   third = { checked: false },
 }) => (
-  <div className={style["tripe-square-check"]}>
+  <div className={style['tripe-square-check']}>
     <SquareCheck checked={first.checked} />
     <SquareCheck type="warning" checked={second.checked} />
     <SquareCheck type="danger" checked={third.checked} />
   </div>
-);
+)
 
 interface PrintInspectionProps {
-  companyId: number | null;
-  id: number;
-  type: string;
-  checklistId: number;
-  refPrint: any;
+  companyId: number | null
+  id: number
+  type: string
+  checklistId: number
+  refPrint: any
 }
 
 export function PrintInspection({
@@ -46,83 +46,83 @@ export function PrintInspection({
   checklistId,
   refPrint,
 }: PrintInspectionProps) {
-  const api = new ApiCore();
-  const router = useRouter();
-  console.log(checklistId);
-  const [receptionStage, setReceptionStage] = useState<StagesDataProps>();
-  const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>();
+  const api = new ApiCore()
+  const router = useRouter()
+  console.log(checklistId)
+  const [receptionStage, setReceptionStage] = useState<StagesDataProps>()
+  const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>()
 
   const { data } = useQuery<ResponseGetCheckList>(
-    ["checklist-createByID-print", router?.query?.id, checklistId, companyId],
+    ['checklist-createByID-print', router?.query?.id, checklistId, companyId],
     () =>
       api
         .get(`/checklist/${checklistId}?company_id=${companyId}`)
         .then((response) => {
           const reception = response.data.data.stages.filter(
-            (st: any) => st.name === "Recepção"
-          );
+            (st: any) => st.name === 'Recepção'
+          )
           const delivery = response.data.data.stages.filter(
-            (st: any) => st.name === "Entrega"
-          );
+            (st: any) => st.name === 'Entrega'
+          )
           // console.log(reception[0])
-          setReceptionStage(reception[0]);
-          setDeliveryStage(delivery[0]);
-          return response.data.data;
+          setReceptionStage(reception[0])
+          setDeliveryStage(delivery[0])
+          return response.data.data
         }),
     {
       refetchOnWindowFocus: false,
       // enabled: !!checklistId && !!router?.query?.id,
     }
-  );
+  )
 
   // console.log(data)
   const recepcaoInspecao = data?.stages[0].itens.filter(
-    (item) => item.rules.type === "visual_inspect"
-  );
+    (item) => item.rules.type === 'visual_inspect'
+  )
   const entregaInspecao = data?.stages[1].itens.filter(
-    (item) => item.rules.type === "visual_inspect"
-  );
+    (item) => item.rules.type === 'visual_inspect'
+  )
 
-  console.log(data);
+  console.log(data)
 
   function getCodeReceptionStage(code: string): Itens {
-    const result = receptionStage?.itens.filter((it) => it.Code === code);
+    const result = receptionStage?.itens.filter((it) => it.Code === code)
     if (result) {
       if (result.length > 0) {
-        const auxResult = result[0];
-        return auxResult;
+        const auxResult = result[0]
+        return auxResult
       }
     }
     return {
-      name: "nao encontrado",
-      comment: "",
-      Code: "none",
+      name: 'nao encontrado',
+      comment: '',
+      Code: 'none',
       rules: {
         required: false,
-        type: "none",
+        type: 'none',
       },
 
       values: { value: false, images: [] },
-    };
+    }
   }
   function getCodeDeliveryStage(code: string): Itens {
-    const result = deliveryStage?.itens.filter((it) => it.Code === code);
+    const result = deliveryStage?.itens.filter((it) => it.Code === code)
     if (result) {
       if (result.length > 0) {
-        const auxResult = result[0];
-        return auxResult;
+        const auxResult = result[0]
+        return auxResult
       }
     }
     return {
-      name: "nao encontrado",
-      comment: "",
-      Code: "none",
+      name: 'nao encontrado',
+      comment: '',
+      Code: 'none',
       rules: {
         required: false,
-        type: "none",
+        type: 'none',
       },
       values: { value: false, images: [] },
-    };
+    }
   }
 
   return (
@@ -132,9 +132,9 @@ export function PrintInspection({
           <div className={style.row}>
             <div
               className={classNames(
-                style["col-40"],
-                style["d-flex"],
-                style["align-items-center"]
+                style['col-40'],
+                style['d-flex'],
+                style['align-items-center']
               )}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -161,43 +161,43 @@ export function PrintInspection({
             <div className={style['col-35']}>Toyota Ramires</div>
           </div> */}
         </header>
-        <div className={style["container-fluid"]}>
+        <div className={style['container-fluid']}>
           <div
             className={classNames(
               style.row,
-              style["my-2"],
-              style["text-center"],
-              style["fw-500"]
+              style['my-2'],
+              style['text-center'],
+              style['fw-500']
             )}
           >
             <div className={style.col}>
               <div
                 className={classNames(
-                  style["bg-success"],
-                  style["p-2"],
-                  style["round-2"]
+                  style['bg-success'],
+                  style['p-2'],
+                  style['round-2']
                 )}
               >
                 OK/SUBSTITUÍDO
               </div>
             </div>
-            <div className={classNames(style.col, style["px-2"])}>
+            <div className={classNames(style.col, style['px-2'])}>
               <div
                 className={classNames(
-                  style["bg-warning"],
-                  style["p-2"],
-                  style["round-2"]
+                  style['bg-warning'],
+                  style['p-2'],
+                  style['round-2']
                 )}
               >
-                REQUER TROCA/REPARO FUTURO{" "}
+                REQUER TROCA/REPARO FUTURO{' '}
               </div>
             </div>
             <div className={style.col}>
               <div
                 className={classNames(
-                  style["bg-danger"],
-                  style["p-2"],
-                  style["round-2"]
+                  style['bg-danger'],
+                  style['p-2'],
+                  style['round-2']
                 )}
               >
                 REQUER TROCA/REPARO IMEDIATO
@@ -205,27 +205,27 @@ export function PrintInspection({
             </div>
           </div>
 
-          <div className={classNames(style.row, style["mb-1"])}>
+          <div className={classNames(style.row, style['mb-1'])}>
             <div
-              className={classNames(style["col-5"])}
-              style={{ alignSelf: "start" }}
+              className={classNames(style['col-5'])}
+              style={{ alignSelf: 'start' }}
             >
-              <div className={classNames(style["form-slot"], style["me-2"])}>
+              <div className={classNames(style['form-slot'], style['me-2'])}>
                 <label>Cliente:</label> {data?.client.name}
               </div>
               <div
                 className={classNames(
                   style.row,
-                  style["mt-1"],
-                  style["les-tres"]
+                  style['mt-1'],
+                  style['les-tres']
                 )}
               >
                 <div className={style.col}>
-                  <div className={classNames(style["form-slot"], style.placa)}>
+                  <div className={classNames(style['form-slot'], style.placa)}>
                     {/* @ts-ignore */}
                     <label>Placa:</label> {data?.vehicleclient?.plate}
                   </div>
-                  <div className={style["blue-slots"]}>
+                  <div className={style['blue-slots']}>
                     <div>Cliente acompanha inspeção?</div>
                     <div>Fixação tapete genuíno</div>
                     <div>Macaco</div>
@@ -240,11 +240,11 @@ export function PrintInspection({
                     <div>Quilometragem</div>
                     <div
                       className={classNames(
-                        style["bg-secondary"],
-                        style["text-black"],
-                        style["text-center"],
-                        style["fw-700"],
-                        style["py-1"]
+                        style['bg-secondary'],
+                        style['text-black'],
+                        style['text-center'],
+                        style['fw-700'],
+                        style['py-1']
                       )}
                     >
                       Condição
@@ -253,11 +253,11 @@ export function PrintInspection({
                     </div>
                     <div
                       className={classNames(
-                        style["bg-secondary"],
-                        style["text-black"],
-                        style["text-center"],
-                        style["fw-700"],
-                        style["py-1"]
+                        style['bg-secondary'],
+                        style['text-black'],
+                        style['text-center'],
+                        style['fw-700'],
+                        style['py-1']
                       )}
                     >
                       Assinatura
@@ -266,27 +266,27 @@ export function PrintInspection({
                     </div>
                   </div>
                 </div>
-                <div className={classNames(style.col, style["px-2"])}>
+                <div className={classNames(style.col, style['px-2'])}>
                   <div>
-                    <div className={style["icon-header"]}>
-                      <span className={style["text-center"]}>Recepção</span>
+                    <div className={style['icon-header']}>
+                      <span className={style['text-center']}>Recepção</span>
                       <div className={style.icon}>icon</div>
                     </div>
                     <div
                       className={classNames(
                         style.row,
-                        style["text-center"],
-                        style["pt-1"],
-                        style["fw-700"],
+                        style['text-center'],
+                        style['pt-1'],
+                        style['fw-700'],
                         style.small
                       )}
                     >
                       <div
                         className={classNames(
                           style.col,
-                          style["round-2"],
-                          style["b-1"],
-                          style["mx-5"]
+                          style['round-2'],
+                          style['b-1'],
+                          style['mx-5']
                         )}
                       >
                         Sim
@@ -294,9 +294,9 @@ export function PrintInspection({
                       <div
                         className={classNames(
                           style.col,
-                          style["round-2"],
-                          style["b-1"],
-                          style["mx-5"]
+                          style['round-2'],
+                          style['b-1'],
+                          style['mx-5']
                         )}
                       >
                         Não
@@ -304,144 +304,144 @@ export function PrintInspection({
                     </div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-CAI").values.value
+                        getCodeReceptionStage('RE-CAI').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeReceptionStage("RE-CAI").values.value
-                          ? ""
+                        getCodeReceptionStage('RE-CAI').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-FTG").values.value
+                        getCodeReceptionStage('RE-FTG').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeReceptionStage("RE-FTG").values.value
-                          ? ""
+                        getCodeReceptionStage('RE-FTG').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-M").values.value
+                        getCodeReceptionStage('RE-M').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeReceptionStage("RE-M").values.value
-                          ? ""
+                        getCodeReceptionStage('RE-M').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-TRI").values.value
+                        getCodeReceptionStage('RE-TRI').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeReceptionStage("RE-TRI").values.value
-                          ? ""
+                        getCodeReceptionStage('RE-TRI').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-CHA").values.value
+                        getCodeReceptionStage('RE-CHA').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeReceptionStage("RE-CHA").values.value
-                          ? ""
+                        getCodeReceptionStage('RE-CHA').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-EST").values.value
+                        getCodeReceptionStage('RE-EST').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeReceptionStage("RE-EST").values.value
-                          ? ""
+                        getCodeReceptionStage('RE-EST').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-DLG").values.value
+                        getCodeReceptionStage('RE-DLG').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeReceptionStage("RE-DLG").values.value
-                          ? ""
+                        getCodeReceptionStage('RE-DLG').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
-                  <div className={style["blue-slots"]}>
+                  <div className={style['blue-slots']}>
                     <div>
                       <div
-                        className={style["form-slot"]}
-                        style={{ color: "black" }}
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
                       >
-                        {getCodeReceptionStage("RE-COMB").values.value}
+                        {getCodeReceptionStage('RE-COMB').values.value}
                       </div>
                     </div>
                     <div>
                       <div
-                        className={style["form-slot"]}
-                        style={{ color: "black" }}
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
                       >
                         {data?.km}
                       </div>
@@ -449,58 +449,58 @@ export function PrintInspection({
                   </div>
 
                   <div
-                    className={classNames(style.row, style["three-checkboxes"])}
+                    className={classNames(style.row, style['three-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeReceptionStage("RE-CL").values.value === "Boa"
+                        getCodeReceptionStage('RE-CL').values.value === 'Boa'
                           ? style.checked
-                          : ""
+                          : ''
                       }
-                    ></div>{" "}
+                    ></div>{' '}
                     Boa
                     <div
                       className={
-                        getCodeReceptionStage("RE-CL").values.value ===
-                        "Regular"
+                        getCodeReceptionStage('RE-CL').values.value ===
+                        'Regular'
                           ? style.checked
-                          : ""
+                          : ''
                       }
-                    ></div>{" "}
+                    ></div>{' '}
                     Regular
                     <div
                       className={
-                        getCodeReceptionStage("RE-CL").values.value === "Ruim"
+                        getCodeReceptionStage('RE-CL').values.value === 'Ruim'
                           ? style.checked
-                          : ""
+                          : ''
                       }
-                    ></div>{" "}
+                    ></div>{' '}
                     Ruim
                   </div>
-                  <div className={style["form-slot"]}></div>
+                  <div className={style['form-slot']}></div>
                 </div>
-                <div className={classNames(style.col, style["px-2"])}>
+                <div className={classNames(style.col, style['px-2'])}>
                   <div>
-                    <div className={style["icon-header"]}>
-                      <span className={style["text-center"]}>Entrega</span>
+                    <div className={style['icon-header']}>
+                      <span className={style['text-center']}>Entrega</span>
                       <div className={style.icon}>icon</div>
                     </div>
                     <div
                       className={classNames(
                         style.row,
-                        style["text-center"],
-                        style["pt-1"],
-                        style["fw-700"],
+                        style['text-center'],
+                        style['pt-1'],
+                        style['fw-700'],
                         style.small
                       )}
                     >
                       <div
                         className={classNames(
                           style.col,
-                          style["round-2"],
-                          style["round-2"],
-                          style["b-1"],
-                          style["mx-5"]
+                          style['round-2'],
+                          style['round-2'],
+                          style['b-1'],
+                          style['mx-5']
                         )}
                       >
                         Sim
@@ -508,10 +508,10 @@ export function PrintInspection({
                       <div
                         className={classNames(
                           style.col,
-                          style["round-2"],
-                          style["round-2"],
-                          style["b-1"],
-                          style["mx-5"]
+                          style['round-2'],
+                          style['round-2'],
+                          style['b-1'],
+                          style['mx-5']
                         )}
                       >
                         Não
@@ -519,144 +519,144 @@ export function PrintInspection({
                     </div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CAI").values.value
+                        getCodeDeliveryStage('ENT-CAI').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CAI").values.value
-                          ? ""
+                        getCodeDeliveryStage('ENT-CAI').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-FTG").values.value
+                        getCodeDeliveryStage('ENT-FTG').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-FTG").values.value
-                          ? ""
+                        getCodeDeliveryStage('ENT-FTG').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-M").values.value
+                        getCodeDeliveryStage('ENT-M').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-M").values.value
-                          ? ""
+                        getCodeDeliveryStage('ENT-M').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-TRI").values.value
+                        getCodeDeliveryStage('ENT-TRI').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-TRI").values.value
-                          ? ""
+                        getCodeDeliveryStage('ENT-TRI').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CHA").values.value
+                        getCodeDeliveryStage('ENT-CHA').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CHA").values.value
-                          ? ""
+                        getCodeDeliveryStage('ENT-CHA').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-EST").values.value
+                        getCodeDeliveryStage('ENT-EST').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-EST").values.value
-                          ? ""
+                        getCodeDeliveryStage('ENT-EST').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
                   <div
-                    className={classNames(style.row, style["two-checkboxes"])}
+                    className={classNames(style.row, style['two-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CL").values.value
+                        getCodeDeliveryStage('ENT-CL').values.value
                           ? style.checked
-                          : ""
+                          : ''
                       }
                     ></div>
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CL").values.value
-                          ? ""
+                        getCodeDeliveryStage('ENT-CL').values.value
+                          ? ''
                           : style.checked
                       }
                     ></div>
                   </div>
-                  <div className={style["blue-slots"]}>
+                  <div className={style['blue-slots']}>
                     <div>
                       <div
-                        className={style["form-slot"]}
-                        style={{ color: "black" }}
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
                       >
-                        {getCodeReceptionStage("RE-COMB").values.value}
+                        {getCodeReceptionStage('RE-COMB').values.value}
                       </div>
                     </div>
                     <div>
                       <div
-                        className={style["form-slot"]}
-                        style={{ color: "black" }}
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
                       >
                         {data?.km}
                       </div>
@@ -664,57 +664,57 @@ export function PrintInspection({
                   </div>
 
                   <div
-                    className={classNames(style.row, style["three-checkboxes"])}
+                    className={classNames(style.row, style['three-checkboxes'])}
                   >
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CL").values.value === "Boa"
+                        getCodeDeliveryStage('ENT-CL').values.value === 'Boa'
                           ? style.checked
-                          : ""
+                          : ''
                       }
-                    ></div>{" "}
+                    ></div>{' '}
                     Boa
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CL").values.value ===
-                        "Regular"
+                        getCodeDeliveryStage('ENT-CL').values.value ===
+                        'Regular'
                           ? style.checked
-                          : ""
+                          : ''
                       }
-                    ></div>{" "}
+                    ></div>{' '}
                     Regular
                     <div
                       className={
-                        getCodeDeliveryStage("ENT-CL").values.value === "Ruim"
+                        getCodeDeliveryStage('ENT-CL').values.value === 'Ruim'
                           ? style.checked
-                          : ""
+                          : ''
                       }
-                    ></div>{" "}
+                    ></div>{' '}
                     Ruim
                   </div>
-                  <div className={style["form-slot"]}></div>
+                  <div className={style['form-slot']}></div>
                 </div>
               </div>
             </div>
-            <div className={style["col-7"]} style={{}}>
+            <div className={style['col-7']} style={{}}>
               <div
-                className={classNames(style["border-wrapper"], style["p-1"])}
+                className={classNames(style['border-wrapper'], style['p-1'])}
                 style={{ paddingTop: 3, paddingBottom: 7 }}
               >
                 <div className={style.row}>
-                  <div className={classNames(style["col-7"], style["pe-1"])}>
+                  <div className={classNames(style['col-7'], style['pe-1'])}>
                     <figure
-                      className={classNames(style.figure, style["mb-10"])}
+                      className={classNames(style.figure, style['mb-10'])}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src="/images/carrinho.jpg" alt="" />
                     </figure>
                     <table
                       className={classNames(
-                        style["table-head"],
-                        style["border-1"],
-                        style["my-2"],
-                        style["cell-h-sm"]
+                        style['table-head'],
+                        style['border-1'],
+                        style['my-2'],
+                        style['cell-h-sm']
                       )}
                     >
                       <thead>
@@ -729,8 +729,8 @@ export function PrintInspection({
                     <table
                       className={classNames(
                         style.bordered,
-                        style["table-head"],
-                        style["cell-h-sm"]
+                        style['table-head'],
+                        style['cell-h-sm']
                       )}
                     >
                       <thead>
@@ -745,26 +745,26 @@ export function PrintInspection({
                         <tr>
                           <td>Dianteiro Esquerdo</td>
                           <td>
-                            {getCodeReceptionStage("RE-PDE").values.value}
+                            {getCodeReceptionStage('RE-PDE').values.value}
                           </td>
-                          <td className={style["text-end"]}>
+                          <td className={style['text-end']}>
                             {/* getCodeReceptionStage('RE-SDE') */}
-                            ______(mm){" "}
+                            ______(mm){' '}
                             <TripleSquareCheck
                               first={{
                                 checked:
-                                  getCodeReceptionStage("RE-SDE").values
-                                    .value === "Bom",
+                                  getCodeReceptionStage('RE-SDE').values
+                                    .value === 'Bom',
                               }}
                               second={{
                                 checked:
-                                  getCodeReceptionStage("RE-SDE").values
-                                    .value === "Médio",
+                                  getCodeReceptionStage('RE-SDE').values
+                                    .value === 'Médio',
                               }}
                               third={{
                                 checked:
-                                  getCodeReceptionStage("RE-SDE").values
-                                    .value === "Ruim",
+                                  getCodeReceptionStage('RE-SDE').values
+                                    .value === 'Ruim',
                               }}
                             />
                           </td>
@@ -772,25 +772,25 @@ export function PrintInspection({
                         <tr>
                           <td>Traseiro Esquerdo</td>
                           <td>
-                            {getCodeReceptionStage("RE-PTE").values.value}
+                            {getCodeReceptionStage('RE-PTE').values.value}
                           </td>
-                          <td className={style["text-end"]}>
-                            ______(mm){" "}
+                          <td className={style['text-end']}>
+                            ______(mm){' '}
                             <TripleSquareCheck
                               first={{
                                 checked:
-                                  getCodeReceptionStage("RE-STE").values
-                                    .value === "Bom",
+                                  getCodeReceptionStage('RE-STE').values
+                                    .value === 'Bom',
                               }}
                               second={{
                                 checked:
-                                  getCodeReceptionStage("RE-STE").values
-                                    .value === "Médio",
+                                  getCodeReceptionStage('RE-STE').values
+                                    .value === 'Médio',
                               }}
                               third={{
                                 checked:
-                                  getCodeReceptionStage("RE-STE").values
-                                    .value === "Ruim",
+                                  getCodeReceptionStage('RE-STE').values
+                                    .value === 'Ruim',
                               }}
                             />
                           </td>
@@ -798,25 +798,25 @@ export function PrintInspection({
                         <tr>
                           <td>Dianteiro Direito</td>
                           <td>
-                            {getCodeReceptionStage("RE-PDD").values.value}
+                            {getCodeReceptionStage('RE-PDD').values.value}
                           </td>
-                          <td className={style["text-end"]}>
-                            ______(mm){" "}
+                          <td className={style['text-end']}>
+                            ______(mm){' '}
                             <TripleSquareCheck
                               first={{
                                 checked:
-                                  getCodeReceptionStage("RE-SDD").values
-                                    .value === "Bom",
+                                  getCodeReceptionStage('RE-SDD').values
+                                    .value === 'Bom',
                               }}
                               second={{
                                 checked:
-                                  getCodeReceptionStage("RE-SDD").values
-                                    .value === "Médio",
+                                  getCodeReceptionStage('RE-SDD').values
+                                    .value === 'Médio',
                               }}
                               third={{
                                 checked:
-                                  getCodeReceptionStage("RE-SDD").values
-                                    .value === "Ruim",
+                                  getCodeReceptionStage('RE-SDD').values
+                                    .value === 'Ruim',
                               }}
                             />
                           </td>
@@ -824,25 +824,25 @@ export function PrintInspection({
                         <tr>
                           <td>Traseiro Direito</td>
                           <td>
-                            {getCodeReceptionStage("RE-PTD").values.value}
+                            {getCodeReceptionStage('RE-PTD').values.value}
                           </td>
-                          <td className={style["text-end"]}>
-                            ______(mm){" "}
+                          <td className={style['text-end']}>
+                            ______(mm){' '}
                             <TripleSquareCheck
                               first={{
                                 checked:
-                                  getCodeReceptionStage("RE-STD").values
-                                    .value === "Bom",
+                                  getCodeReceptionStage('RE-STD').values
+                                    .value === 'Bom',
                               }}
                               second={{
                                 checked:
-                                  getCodeReceptionStage("RE-STD").values
-                                    .value === "Médio",
+                                  getCodeReceptionStage('RE-STD').values
+                                    .value === 'Médio',
                               }}
                               third={{
                                 checked:
-                                  getCodeReceptionStage("RE-STD").values
-                                    .value === "Ruim",
+                                  getCodeReceptionStage('RE-STD').values
+                                    .value === 'Ruim',
                               }}
                             />
                           </td>
@@ -851,14 +851,14 @@ export function PrintInspection({
                     </table>
                   </div>
                   <div
-                    className={style["col-5"]}
-                    style={{ marginTop: "-28px" }}
+                    className={style['col-5']}
+                    style={{ marginTop: '-28px' }}
                   >
                     <table
                       className={classNames(
                         style.bordered,
-                        style["table-head"],
-                        style["cell-h-sm"]
+                        style['table-head'],
+                        style['cell-h-sm']
                       )}
                     >
                       <thead>
@@ -968,27 +968,27 @@ export function PrintInspection({
                   <div
                     className={classNames(
                       style.col,
-                      style["p-1"],
-                      style["lh-150"]
+                      style['p-1'],
+                      style['lh-150']
                     )}
-                    style={{ paddingBottom: "16px" }}
+                    style={{ paddingBottom: '16px' }}
                   >
                     <div>
-                      Pintura/Carroçaria:{" "}
-                      <hr className={style["bottom-line"]} />
+                      Pintura/Carroçaria:{' '}
+                      <hr className={style['bottom-line']} />
                     </div>
                     <div>
-                      Para-brisa: <hr className={style["bottom-line"]} />
+                      Para-brisa: <hr className={style['bottom-line']} />
                     </div>
                     <div>
-                      Assinatura Estofamento:{" "}
-                      <hr className={style["bottom-line"]} />
+                      Assinatura Estofamento:{' '}
+                      <hr className={style['bottom-line']} />
                     </div>
-                    <div style={{ marginBottom: "-8px" }}>
+                    <div style={{ marginBottom: '-8px' }}>
                       Cliente deseja trocar o veículo?
                       <hr
-                        className={style["bottom-line"]}
-                        style={{ paddingBottom: "-10px" }}
+                        className={style['bottom-line']}
+                        style={{ paddingBottom: '-10px' }}
                       />
                     </div>
                   </div>
@@ -1001,18 +1001,18 @@ export function PrintInspection({
           <div
             className={classNames(
               style.row,
-              style["equal-form-slots"],
-              style["h-12mm"]
+              style['equal-form-slots'],
+              style['h-12mm']
             )}
           >
-            <div className={style["col-6"]}>
+            <div className={style['col-6']}>
               <div
-                className={classNames(style["form-slot"], style["me-1"])}
+                className={classNames(style['form-slot'], style['me-1'])}
                 style={{
-                  padding: "7px 5px",
+                  padding: '7px 5px',
                 }}
               >
-                <p className={style["mb-1"]}>
+                <p className={style['mb-1']}>
                   Veículo oriundo de guincho/plataforma: ( &nbsp; ) Sim &nbsp; (
                   &nbsp; ) Nao
                 </p>
@@ -1021,10 +1021,10 @@ export function PrintInspection({
                 guardar &nbsp; ( &nbsp; ) No veículo
               </div>
             </div>
-            <div className={style["col-6"]}>
+            <div className={style['col-6']}>
               <div
-                className={style["form-slot"]}
-                style={{ maxHeight: "100%", paddingBottom: "14px" }}
+                className={style['form-slot']}
+                style={{ maxHeight: '100%', paddingBottom: '14px' }}
               >
                 <label>Observações:</label>
                 <br />
@@ -1033,28 +1033,28 @@ export function PrintInspection({
               </div>
             </div>
           </div>
-          <div className={classNames(style.row, style["smallest-gutters"])}>
-            <div className={classNames(style["col-6"], style["text-center"])}>
+          <div className={classNames(style.row, style['smallest-gutters'])}>
+            <div className={classNames(style['col-6'], style['text-center'])}>
               <div
                 className={classNames(
-                  style["form-slot"],
-                  style["p-2"],
-                  style["me-1"]
+                  style['form-slot'],
+                  style['p-2'],
+                  style['me-1']
                 )}
               >
                 <div
-                  className={classNames(style["text-justify"], style["ls-05"])}
+                  className={classNames(style['text-justify'], style['ls-05'])}
                 >
                   Declaro ter deixado o veículo nas condições informadas nesta
                   folha de inspeção.
                 </div>
-                <p className={style["my-5"]}>
+                <p className={style['my-5']}>
                   Data: ____ / ____ /________ &nbsp; Hora: ____ : ____
                 </p>
                 <span
                   className={classNames(
                     style.signature,
-                    style["px-4"],
+                    style['px-4'],
                     style.small
                   )}
                 >
@@ -1065,24 +1065,24 @@ export function PrintInspection({
                 </span>
               </div>
             </div>
-            <div className={classNames(style["col-6"], style["text-center"])}>
+            <div className={classNames(style['col-6'], style['text-center'])}>
               <div
-                className={classNames(style["form-slot"], style["p-2"])}
-                style={{ height: "100%" }}
+                className={classNames(style['form-slot'], style['p-2'])}
+                style={{ height: '100%' }}
               >
                 <div
-                  className={classNames(style["text-justify"], style["ls-05"])}
+                  className={classNames(style['text-justify'], style['ls-05'])}
                 >
                   Declaro ter retirado o veículo nas condições informadas nesta
                   folha de inspeção.
                 </div>
-                <p className={style["my-5"]}>
+                <p className={style['my-5']}>
                   Data: ____ / ____ /________ &nbsp; Hora: ____ : ____
                 </p>
                 <span
                   className={classNames(
                     style.signature,
-                    style["px-4"],
+                    style['px-4'],
                     style.small
                   )}
                 >
@@ -1098,26 +1098,26 @@ export function PrintInspection({
           {/* seção */}
           <div
             className={classNames(
-              style["icon-header"],
-              style["p-1"],
-              style["text-white"],
-              style["mt-1"]
+              style['icon-header'],
+              style['p-1'],
+              style['text-white'],
+              style['mt-1']
             )}
           >
             <div className={style.row}>
-              <div className={style["col-auto"]}>TIPO DE SERVIÇO</div>
-              <div className={style["col-auto"]}>Revisão</div>
+              <div className={style['col-auto']}>TIPO DE SERVIÇO</div>
+              <div className={style['col-auto']}>Revisão</div>
             </div>
           </div>
           <div
             className={classNames(
               style.row,
-              style["align-items-start"],
-              style["ls-05"]
+              style['align-items-start'],
+              style['ls-05']
             )}
           >
-            <div className={classNames(style["col-4"], style["pe-1"])}>
-              <div className={classNames(style["icon-header"], style["my-1"])}>
+            <div className={classNames(style['col-4'], style['pe-1'])}>
+              <div className={classNames(style['icon-header'], style['my-1'])}>
                 <span>PARTE INTERNA</span>
                 <div className={style.icon}>icon</div>
               </div>
@@ -1242,7 +1242,7 @@ export function PrintInspection({
                   </tr>
                 </tbody>
               </table>
-              <div className={classNames(style["icon-header"], style["my-2"])}>
+              <div className={classNames(style['icon-header'], style['my-2'])}>
                 <span>PARTE EXTERNA</span>
                 <div className={style.icon}>icon</div>
               </div>
@@ -1263,12 +1263,12 @@ export function PrintInspection({
                 </tbody>
               </table>
             </div>
-            <div className={classNames(style["col-4"], style["px-2"])}>
+            <div className={classNames(style['col-4'], style['px-2'])}>
               <div
                 className={classNames(
-                  style["icon-header"],
-                  style["mb-1"],
-                  style["mt-1"]
+                  style['icon-header'],
+                  style['mb-1'],
+                  style['mt-1']
                 )}
               >
                 <span>COM O CAPÔ ABERTO</span>
@@ -1311,9 +1311,9 @@ export function PrintInspection({
                       <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>
-                      Tensão da bateria. Encontrado:{" "}
+                      Tensão da bateria. Encontrado:{' '}
                       <span
-                        className={classNames(style["mx-10"], style["px-5"])}
+                        className={classNames(style['mx-10'], style['px-5'])}
                       ></span>
                       V •
                     </td>
@@ -1326,7 +1326,7 @@ export function PrintInspection({
                   </tr>
                 </tbody>
               </table>
-              <div className={classNames(style["icon-header"], style["my-1"])}>
+              <div className={classNames(style['icon-header'], style['my-1'])}>
                 <span>FLUÍDOS</span>
                 <div className={style.icon}>icon</div>
               </div>
@@ -1376,7 +1376,7 @@ export function PrintInspection({
                   </tr>
                 </tbody>
               </table>
-              <div className={classNames(style["icon-header"], style["my-1"])}>
+              <div className={classNames(style['icon-header'], style['my-1'])}>
                 <span>EMBAIXO DO VEÍCULO</span>
                 <div className={style.icon}>icon</div>
               </div>
@@ -1435,8 +1435,8 @@ export function PrintInspection({
                 </tbody>
               </table>
             </div>
-            <div className={classNames(style["col-4"], style["ps-1"])}>
-              <div className={classNames(style["icon-header"], style["my-1"])}>
+            <div className={classNames(style['col-4'], style['ps-1'])}>
+              <div className={classNames(style['icon-header'], style['my-1'])}>
                 <span>CALIBRAGEM DOS PNEUS •</span>
                 <div className={style.icon}>icon</div>
               </div>
@@ -1445,14 +1445,14 @@ export function PrintInspection({
                 <thead>
                   <tr>
                     <th></th>
-                    <th className={style["text-center"]}>CALIBRADO</th>
+                    <th className={style['text-center']}>CALIBRADO</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td width={105}>DIANTEIRO ESQUERDO:</td>
                     <td
-                      className={classNames(style["text-end"], style["py-2"])}
+                      className={classNames(style['text-end'], style['py-2'])}
                     >
                       psi
                     </td>
@@ -1460,7 +1460,7 @@ export function PrintInspection({
                   <tr>
                     <td width={105}>DIANTEIRO DIREITO:</td>
                     <td
-                      className={classNames(style["text-end"], style["py-2"])}
+                      className={classNames(style['text-end'], style['py-2'])}
                     >
                       psi
                     </td>
@@ -1468,7 +1468,7 @@ export function PrintInspection({
                   <tr>
                     <td width={105}>TRASEIRO ESQUERDO:</td>
                     <td
-                      className={classNames(style["text-end"], style["py-2"])}
+                      className={classNames(style['text-end'], style['py-2'])}
                     >
                       psi
                     </td>
@@ -1476,14 +1476,14 @@ export function PrintInspection({
                   <tr>
                     <td width={105}>TRASEIRO DIREITO:</td>
                     <td
-                      className={classNames(style["text-end"], style["py-2"])}
+                      className={classNames(style['text-end'], style['py-2'])}
                     >
                       psi
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <div className={classNames(style["icon-header"], style["mb-1"])}>
+              <div className={classNames(style['icon-header'], style['mb-1'])}>
                 <span>FREIOS •</span>
                 <div className={style.icon}>icon</div>
               </div>
@@ -1491,19 +1491,19 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style["last-checks"]
+                  style['last-checks']
                 )}
               >
                 <thead>
                   <tr>
                     <th></th>
-                    <th className={style["text-end"]}>ENCONTRADO</th>
+                    <th className={style['text-end']}>ENCONTRADO</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={style["text-center"]} width={40} rowSpan={5}>
+                    <td className={style['text-center']} width={40} rowSpan={5}>
                       icon
                       <br />
                       PASTILHAS
@@ -1551,19 +1551,19 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style["last-checks"]
+                  style['last-checks']
                 )}
               >
                 <thead>
                   <tr>
                     <th></th>
-                    <th className={style["text-end"]}>ENCONTRADO</th>
+                    <th className={style['text-end']}>ENCONTRADO</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={style["text-center"]} width={40} rowSpan={5}>
+                    <td className={style['text-center']} width={40} rowSpan={5}>
                       icon
                       <br />
                       DISCOS
@@ -1611,19 +1611,19 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style["last-checks"]
+                  style['last-checks']
                 )}
               >
                 <thead>
                   <tr>
                     <th></th>
-                    <th className={style["text-end"]}>ENCONTRADO</th>
+                    <th className={style['text-end']}>ENCONTRADO</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={style["text-center"]} width={40} rowSpan={3}>
+                    <td className={style['text-center']} width={40} rowSpan={3}>
                       icon
                       <br />
                       LONAS
@@ -1657,12 +1657,12 @@ export function PrintInspection({
                 className={classNames(
                   style.table,
                   style.checks,
-                  style["last-checks"]
+                  style['last-checks']
                 )}
               >
                 <tbody>
                   <tr>
-                    <td className={style["text-center"]} width={40} rowSpan={3}>
+                    <td className={style['text-center']} width={40} rowSpan={3}>
                       icon
                       <br />
                       TAMBORES
@@ -1722,7 +1722,7 @@ export function PrintInspection({
                     >
                       {item?.screenShot && (
                         <Image
-                          src={item?.screenShot ?? ""}
+                          src={item?.screenShot ?? ''}
                           alt=""
                           key={index + Math.random() * 20000}
                           width={135}
@@ -1739,13 +1739,13 @@ export function PrintInspection({
                               key={index + image.url}
                               width={135}
                               height={100}
-                              style={{ borderRadius: "5px" }}
+                              style={{ borderRadius: '5px' }}
                             />
-                          );
+                          )
                         })}
                     </Stack>
                   </div>
-                );
+                )
               })}
           </Stack>
           <Stack
@@ -1762,7 +1762,7 @@ export function PrintInspection({
               ? // @ts-ignore
                 data?.stages[0]?.signatures.map((signature) => {
                   if (signature.image.length === 0) {
-                    return null;
+                    return null
                   }
                   return (
                     <Stack key={Math.random() * 200000} spacing={1}>
@@ -1773,11 +1773,11 @@ export function PrintInspection({
                         alt=""
                         width={90}
                         height={70}
-                        style={{ borderRadius: "5px" }}
+                        style={{ borderRadius: '5px' }}
                       />
                       <p>{signature.name}</p>
                     </Stack>
-                  );
+                  )
                 })
               : null}
           </Stack>
@@ -1809,7 +1809,7 @@ export function PrintInspection({
                     >
                       {item?.screenShot && (
                         <Image
-                          src={item?.screenShot ?? ""}
+                          src={item?.screenShot ?? ''}
                           alt=""
                           key={index + Math.random() * 20000}
                           width={135}
@@ -1826,13 +1826,13 @@ export function PrintInspection({
                               key={index + image.url}
                               width={135}
                               height={100}
-                              style={{ borderRadius: "5px" }}
+                              style={{ borderRadius: '5px' }}
                             />
-                          );
+                          )
                         })}
                     </Stack>
                   </div>
-                );
+                )
               })}
           </Stack>
           {/* @ts-ignore */}
@@ -1850,7 +1850,7 @@ export function PrintInspection({
                 // @ts-ignore
                 data?.stages[1]?.signatures.map((signature) => {
                   if (signature.image.length === 0) {
-                    return null;
+                    return null
                   }
                   return (
                     <Stack key={Math.random() * 200000} spacing={1}>
@@ -1861,16 +1861,16 @@ export function PrintInspection({
                         alt=""
                         width={90}
                         height={70}
-                        style={{ borderRadius: "5px" }}
+                        style={{ borderRadius: '5px' }}
                       />
                       <p>{signature.name}</p>
                     </Stack>
-                  );
+                  )
                 })}
             </Stack>
           ) : null}
         </Paper>
       )}
     </div>
-  );
+  )
 }
