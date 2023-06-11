@@ -13,19 +13,19 @@ export default function BudgetList() {
     id: number
     client: {
       name: string
-    };
+    }
     client_vehicle: {
       plate: string
       chasis: string
-    };
+    }
     technical_consultant: {
       name: string
-    };
+    }
     TotalGeralDesconto: number
     TotalGeral: number
     total: number
   }
-  const [infoBudget, setBudget] = React.useState<BudgetItem[] | undefined>();
+  const [infoBudget, setBudget] = React.useState<BudgetItem[] | undefined>()
   const [value, setValue] = React.useState('')
   const [open, setOpen] = React.useState(false)
 
