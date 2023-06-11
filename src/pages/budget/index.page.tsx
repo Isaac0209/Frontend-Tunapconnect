@@ -30,7 +30,7 @@ export default function BudgetList() {
   const [open, setOpen] = React.useState(false)
 
   const api = new ApiCore()
-  const url = 'http://a.tunapconnect.com'
+  const url = 'https://a.tunapconnect.com'
   type filterValuesProps = {
     date: {
       dateStart: string | null
