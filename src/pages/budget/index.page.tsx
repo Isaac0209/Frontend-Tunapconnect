@@ -35,7 +35,7 @@ export default function BudgetList() {
   const [open, setOpen] = React.useState(false)
 
   const api = new ApiCore()
-  const url = 'https://tunapconnect-api.herokuapp.com/api'
+  const url = 'https://tunapconnect-api.herokuapp.com'
   type filterValuesProps = {
     date: {
       dateStart: string | null
@@ -49,7 +49,7 @@ export default function BudgetList() {
 
   async function getBudget(values: String) {
     if (values === 'null') {
-      api.get(`${url}/api/quotations?company_id=2`).then((response) => {
+      api.get(`${url}/api/quotations?company_id=1`).then((response) => {
         setBudget(response.data.data)
         console.log(tem)
 
