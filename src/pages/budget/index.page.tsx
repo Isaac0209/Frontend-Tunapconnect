@@ -8,7 +8,6 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { ApiCore } from '@/lib/api'
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
-import Skeleton from '@mui/material/Skeleton'
 import { CustomNoRowsOverlay } from '../../components/TableApp/NoRows'
 import Box from '@mui/material/Box'
 
@@ -55,7 +54,7 @@ export default function BudgetList() {
         console.log(tem)
 
         console.log(response.data.data)
-        if (response.data.data.length == 0) {
+        if (response.data.data.length === 0) {
           setTem(false)
         } else {
           setTem(true)
@@ -67,7 +66,7 @@ export default function BudgetList() {
         .then((response) => {
           setBudget(response.data.data)
 
-          if (response.data.data.length == 0) {
+          if (response.data.data.length === 0) {
             setTem(false)
           }
         })
