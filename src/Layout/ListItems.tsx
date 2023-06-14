@@ -71,7 +71,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
       // },
       {
         path: '/budget',
-        href: '/budget',
+        href: `/budget?company_id=${companySelected}`,
         component: <AttachMoneyIcon />,
         title: 'Orçamentos',
       },

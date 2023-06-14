@@ -10,6 +10,8 @@ import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
 import { CustomNoRowsOverlay } from '../../components/TableApp/NoRows'
 import Box from '@mui/material/Box'
+import { useRouter } from 'next/router';
+import Skeleton from '@mui/material/Skeleton'
 
 export default function BudgetList() {
   interface BudgetItem {
@@ -24,16 +26,18 @@ export default function BudgetList() {
     technical_consultant: {
       name: string
     }
+    TotalServicos: number
     TotalGeralDesconto: number
     TotalGeral: number
-    total: number
   }
 
   const [infoBudget, setBudget] = React.useState<BudgetItem[] | undefined>()
   const [value, setValue] = React.useState('')
   const [tem, setTem] = React.useState<Boolean>()
   const [open, setOpen] = React.useState(false)
-
+  const [carregando, Setcarregando] = React.useState(true)
+  const router = useRouter()
+  const { company_id } = router.query
   const api = new ApiCore()
   const url = 'https://tunapconnect-api.herokuapp.com'
   type filterValuesProps = {
@@ -49,10 +53,9 @@ export default function BudgetList() {
 
   async function getBudget(values: String) {
     if (values === 'null') {
-      api.get(`${url}/api/quotations?company_id=1`).then((response) => {
+      api.get(`${url}/api/quotations?company_id=${company_id}`).then((response) => {
         setBudget(response.data.data)
-        console.log(tem)
-
+        Setcarregando(false)
         console.log(response.data.data)
         if (response.data.data.length === 0) {
           setTem(false)
@@ -62,12 +65,15 @@ export default function BudgetList() {
       })
     } else {
       api
-        .get(`${url}/api/quotations?company_id=1&search=${values}`)
+        .get(`${url}/api/quotations?company_id=${company_id}&search=${values}`)
         .then((response) => {
           setBudget(response.data.data)
+          Setcarregando(false)
 
           if (response.data.data.length === 0) {
             setTem(false)
+          }else{
+            setTem(true)
           }
         })
     }
@@ -155,8 +161,13 @@ export default function BudgetList() {
             <th>Ação</th>
           </tr>
         </thead>
+      {carregando ? (
+          <Box position={'absolute'} maxWidth={'100%'} minWidth={'80%'}>
+          <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
+          </Box>
 
-        {!tem ? (
+      ): ( 
+        !tem ? (
           <Box position={'absolute'} maxWidth={'100%'} minWidth={'80%'}>
             <CustomNoRowsOverlay />
           </Box>
@@ -169,9 +180,9 @@ export default function BudgetList() {
                 <td>{item.client_vehicle?.plate}</td>
                 <td>{item.client_vehicle?.chasis}</td>
                 <td>{item.technical_consultant?.name}</td>
-                <td>{item.TotalGeralDesconto}</td>
-                <td>{item.TotalGeral}</td>
-                <td>{item.total}</td>
+                <td>R${item.TotalServicos}</td>
+                <td>R${item.TotalGeralDesconto}</td>
+                <td>R${item.TotalGeral}</td>
                 <td>
                   <Button
                     onClick={(event) => handleClick(event, item.id)}
@@ -189,9 +200,14 @@ export default function BudgetList() {
                 </td>
               </tr>
             ))}
-            )
+            
+            
           </tbody>
-        )}
+       
+          )
+      )}
+          
+        
       </table>
     </main>
   )
