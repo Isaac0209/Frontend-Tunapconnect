@@ -97,7 +97,7 @@ export default function BudgetList() {
 
   function onSubmitSearch(data: SearchFormProps) {
     router.push(
-      `/quotations?company_id=${companySelected}${
+      `/budget?company_id=${companySelected}${
         data.search ? '&search=' + data.search : ''
       }${
         router.query.current_page
@@ -108,7 +108,11 @@ export default function BudgetList() {
   }
 
   const handleDelete = (id: number) => {
-    refetch()
+    api
+      .delete(`https://tunapconnect-api.herokuapp.com/api/quotations/${id}`)
+      .then((response) => {
+        refetch()
+      })
   }
 
   let url = `https://tunapconnect-api.herokuapp.com/api/quotations?company_id=${companySelected}`
@@ -335,7 +339,7 @@ export default function BudgetList() {
       }
     }
 
-    const newUrlPagination = `https://tunapconnect-api.herokuapp.com/api/quotations?company_id=${companySelected}${
+    const newUrlPagination = `/budget?company_id=${companySelected}${
       router.query.search ? '&search=' + router.query.search : ''
     }${'&current_page=' + newCurrent_page}${
       router.query.limit ? '&limit=' + router.query.limit : ''
