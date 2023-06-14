@@ -1,209 +1,476 @@
 import * as React from 'react'
-import style from './style.module.css'
-import SearchIcon from '@mui/icons-material/Search'
-import Button from '@mui/material/Button'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import ButtonFilterSelect from './components/ButtonFilterSelect'
-import DeleteIcon from '@mui/icons-material/Delete'
-import { ApiCore } from '@/lib/api'
-import Snackbar from '@mui/material/Snackbar'
-import Alert from '@mui/material/Alert'
-import { CustomNoRowsOverlay } from '../../components/TableApp/NoRows'
+import { useForm } from 'react-hook-form'
+import { useContext, useState, useMemo, useEffect } from 'react'
+
+import Container from '@mui/material/Container'
+
+import {
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+} from '@mui/x-data-grid'
+
 import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
+import TextField from '@mui/material/TextField'
+import SearchIcon from '@mui/icons-material/Search'
+
+import { ButtonAdd, ButtonIcon } from './style'
+import { ServiceSchedulesListProps } from '@/types/service-schedule'
+import { ApiCore } from '@/lib/api'
+import IconButton from '@mui/material/IconButton'
+import { Delete } from '@mui/icons-material'
+
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { useRouter } from 'next/router'
+import { TableApp } from '@/components/TableApp'
+import { CompanyContext } from '@/contexts/CompanyContext'
+import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
+import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
+
+import { useQuery } from 'react-query'
 import Skeleton from '@mui/material/Skeleton'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+import ButtonFilterSelect from './components/ButtonFilterSelect'
+import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
+type SearchFormProps = {
+  search: string
+}
+
+type DataFetchProps = {
+  paginate: {
+    current_page: number
+    total_pages: number
+    total_results: number
+  }
+  serviceSchedulesList: ServiceSchedulesListProps[] | []
+}
+
+type filterValuesProps = {
+  date: {
+    dateStart: string | null
+    dateEnd: string | null
+  }
+}
+
+const api = new ApiCore()
+
+const HeaderBreadcrumbData: listBreadcrumb[] = [
+  {
+    label: 'Tunap',
+    href: '/company',
+  },
+  {
+    label: 'Lista de agendamentos',
+    href: '/service-schedules/list',
+  },
+  {
+    label: 'Lista de orçamentos',
+    href: '/budget2/list',
+  },
+]
 
 export default function BudgetList() {
-  interface BudgetItem {
-    id: number
-    client: {
-      name: string
-    }
-    client_vehicle: {
-      plate: string
-      chasis: string
-    }
-    technical_consultant: {
-      name: string
-    }
-    TotalServicos: number
-    TotalGeralDesconto: number
-    TotalGeral: number
-  }
+  const [pages, setPages] = useState<{
+    next: boolean
+    previous: boolean
+  }>({ next: true, previous: true })
+  const [filterValues, setFilterValues] = useState<filterValuesProps>()
 
-  const [infoBudget, setBudget] = React.useState<BudgetItem[] | undefined>()
-  const [value, setValue] = React.useState('')
-  const [tem, setTem] = React.useState<Boolean>()
-  const [open, setOpen] = React.useState(false)
-  const [carregando, Setcarregando] = React.useState(true)
+  const { companySelected } = useContext(CompanyContext)
+  const { setListServiceSchedule } = useContext(ServiceScheduleContext)
+
   const router = useRouter()
-  const { company_id } = router.query
-  const api = new ApiCore()
-  const url = 'https://tunapconnect-api.herokuapp.com'
-  type filterValuesProps = {
-    date: {
-      dateStart: string | null
-      dateEnd: string | null
-    }
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    // formState: { errors },
+  } = useForm({
+    defaultValues: {
+      search: '',
+    },
+  })
+
+  function onSubmitSearch(data: SearchFormProps) {
+    router.push(
+      `/quotations?company_id=${companySelected}${
+        data.search ? '&search=' + data.search : ''
+      }${
+        router.query.current_page
+          ? '&current_page=' + router.query.current_page
+          : ''
+      }`,
+    )
   }
 
-  const handleCloseSnackbar = () => {
-    setOpen(false)
+  const handleDelete = (id: number) => {
+    refetch()
   }
 
-  async function getBudget(values: String) {
-    if (values === 'null') {
-      api
-        .get(`${url}/api/quotations?company_id=${company_id}`)
-        .then((response) => {
-          setBudget(response.data.data)
-          Setcarregando(false)
-          console.log(response.data.data)
-          if (response.data.data.length === 0) {
-            setTem(false)
-          } else {
-            setTem(true)
-          }
-        })
-    } else {
-      api
-        .get(`${url}/api/quotations?company_id=${company_id}&search=${values}`)
-        .then((response) => {
-          setBudget(response.data.data)
-          Setcarregando(false)
+  let url = `https://tunapconnect-api.herokuapp.com/api/quotations?company_id=${companySelected}`
 
-          if (response.data.data.length === 0) {
-            setTem(false)
-          } else {
-            setTem(true)
-          }
-        })
-    }
+  if (router.query.limit) {
+    url += `&limit=${router.query.limit}`
   }
-  async function deleteBudget(values: number) {
-    api.delete(`${url}/api/quotations/${values}`).then((response) => {
-      value.length < 1 ? getBudget('null') : getBudget(value)
-      setOpen(true)
-    })
+
+  if (router.query.current_page) {
+    url += `&current_page=${router.query.current_page}`
+  }
+
+  if (router.query.search) {
+    url += `&search=${router.query.search}`
+  }
+
+  if (router.query.promised_date_min) {
+    url += `&promised_date_min=${filterValues?.date.dateStart}`
+  }
+  if (router.query.promised_date_max) {
+    url += `&promised_date_max=${filterValues?.date.dateEnd}`
+  }
+  if (router.query.orderby) {
+    url += '&orderby=promised_date'
   }
 
   async function handleFilterValues(values: filterValuesProps) {
-    console.log(values?.date.dateStart)
+    setFilterValues(values)
+    if (values?.date.dateStart) {
+      url += `&promised_date_min=${values?.date.dateStart}`
+    }
+    if (values?.date.dateEnd) {
+      url += `&promised_date_max=${values?.date.dateEnd}`
+    }
+    url += '&orderby=promised_date'
+    console.log(url)
+    await router.push(url)
   }
+  const columns: GridColDef[] = useMemo(
+    () => [
+      {
+        field: 'id',
+        headerName: 'Número',
+        headerClassName: 'super-app-theme--header',
+        width: 80,
+        type: 'number',
+        align: 'center',
+        sortable: false,
+      },
 
-  const handleChangeValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value)
-  }
-  const handleClick = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    value: number,
-  ) => {
-    deleteBudget(value)
-  }
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    value.length < 1 ? getBudget('null') : getBudget(value)
-  }
-  React.useEffect(() => {
-    getBudget('null')
-  }, [])
+      {
+        field: 'client',
+        headerName: 'Cliente',
+        headerClassName: 'super-app-theme--header',
+        flex: 1,
+        maxWidth: 230,
+        minWidth: 120,
+        align: 'left',
+        sortable: false,
+      },
+      {
+        field: 'plate',
+        headerName: 'Placa',
+        headerClassName: 'super-app-theme--header',
+        width: 120,
+        sortable: false,
+      },
+      {
+        field: 'chassis',
+        headerName: 'Chassis',
+        headerClassName: 'super-app-theme--header',
+        flex: 1,
+        maxWidth: 240,
+        minWidth: 120,
+        sortable: false,
+      },
+      {
+        field: 'technical_consultant',
+        headerName: 'Responsavél',
+        headerClassName: 'super-app-theme--header',
+        flex: 1,
+        maxWidth: 200,
+        minWidth: 120,
+        sortable: false,
+      },
+      {
+        field: 'totalBudget',
+        headerName: 'Tipo Orçamento',
+        headerClassName: 'super-app-theme--header',
+        width: 160,
+        sortable: false,
+        valueGetter: (params: GridValueGetterParams) =>
+          `${formatMoneyPtBR(params.row.totalBudget) || ''}`,
+      },
+      {
+        field: 'totalDiscount',
+        headerName: 'Tipo Desconto',
+        headerClassName: 'super-app-theme--header',
+        // type: 'number',
+        width: 110,
+        align: 'center',
+        sortable: false,
+        valueGetter: (params: GridValueGetterParams) =>
+          `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
+      },
+      {
+        field: 'total',
+        headerName: 'Total Geral',
+        headerClassName: 'super-app-theme--header',
+        // type: 'number',
+        width: 110,
+        align: 'center',
+        sortable: false,
+        valueGetter: (params: GridValueGetterParams) =>
+          `${formatMoneyPtBR(params.row.total) || ''}`,
+      },
+      {
+        field: 'action',
+        headerName: 'Ação',
+        headerClassName: 'super-app-theme--header',
+        sortable: false,
+        width: 90,
+        align: 'left',
+        renderCell: (params: GridRenderCellParams) => {
+          const onClick = (e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation()
+            const id = params.id
+            ActionDeleteConfirmations(id as number, handleDelete)
+          }
+          return (
+            <IconButton
+              aria-label="search"
+              color="warning"
+              onClick={onClick}
+              sx={{ marginLeft: 1, color: 'red' }}
+            >
+              <Delete />
+            </IconButton>
+          )
+        },
+      },
+    ],
+    [],
+  )
 
+  const {
+    data: rows,
+    isSuccess,
+    // isInitialLoading,
+    // isLoading,
+    // isFetched,
+    refetch,
+    isFetching,
+  } = useQuery<DataFetchProps>(
+    ['budget-list', companySelected],
+    () =>
+      api.get(url).then((response) => {
+        setListServiceSchedule(response.data.data)
+        console.log(response)
+        localStorage.setItem('budget-list', JSON.stringify(response.data.data))
+        const resp = response.data.data.map((data: any) => {
+          return {
+            id: data?.id ?? 'Não informado',
+            promised_date: data?.promised_date ?? 'Não informado',
+            client: data?.client?.name ?? 'Não informado',
+            plate: data?.client_vehicle?.plate ?? 'Não informado',
+            chassis: data?.client_vehicle?.chasis ?? 'Não informado',
+            technical_consultant:
+              data?.technical_consultant?.name ?? 'Não informado',
+            totalBudget: data?.TotalServicos ?? 'não definido',
+            totalDiscount: data?.TotalGeralDesconto ?? 'Não definido',
+            total: data?.TotalGeral ?? 'Não definido',
+          }
+        })
+
+        if (response.data.total_pages === 1)
+          setPages({
+            next: false,
+            previous: false,
+          })
+        if (!router.query.current_page) {
+          if (response.data.current_page === 1) {
+            setPages((prevState) => ({ ...prevState, previous: false }))
+          }
+        }
+
+        return {
+          paginate: {
+            current_page: response.data.current_page,
+            total_pages: response.data.total_pages,
+            total_results: response.data.total_results,
+          },
+          serviceSchedulesList: resp,
+        }
+      }),
+
+    {
+      // enabled: !!companySelected || !!url,
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+    },
+  )
+
+  function handlePages(nextPage: any): void {
+    let newCurrent_page = 1
+    const actualCurrent_page = router.query.current_page
+      ? parseInt(router.query.current_page as string)
+      : 1
+
+    if (!rows?.paginate) {
+      return
+    }
+
+    if (nextPage === 'next') {
+      newCurrent_page = actualCurrent_page + 1
+      if (newCurrent_page > rows?.paginate.total_pages) {
+        return
+      }
+    }
+    if (nextPage === 'back') {
+      newCurrent_page = actualCurrent_page - 1
+      if (newCurrent_page < 1) {
+        return
+      }
+    }
+
+    const newUrlPagination = `https://tunapconnect-api.herokuapp.com/api/quotations?company_id=${companySelected}${
+      router.query.search ? '&search=' + router.query.search : ''
+    }${'&current_page=' + newCurrent_page}${
+      router.query.limit ? '&limit=' + router.query.limit : ''
+    }`
+
+    router.push(newUrlPagination)
+  }
+  useEffect(() => {
+    async function refetchUrl() {
+      if (router.query.search) {
+        setValue('search', router.query.search as string)
+      } else {
+        setValue('search', '')
+      }
+
+      if (router.query.current_page) {
+        const currentPage = parseInt(router.query.current_page as string)
+        if (rows?.paginate) {
+          if (currentPage >= rows?.paginate.total_pages) {
+            setPages({
+              next: false,
+              previous: true,
+            })
+          } else {
+            if (pages.next === false) {
+              setPages((prevState) => ({ ...prevState, next: true }))
+            }
+          }
+          if (currentPage <= 1) {
+            setPages({
+              next: true,
+              previous: false,
+            })
+          } else {
+            if (pages.previous === false) {
+              setPages((prevState) => ({ ...prevState, previous: true }))
+            }
+          }
+        }
+      }
+
+      await refetch()
+    }
+    refetchUrl()
+  }, [router])
   return (
-    <main className={style.budgetMain}>
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        open={open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert onClose={handleCloseSnackbar} severity="success">
-          Deletado com sucesso!
-        </Alert>
-      </Snackbar>
-      <div className={style.pesquisa}>
-        <div className={style.divPrimary}>
-          <form onSubmit={handleSubmit}>
-            <input
-              value={value}
-              onChange={handleChangeValue}
-              type="text"
-              placeholder="Procurar"
-            ></input>
-            <Button
-              type="submit"
-              variant="contained"
-              className={style.buttonSearch}
-              startIcon={
-                <SearchIcon style={{ fontSize: '24px', margin: 'auto' }} />
-              }
-            ></Button>
-            <ButtonFilterSelect handleFilterValues={handleFilterValues} />
-          </form>
-          <Button
-            className={style.buttonBudget}
-            variant="contained"
-            startIcon={<AddCircleOutlineIcon />}
-          >
-            Novo orçamento
-          </Button>
-        </div>
-      </div>
-      <h6 className={style.h1}>Lista de orçamentos</h6>
-      <table className={style.table}>
-        <thead className={style.thead}>
-          <tr>
-            <th>Numero</th>
-            <th>Cliente</th>
-            <th>Placa</th>
-            <th>Chassi</th>
-            <th>Responsável</th>
-            <th>Tipo Orçamento</th>
-            <th>Tipo de Desconto</th>
-            <th>Total Geral</th>
-            <th>Ação</th>
-          </tr>
-        </thead>
-        {carregando ? (
-          <Box position={'absolute'} maxWidth={'100%'} minWidth={'80%'}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'row' }}>
+            <Grid container spacing={3}>
+              <Grid
+                item
+                xs={12}
+                md={12}
+                lg={8}
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
+                <Box
+                  component="form"
+                  onSubmit={handleSubmit(onSubmitSearch)}
+                  sx={{ flexWrap: 'nowrap', display: 'flex', flex: 1 }}
+                >
+                  <TextField
+                    label="Procura"
+                    id="outlined-size-small"
+                    size="small"
+                    sx={{ flex: 1, width: '100%' }}
+                    {...register('search')}
+                  />
+
+                  <ButtonIcon
+                    type="submit"
+                    aria-label="search"
+                    color="primary"
+                    sx={{ marginLeft: 1 }}
+                  >
+                    <SearchIcon />
+                  </ButtonIcon>
+                </Box>
+                <Box>
+                  <ButtonFilterSelect handleFilterValues={handleFilterValues} />
+                </Box>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                md={12}
+                lg={4}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <ButtonAdd
+                  size="large"
+                  variant="contained"
+                  sx={{ alignSelf: 'flex-end' }}
+                  startIcon={<AddCircleOutlineIcon />}
+                  onClick={async () => {
+                    //await router.push(`/budget2/create`)
+                  }}
+                  // disabled
+                >
+                  Adicionar novo
+                </ButtonAdd>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <HeaderBreadcrumb
+            data={HeaderBreadcrumbData}
+            title="Lista de Orçamentos"
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          {!isFetching ? (
+            <TableApp
+              columns={columns}
+              rowsData={isSuccess ? rows.serviceSchedulesList : []}
+              handlePages={handlePages}
+              pages={pages}
+              loading={isFetching}
+              companyId={companySelected}
+            />
+          ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
-          </Box>
-        ) : !tem ? (
-          <Box position={'absolute'} maxWidth={'100%'} minWidth={'80%'}>
-            <CustomNoRowsOverlay />
-          </Box>
-        ) : (
-          <tbody>
-            {infoBudget?.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.client?.name}</td>
-                <td>{item.client_vehicle?.plate}</td>
-                <td>{item.client_vehicle?.chasis}</td>
-                <td>{item.technical_consultant?.name}</td>
-                <td>R${item.TotalServicos}</td>
-                <td>R${item.TotalGeralDesconto}</td>
-                <td>R${item.TotalGeral}</td>
-                <td>
-                  <Button
-                    onClick={(event) => handleClick(event, item.id)}
-                    component="button"
-                    startIcon={
-                      <DeleteIcon
-                        style={{
-                          fontSize: '30px',
-                          margin: 'auto',
-                          color: 'red',
-                        }}
-                      />
-                    }
-                  ></Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        )}
-      </table>
-    </main>
+          )}
+        </Grid>
+      </Grid>
+    </Container>
   )
 }
 
