@@ -10,7 +10,7 @@ import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
 import { CustomNoRowsOverlay } from '../../components/TableApp/NoRows'
 import Box from '@mui/material/Box'
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/router'
 import Skeleton from '@mui/material/Skeleton'
 
 export default function BudgetList() {
@@ -53,16 +53,18 @@ export default function BudgetList() {
 
   async function getBudget(values: String) {
     if (values === 'null') {
-      api.get(`${url}/api/quotations?company_id=${company_id}`).then((response) => {
-        setBudget(response.data.data)
-        Setcarregando(false)
-        console.log(response.data.data)
-        if (response.data.data.length === 0) {
-          setTem(false)
-        } else {
-          setTem(true)
-        }
-      })
+      api
+        .get(`${url}/api/quotations?company_id=${company_id}`)
+        .then((response) => {
+          setBudget(response.data.data)
+          Setcarregando(false)
+          console.log(response.data.data)
+          if (response.data.data.length === 0) {
+            setTem(false)
+          } else {
+            setTem(true)
+          }
+        })
     } else {
       api
         .get(`${url}/api/quotations?company_id=${company_id}&search=${values}`)
@@ -72,7 +74,7 @@ export default function BudgetList() {
 
           if (response.data.data.length === 0) {
             setTem(false)
-          }else{
+          } else {
             setTem(true)
           }
         })
@@ -161,13 +163,11 @@ export default function BudgetList() {
             <th>Ação</th>
           </tr>
         </thead>
-      {carregando ? (
+        {carregando ? (
           <Box position={'absolute'} maxWidth={'100%'} minWidth={'80%'}>
-          <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
+            <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
           </Box>
-
-      ): ( 
-        !tem ? (
+        ) : !tem ? (
           <Box position={'absolute'} maxWidth={'100%'} minWidth={'80%'}>
             <CustomNoRowsOverlay />
           </Box>
@@ -200,14 +200,8 @@ export default function BudgetList() {
                 </td>
               </tr>
             ))}
-            
-            
           </tbody>
-       
-          )
-      )}
-          
-        
+        )}
       </table>
     </main>
   )
