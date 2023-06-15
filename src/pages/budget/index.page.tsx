@@ -200,7 +200,7 @@ export default function BudgetList() {
       },
       {
         field: 'totalBudget',
-        headerName: 'Tipo Orçamento',
+        headerName: 'Valor Do Orçamento',
         headerClassName: 'super-app-theme--header',
         width: 160,
         sortable: false,
@@ -212,7 +212,7 @@ export default function BudgetList() {
         headerName: 'Tipo Desconto',
         headerClassName: 'super-app-theme--header',
         // type: 'number',
-        width: 110,
+        width: 160,
         align: 'center',
         sortable: false,
         valueGetter: (params: GridValueGetterParams) =>
