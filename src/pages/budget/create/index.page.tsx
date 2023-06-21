@@ -6,14 +6,17 @@ import Container from '@mui/material/Container'
 
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
+import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 
 import {
   ClientInfor,
   ClientResponseType,
+  Kit,
+  Service,
   ClientVehicle,
   // ServiceSchedulesListProps,
   TechnicalConsultant,
-} from '@/types/service-schedule'
+} from '@/types/budget'
 import { ApiCore } from '@/lib/api'
 
 import { useRouter } from 'next/router'
@@ -57,7 +60,9 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, ListItem, ListItemText, Typography } from '@mui/material'
+import ModalCreateKit from './components/ModalCreateKit'
+import ModalCreateService from './components/ModalCreateService'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
@@ -96,6 +101,9 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 export default function ServiceBudgetCreate() {
   const [client, setClient] = useState<ClientInfor | null>()
   const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
+  const [kit, SetKit] = useState<Kit | null>()
+  const [service, SetService] = useState<Service | null>()
+  const [totals, SetTotals] = useState<any[]>([])
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [textFieldValue, setTextFieldValue] = useState('')
   const [complaint, setComplaint] = useState<string[]>([]);
@@ -114,6 +122,9 @@ export default function ServiceBudgetCreate() {
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
+  const [openModalCreateKit, setOpenModalCreateKit] = useState(false)
+  const [openModalCreateService, setOpenModalCreateService] = useState(false)
+
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
   // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
@@ -128,6 +139,12 @@ export default function ServiceBudgetCreate() {
   }
   function handleCloseModalClientVehicleSearch() {
     setOpenModalClientVehicleSearch(false)
+  }
+  function handleCloseModalCreateKit(){
+    setOpenModalCreateKit(false)
+  }
+  function handleCloseModalCreateService(){
+    setOpenModalCreateService(false)
   }
   // function handleCloseModalClaimServiceVehicleSearch() {
   //   setOpenModalClaimServiceSearch(false)
@@ -224,6 +241,39 @@ export default function ServiceBudgetCreate() {
       color: client_vehicle?.color ?? 'Não informado',
       plate: client_vehicle?.plate ?? 'Não informado',
     })
+  }
+  function handleAddKit(kit: Kit) {
+    SetKit(null)
+    SetKit({
+      tipo: kit.tipo,
+      descricao: kit.descricao ?? 'Não informado', 
+      qtd: kit.qtd ?? '0',
+      desconto: kit.desconto ?? '0',
+      valor: kit.valor ?? '0',
+      total: kit.total ?? '0'
+    })
+    addTotals(kit)
+  }
+
+
+  function handleAddService(service: Service) {
+    SetService(null)
+    SetService({
+      tipo: service.tipo,
+      descricao: service.descricao ?? 'Não informado', 
+      qtd: service.qtd ?? '0',
+      desconto: service.desconto ?? '0',
+      valor: service.valor ?? '0',
+      total: service.total ?? '0'
+    })
+    console.log(service)
+    addTotals(service)
+  }
+
+
+  function addTotals(value: any){
+    SetTotals((totals) => [...totals, value]);
+   
   }
   // function handleAddClainServiceVehicle(client_vehicle: any) {
   //   console.log(client_vehicle)
@@ -504,10 +554,10 @@ export default function ServiceBudgetCreate() {
                 <DividerCard />
               
                 <div style={{ marginTop: '13px', flexWrap: "wrap", rowGap: "20px", display: 'flex', justifyContent: 'flex-end', columnGap: "10px" }}>
-                  <Button onClick={() => addComplaint()} variant="contained" style={{ background: "rgba(14, 148, 139, 1)"}}>
+                  <Button onClick={() => setOpenModalCreateKit(true)} variant="contained" style={{ background: "rgba(14, 148, 139, 1)"}}>
                   + Kits
                   </Button>
-                  <Button onClick={() => addComplaint()} variant="contained" style={{ background: "rgba(14, 148, 139, 0.77)"}}>
+                  <Button onClick={() => setOpenModalCreateService(true)} variant="contained" style={{ background: "rgba(14, 148, 139, 0.77)"}}>
                   + Serviços
                   </Button>
                   <Button onClick={() => addComplaint()} variant="contained" style={{ background: "rgba(14, 148, 139, 1)"}}>
@@ -518,7 +568,18 @@ export default function ServiceBudgetCreate() {
                  <Stack style={{backgroundColor: "rgba(197, 203, 208, 1)", padding: "14px 6px", textAlign: 'center'}}>
                   <Typography variant="body1" style={{fontSize: "13px"}}>Classificação Itens Qtd Preço Desconto Unitário Total ações</Typography >
                  </Stack>
+                 {totals?.map((option, index) => {
+                    return <ListItem style={{columnGap: '20px'}}>
+                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{option.descricao}</ListItemText>
+                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{option.tipo + (index + 1)} </ListItemText>
+                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{option.qtd}</ListItemText>
+                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{formatMoneyPtBR(option.desconto) || ''}</ListItemText>
+                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{formatMoneyPtBR(option.valor) || ''}</ListItemText>
+                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{formatMoneyPtBR(option.total) || ''}</ListItemText>
 
+                  </ListItem>
+                 })}
+                  
 
                  <div>
 
@@ -653,6 +714,17 @@ export default function ServiceBudgetCreate() {
         openMolal={openModalClientVehicleSearch}
         handleAddClientVehicle={handleAddClientVehicle}
       />
+       <ModalCreateKit
+        handleClose={handleCloseModalCreateKit}
+        openMolal={openModalCreateKit}
+        handleAddKit={handleAddKit}
+      />
+      <ModalCreateService
+        handleClose={handleCloseModalCreateService}
+        openMolal={openModalCreateService}
+        handleAddService={handleAddService}
+      />
+     
       {/* <ModalSearchClaimService
         handleClose={handleCloseModalClaimServiceVehicleSearch}
         openMolal={openModalClaimServiceSearch}
