@@ -36,14 +36,13 @@ import {
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import dayjs, { Dayjs } from 'dayjs'
 // import * as locale from 'date-fns/locale/pt-BR';
-
+import IconButton from '@mui/material/IconButton'
+import { Delete } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
 import TextField from '@mui/material/TextField'
-import Box from '@mui/material/Box'
 import { formatDateTimeTimezone } from '@/ultis/formatDate'
 import ActionAlerts from '@/components/ActionAlerts'
-import { DataTimeInput } from '@/components/DataTimeInput'
 import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
 import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
@@ -58,6 +57,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
+import { Box, Button, Typography } from '@mui/material'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
@@ -65,7 +65,7 @@ const api = new ApiCore()
 type isEditSelectedCardType =
   | 'client'
   | 'clientVehicle'
-  | 'schedule'
+  | 'complaintEdit'
   | 'technicalConsultant'
   | null
 
@@ -88,15 +88,17 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
     href: '/company',
   },
   {
-    label: 'Edição de agendamento',
-    href: '/service-schedule/edit',
+    label: 'Edição de orçamento',
+    href: '/budget/edit',
   },
 ]
 
-export default function ServiceSchedulesCreate() {
+export default function ServiceBudgetCreate() {
   const [client, setClient] = useState<ClientInfor | null>()
   const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
+  const [textFieldValue, setTextFieldValue] = useState('')
+  const [complaint, setComplaint] = useState<string[]>([]);
   const [technicalConsultant, setTechnicalConsultant] =
     useState<TechnicalConsultant | null>({
       id: 0,
@@ -136,11 +138,6 @@ export default function ServiceSchedulesCreate() {
     setWasEdited(true)
   }
 
-  function handleTechnicalConsultant(id: number) {
-    setTechnicalConsultant((prevState) => {
-      return technicalConsultantsList.filter((c) => c.id === id)[0]
-    })
-  }
 
   function handleCancelled() {
     setWasEdited(false)
@@ -154,9 +151,16 @@ export default function ServiceSchedulesCreate() {
       type: 'success',
     })
   }
-
-  function handleDateSchedule(data: Dayjs | null) {
-    setVisitDate(data)
+  const handleTextFieldChange = (event: { target: { value: React.SetStateAction<string> } }) => {
+    setTextFieldValue(event.target.value);
+  };
+  function addComplaint(){
+    setComplaint((complaint) => [...complaint, textFieldValue]);
+  }
+  function removeComplaint(value: number){
+    const updatedArray = [...complaint];
+    updatedArray.splice(value, 1);
+    setComplaint(updatedArray);
   }
 
   async function onSave() {
@@ -179,7 +183,7 @@ export default function ServiceSchedulesCreate() {
       )
       const idCreatedResponse = respCreate.data.data.id
 
-      router.push('/service-schedule/' + idCreatedResponse)
+      router.push('/budget/' + idCreatedResponse)
 
       setIsEditSelectedCard(null)
       setActionAlerts({
@@ -303,7 +307,7 @@ export default function ServiceSchedulesCreate() {
   // }, [dataServiceScheduleStatus, dataServiceSchedule])
 
   useEffect(() => {
-    localStorage.removeItem('service-schedule-list')
+    localStorage.removeItem('service-budget-list')
   }, [])
 
   return (
@@ -313,7 +317,7 @@ export default function ServiceSchedulesCreate() {
           <Grid item xs={12} md={12} lg={12}>
             <HeaderBreadcrumb
               data={HeaderBreadcrumbData}
-              title="Agenda de Serviços"
+              title="Orçamentos"
             />
           </Grid>
           <Grid item xs={12} md={7} lg={7}>
@@ -403,8 +407,127 @@ export default function ServiceSchedulesCreate() {
                   )}
                 </List>
               </Paper>
-              {/* Veículo */}
-              <Paper
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12} md={5} lg={5}>
+            <Stack spacing={2}>
+            {/* RECLAMAÇÕES */}
+
+            <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>RECLAMAÇÕES</TitleCard>
+                  <MoreOptionsButtonSelect
+                    handleIsEditSelectedCard={handleIsEditSelectedCard}
+                    typeEdit="complaintEdit"
+                  />
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  {complaint?.map((option, index) => {
+                      return  <ListItemCard style={{ paddingBottom: "20"}}><InfoCardName>{option}</InfoCardName>{wasEdited && isEditSelectedCard == "complaintEdit" && ( <IconButton
+                        aria-label="search"
+                        color="warning"
+                        onClick={() => removeComplaint(index)}
+                        sx={{ marginLeft: 1, color: 'red' }}
+                      >
+                        <Delete />
+                      </IconButton>)}</ListItemCard>
+                      })}
+                  
+                </List>
+                <TextField value={textFieldValue} onChange={handleTextFieldChange} placeholder='Reclamação...'></TextField>
+                <div style={{ marginTop: '13px', display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button onClick={() => addComplaint()} variant="contained" color="primary">
+                    Enviar
+                  </Button>
+              </div>
+
+              </Paper>
+              {wasEdited && isEditSelectedCard === 'complaintEdit' && (
+                <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      justifyContent="flex-end"
+                      spacing={2}
+                    >
+                
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleCancelled()}
+                      >
+                        Ok
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+
+                  
+                </Grid>
+              )}
+              {/* ITENS SELECIONADOS */}
+
+               <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>ITENS SELECIONADOS</TitleCard>
+                 
+                </Stack>
+                <DividerCard />
+              
+                <div style={{ marginTop: '13px', flexWrap: "wrap", rowGap: "20px", display: 'flex', justifyContent: 'flex-end', columnGap: "10px" }}>
+                  <Button onClick={() => addComplaint()} variant="contained" style={{ background: "rgba(14, 148, 139, 1)"}}>
+                  + Kits
+                  </Button>
+                  <Button onClick={() => addComplaint()} variant="contained" style={{ background: "rgba(14, 148, 139, 0.77)"}}>
+                  + Serviços
+                  </Button>
+                  <Button onClick={() => addComplaint()} variant="contained" style={{ background: "rgba(14, 148, 139, 1)"}}>
+                  + Peças
+                  </Button>
+              </div>
+              <List dense={false}>
+                 <Stack style={{backgroundColor: "rgba(197, 203, 208, 1)", padding: "14px 6px", textAlign: 'center'}}>
+                  <Typography variant="body1" style={{fontSize: "13px"}}>Classificação Itens Qtd Preço Desconto Unitário Total ações</Typography >
+                 </Stack>
+
+
+                 <div>
+
+                 </div>
+              </List>
+
+              </Paper>
+                {/* Veículo */}
+                <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
@@ -480,210 +603,6 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                 </List>
               </Paper>
-              {/* Claim Service */}
-              {/* <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Serviços</TitleCard>
-                  <ButtonAdd
-                    aria-label="add to client"
-                    onClick={() => {
-                      setOpenModalClientVehicleSearch(true)
-                    }}
-                  >
-                    <AddCircleIcon />
-                  </ButtonAdd>
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Marca:</InfoCardName>{' '}
-                    {clientVehicle?.brand ? (
-                      <InfoCardText>{clientVehicle?.brand}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Modelo:</InfoCardName>{' '}
-                    {clientVehicle?.model ? (
-                      <InfoCardText>{clientVehicle?.model}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Veículo:</InfoCardName>{' '}
-                    {clientVehicle?.vehicle ? (
-                      <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Cor:</InfoCardName>{' '}
-                    {clientVehicle?.color ? (
-                      <InfoCardText>{clientVehicle?.color}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Chassi:</InfoCardName>{' '}
-                    {clientVehicle?.chassis ? (
-                      <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Placa:</InfoCardName>{' '}
-                    {clientVehicle?.plate ? (
-                      <InfoCardText>
-                        {formatPlate(clientVehicle?.plate)}
-                      </InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                </List>
-              </Paper> */}
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12} md={5} lg={5}>
-            <Stack spacing={2}>
-              {/* Agendamento */}
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>AGENDAMENTO</TitleCard>
-                  <MoreOptionsButtonSelect
-                    handleIsEditSelectedCard={handleIsEditSelectedCard}
-                    typeEdit="schedule"
-                  />
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Data da visita:</InfoCardName>
-
-                    <DataTimeInput
-                      dateSchedule={visitDate}
-                      handleDateSchedule={handleDateSchedule}
-                    />
-                  </ListItemCard>
-                </List>
-              </Paper>
-              {wasEdited && isEditSelectedCard === 'schedule' && (
-                <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
-                  <Paper
-                    sx={{
-                      p: '0 2',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      background: 'transparent',
-                    }}
-                    elevation={0}
-                  >
-                    <Stack
-                      direction="row"
-                      justifyContent="flex-end"
-                      spacing={2}
-                    >
-                      <ButtonSubmit
-                        variant="contained"
-                        size="small"
-                        onClick={() => onSave()}
-                      >
-                        save
-                      </ButtonSubmit>
-                      <ButtonSubmit
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleCancelled()}
-                      >
-                        cancelar
-                      </ButtonSubmit>
-                    </Stack>
-                  </Paper>
-                </Grid>
-              )}
-
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Consultor técnico</TitleCard>
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Nome:</InfoCardName>{' '}
-                    <Box width="100%">
-                      <TextField
-                        id="standard-select-currency"
-                        select
-                        sx={{
-                          width: '100%',
-                        }}
-                        value={technicalConsultant?.id}
-                        variant="standard"
-                        onChange={(e) =>
-                          handleTechnicalConsultant(parseInt(e.target.value))
-                        }
-                      >
-                        <MenuItem value={technicalConsultant?.id}>
-                          {'Selecione um Consultor'}
-                        </MenuItem>
-                        {technicalConsultantsList.map((option) => (
-                          <MenuItem
-                            key={option.id + option.name}
-                            value={option.id}
-                          >
-                            {option.name}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Box>
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Código consultor:</InfoCardName>{' '}
-                    <InfoCardText>
-                      {technicalConsultant?.id === 0
-                        ? null
-                        : technicalConsultant?.id}
-                    </InfoCardText>
-                  </ListItemCard>
-                </List>
-              </Paper>
-
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
@@ -743,4 +662,4 @@ export default function ServiceSchedulesCreate() {
   )
 }
 
-ServiceSchedulesCreate.auth = true
+ServiceBudgetCreate.auth = true
