@@ -208,7 +208,7 @@ export default function ServiceBudgetCreate() {
   }
   async function getOsTypeId() {
     try {
-      let result = await api.get(
+      const result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/os?company_id=${companySelected}`,
       )
       return result.data.data[0].id
@@ -218,7 +218,7 @@ export default function ServiceBudgetCreate() {
   }
   async function getMaintenanceReviewId() {
     try {
-      let result = await api.get(
+      const result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/maintenance-review?company_id=${companySelected}`,
       )
       return result.data.data[0].id
@@ -228,7 +228,7 @@ export default function ServiceBudgetCreate() {
   }
   async function getClaims() {
     try {
-      let result = await api.get(
+      const result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/claim-service?company_id=${companySelected}`,
       )
       return result.data.data
@@ -887,7 +887,7 @@ export default function ServiceBudgetCreate() {
                 <List dense={false}>
                   {complaint?.map((key, index) => {
                     return (
-                      <ListItemCard style={{ paddingBottom: '20' }}>
+                      <ListItemCard key={index} style={{ paddingBottom: '20' }}>
                         <Typography
                           style={{
                             fontWeight: '900',
@@ -897,7 +897,7 @@ export default function ServiceBudgetCreate() {
                         >
                           {key}
                         </Typography>
-                        {wasEdited && isEditSelectedCard == 'complaintEdit' && (
+                        {wasEdited && isEditSelectedCard === 'complaintEdit' && (
                           <IconButton
                             aria-label="search"
                             color="warning"
@@ -1023,7 +1023,7 @@ export default function ServiceBudgetCreate() {
                   </Stack>
                   {service?.map((key, index) => {
                     return (
-                      <ListItem style={{ columnGap: '5px' }}>
+                      <ListItem key={index} style={{ columnGap: '5px' }}>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
@@ -1048,16 +1048,12 @@ export default function ServiceBudgetCreate() {
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {formatMoneyPtBR(parseInt(key.standard_value)) ||
-                            ''}
+                          {formatMoneyPtBR(parseInt(key.standard_value)) || ''}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {formatMoneyPtBR(
-                            parseInt(key.standard_value) -
-                              key.price_discount,
-                          ) || ''}
+                          {formatMoneyPtBR(parseInt(key.standard_value) - key.price_discount, ) || ''}
                         </Typography>
                         <IconButton
                           aria-label="search"
@@ -1073,7 +1069,7 @@ export default function ServiceBudgetCreate() {
                   {part?.map((key, index) => {
                     return (
                       <ListItem style={{ columnGap: '5px', maxWidth: '100%' }}>
-                        <Typography
+                        <Typography key={index}
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
                           {key.name}

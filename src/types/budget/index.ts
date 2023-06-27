@@ -32,7 +32,6 @@ export interface ClientResponseType {
   fullName: string
 }
 
-
 export interface Service {
   length: any
   id: number
@@ -67,12 +66,14 @@ export interface Part {
   price_discount: number
   quantity: number
 }
+
 export interface Kit {
   kit_id: number
   name: string
   products: Part[]
   services: Service[]
 }
+
 export interface ClientVehicle {
   id: number
   brand: string

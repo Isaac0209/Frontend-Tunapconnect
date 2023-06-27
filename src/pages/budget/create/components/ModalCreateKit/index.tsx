@@ -67,7 +67,7 @@ export default function ModalSearchKit({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     name: string,
   ) => {
-    let value = parseInt(event.target.value)
+    const value = parseInt(event.target.value)
     setAdicions({
       ...adicionais,
       [name]: value,
