@@ -42,9 +42,7 @@ export default function ModalSearchKit({
   handleAddService,
   handleAddPart,
 }: ModalSearchKitProps) {
-
   const [kitList, setKitList] = useState<Kit[] | []>([])
-
   const [adicionais, setAdicions] = useState({
     desconto: 0,
     quantidade: 0,
@@ -69,7 +67,7 @@ export default function ModalSearchKit({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     name: string,
   ) => {
-    var value = parseInt(event.target.value)
+    let value = parseInt(event.target.value)
     setAdicions({
       ...adicionais,
       [name]: value,
@@ -151,7 +149,6 @@ export default function ModalSearchKit({
                   <ListItemButton
                     key={`${index}-${item}`}
                     onClick={() => {
-                    
                       setKitSelect(item)
                     }}
                     selected={item.kit_id === kitSelect?.kit_id}
@@ -229,7 +226,6 @@ export default function ModalSearchKit({
                   }
                 }
                 handleClose()
-                
                 setKitSelect(null)
                 setAdicions({
                   desconto: 0,

@@ -31,21 +31,8 @@ export interface ClientResponseType {
   email: any
   fullName: string
 }
-export interface Kit {
-  kit_id: number
-  name: string
-  products: Part[]
-  services: Service[]
-}
-export interface Claims {
-  id: number | undefined
-  company_id: number | undefined
-  integration_code: string | null
-  description: string | null
-  deleted_at: string | null
-  created_at: string | null
-  updated_at: string | null
-}
+
+
 export interface Service {
   length: any
   id: number
@@ -63,15 +50,9 @@ export interface Service {
   price_discount: number
   quantity: number
 }
-export interface Budget {
-  number: number
-  date: Dayjs | null
-  TechnicalConsultant: TechnicalConsultant | null
-  typeBudget: string
-}
+
 export interface Part {
   length: any
-
   id: number
   company_id: number
   tipo: string
@@ -86,7 +67,12 @@ export interface Part {
   price_discount: number
   quantity: number
 }
-
+export interface Kit {
+  kit_id: number
+  name: string
+  products: Part[]
+  services: Service[]
+}
 export interface ClientVehicle {
   id: number
   brand: string
@@ -100,7 +86,12 @@ export interface TechnicalConsultant {
   id: number
   name: string
 }
-
+export interface Budget {
+  number: number
+  date: Dayjs | null
+  TechnicalConsultant: TechnicalConsultant | null
+  typeBudget: string
+}
 // =================================================
 
 export interface BrandType {

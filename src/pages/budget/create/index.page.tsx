@@ -18,7 +18,6 @@ import {
   TechnicalConsultant,
   Part,
   Budget,
-  Claims,
 } from '@/types/budget'
 import { ApiCore } from '@/lib/api'
 
@@ -47,7 +46,6 @@ import { Delete } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
 import TextField from '@mui/material/TextField'
-import { formatDate, formatDateTimeTimezone } from '@/ultis/formatDate'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
 import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
@@ -63,7 +61,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
-import { Box, Button, ListItem, ListItemText, Typography } from '@mui/material'
+import { Box, Button, ListItem, Typography } from '@mui/material'
 import ModalCreateKit from './components/ModalCreateKit'
 import ModalCreateService from './components/ModalCreateService'
 import ModalCreatePart from './components/ModalCreatePart'
@@ -112,7 +110,6 @@ export default function ServiceBudgetCreate() {
   const [kit, SetKit] = useState<Kit[]>([])
   const [service, SetService] = useState<Service[]>([])
   const [part, SetPart] = useState<Part[]>([])
-  const [claims, SetClaims] = useState<Claims[]>([])
 
   const [budgetDate, setBudgetDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [textFieldValue, setTextFieldValue] = useState('')
@@ -211,7 +208,7 @@ export default function ServiceBudgetCreate() {
   }
   async function getOsTypeId() {
     try {
-      var result = await api.get(
+      let result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/os?company_id=${companySelected}`,
       )
       return result.data.data[0].id
@@ -221,7 +218,7 @@ export default function ServiceBudgetCreate() {
   }
   async function getMaintenanceReviewId() {
     try {
-      var result = await api.get(
+      let result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/maintenance-review?company_id=${companySelected}`,
       )
       return result.data.data[0].id
@@ -231,7 +228,7 @@ export default function ServiceBudgetCreate() {
   }
   async function getClaims() {
     try {
-      var result = await api.get(
+      let result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/claim-service?company_id=${companySelected}`,
       )
       return result.data.data
@@ -888,7 +885,7 @@ export default function ServiceBudgetCreate() {
                 </Stack>
                 <DividerCard />
                 <List dense={false}>
-                  {complaint?.map((option, index) => {
+                  {complaint?.map((key, index) => {
                     return (
                       <ListItemCard style={{ paddingBottom: '20' }}>
                         <Typography
@@ -898,7 +895,7 @@ export default function ServiceBudgetCreate() {
                             wordBreak: 'break-word',
                           }}
                         >
-                          {option}
+                          {key}
                         </Typography>
                         {wasEdited && isEditSelectedCard == 'complaintEdit' && (
                           <IconButton
@@ -1024,42 +1021,42 @@ export default function ServiceBudgetCreate() {
                       Classificação Itens Qtd Desconto Preço Total ações
                     </Typography>
                   </Stack>
-                  {service?.map((option, index) => {
+                  {service?.map((key, index) => {
                     return (
                       <ListItem style={{ columnGap: '5px' }}>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {option.description}
+                          {key.description}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
                           {' '}
-                          {option.tipo}
+                          {key.tipo}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {option.quantity}
+                          {key.quantity}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {formatMoneyPtBR(option.price_discount) || ''}
+                          {formatMoneyPtBR(key.price_discount) || ''}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {formatMoneyPtBR(parseInt(option.standard_value)) ||
+                          {formatMoneyPtBR(parseInt(key.standard_value)) ||
                             ''}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
                           {formatMoneyPtBR(
-                            parseInt(option.standard_value) -
-                              option.price_discount,
+                            parseInt(key.standard_value) -
+                              key.price_discount,
                           ) || ''}
                         </Typography>
                         <IconButton
@@ -1073,40 +1070,40 @@ export default function ServiceBudgetCreate() {
                       </ListItem>
                     )
                   })}
-                  {part?.map((option, index) => {
+                  {part?.map((key, index) => {
                     return (
                       <ListItem style={{ columnGap: '5px', maxWidth: '100%' }}>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {option.name}
+                          {key.name}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
                           {' '}
-                          {option.tipo}
+                          {key.tipo}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {option.quantity}
+                          {key.quantity}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {formatMoneyPtBR(option.price_discount) || ''}
+                          {formatMoneyPtBR(key.price_discount) || ''}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {formatMoneyPtBR(parseInt(option.sale_value)) || ''}
+                          {formatMoneyPtBR(parseInt(key.sale_value)) || ''}
                         </Typography>
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
                           {formatMoneyPtBR(
-                            parseInt(option.sale_value) - option.price_discount,
+                            parseInt(key.sale_value) - key.price_discount,
                           ) || ''}
                         </Typography>
                         <IconButton
