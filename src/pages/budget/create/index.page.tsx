@@ -16,6 +16,9 @@ import {
   ClientVehicle,
   // ServiceSchedulesListProps,
   TechnicalConsultant,
+  Part,
+  Budget,
+  Claims,
 } from '@/types/budget'
 import { ApiCore } from '@/lib/api'
 
@@ -44,7 +47,7 @@ import { Delete } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
 import TextField from '@mui/material/TextField'
-import { formatDateTimeTimezone } from '@/ultis/formatDate'
+import { formatDate, formatDateTimeTimezone } from '@/ultis/formatDate'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
 import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
@@ -63,6 +66,8 @@ import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle
 import { Box, Button, ListItem, ListItemText, Typography } from '@mui/material'
 import ModalCreateKit from './components/ModalCreateKit'
 import ModalCreateService from './components/ModalCreateService'
+import ModalCreatePart from './components/ModalCreatePart'
+import { DateInput } from '@/components/DateInput'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
@@ -72,19 +77,22 @@ type isEditSelectedCardType =
   | 'clientVehicle'
   | 'complaintEdit'
   | 'technicalConsultant'
+  | 'budget'
+  | 'schedule'
   | null
 
 type updateData = {
-  code: null
-  promised_date: string
+  os_type_id: number | undefined
+  maintenance_review_id: number
+  consultant_id: number | undefined | null
+  mandatory_itens: any[]
+  quotation_itens: any[]
   technical_consultant_id: number | undefined
   client_id: number | undefined
   client_vehicle_id: number | undefined
   company_id: string | undefined
   // chasis: string | undefined
-  plate: string | undefined
-  claims_service: any[]
-  checklist_version_id: number | undefined
+  claim_services: any[]
 }
 
 const HeaderBreadcrumbData: listBreadcrumb[] = [
@@ -101,17 +109,26 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 export default function ServiceBudgetCreate() {
   const [client, setClient] = useState<ClientInfor | null>()
   const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
-  const [kit, SetKit] = useState<Kit | null>()
-  const [service, SetService] = useState<Service | null>()
-  const [totals, SetTotals] = useState<any[]>([])
-  const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
+  const [kit, SetKit] = useState<Kit[]>([])
+  const [service, SetService] = useState<Service[]>([])
+  const [part, SetPart] = useState<Part[]>([])
+  const [claims, SetClaims] = useState<Claims[]>([])
+
+  const [budgetDate, setBudgetDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [textFieldValue, setTextFieldValue] = useState('')
-  const [complaint, setComplaint] = useState<string[]>([]);
+  const [complaint, setComplaint] = useState<string[]>([])
   const [technicalConsultant, setTechnicalConsultant] =
     useState<TechnicalConsultant | null>({
       id: 0,
       name: '-',
     })
+  const [budget, SetBudget] = useState<Budget>({
+    number: 0,
+    date: budgetDate,
+    TechnicalConsultant: technicalConsultant,
+    typeBudget: '',
+  })
+
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
     TechnicalConsultant[]
   >([])
@@ -124,6 +141,7 @@ export default function ServiceBudgetCreate() {
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
   const [openModalCreateKit, setOpenModalCreateKit] = useState(false)
   const [openModalCreateService, setOpenModalCreateService] = useState(false)
+  const [openModalCreatePart, setOpenModalCreatePart] = useState(false)
 
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
@@ -134,17 +152,28 @@ export default function ServiceBudgetCreate() {
 
   const { companySelected } = useContext(CompanyContext)
 
+  function handleDateSchedule(data: Dayjs | null) {
+    setBudgetDate(data)
+  }
+  function handleTechnicalConsultant(id: number) {
+    setTechnicalConsultant((prevState) => {
+      return technicalConsultantsList.filter((c) => c.id === id)[0]
+    })
+  }
   function handleCloseModalClienteSearch() {
     setOpenModalClientSearch(false)
   }
   function handleCloseModalClientVehicleSearch() {
     setOpenModalClientVehicleSearch(false)
   }
-  function handleCloseModalCreateKit(){
+  function handleCloseModalCreateKit() {
     setOpenModalCreateKit(false)
   }
-  function handleCloseModalCreateService(){
+  function handleCloseModalCreateService() {
     setOpenModalCreateService(false)
+  }
+  function handleCloseModalCreatePart() {
+    setOpenModalCreatePart(false)
   }
   // function handleCloseModalClaimServiceVehicleSearch() {
   //   setOpenModalClaimServiceSearch(false)
@@ -154,7 +183,6 @@ export default function ServiceBudgetCreate() {
     setIsEditSelectedCard(value)
     setWasEdited(true)
   }
-
 
   function handleCancelled() {
     setWasEdited(false)
@@ -168,36 +196,69 @@ export default function ServiceBudgetCreate() {
       type: 'success',
     })
   }
-  const handleTextFieldChange = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setTextFieldValue(event.target.value);
-  };
-  function addComplaint(){
-    setComplaint((complaint) => [...complaint, textFieldValue]);
+  const handleTextFieldChange = (event: {
+    target: { value: React.SetStateAction<string> }
+  }) => {
+    setTextFieldValue(event.target.value)
   }
-  function removeComplaint(value: number){
-    const updatedArray = [...complaint];
-    updatedArray.splice(value, 1);
-    setComplaint(updatedArray);
+  function addComplaint() {
+    setComplaint((complaint) => [...complaint, textFieldValue])
+  }
+  function removeComplaint(value: number) {
+    const updatedArray = [...complaint]
+    updatedArray.splice(value, 1)
+    setComplaint(updatedArray)
+  }
+  async function getOsTypeId() {
+    try {
+      var result = await api.get(
+        `https://tunapconnect-api.herokuapp.com/api/os?company_id=${companySelected}`,
+      )
+      return result.data.data[0].id
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  async function getMaintenanceReviewId() {
+    try {
+      var result = await api.get(
+        `https://tunapconnect-api.herokuapp.com/api/maintenance-review?company_id=${companySelected}`,
+      )
+      return result.data.data[0].id
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  async function getClaims() {
+    try {
+      var result = await api.get(
+        `https://tunapconnect-api.herokuapp.com/api/claim-service?company_id=${companySelected}`,
+      )
+      return result.data.data
+    } catch (error) {}
   }
 
   async function onSave() {
+    console.log(service)
     const dataFormatted: updateData = {
-      code: null,
-      promised_date: formatDateTimeTimezone(`${visitDate}`),
-      technical_consultant_id: technicalConsultant?.id,
-      client_id: client?.id,
-      client_vehicle_id: clientVehicle?.id,
       company_id: `${companySelected}`,
-      plate: clientVehicle?.plate,
-      claims_service: [],
-      checklist_version_id: 14,
+      client_vehicle_id: clientVehicle?.id,
+      client_id: client?.id,
+      os_type_id: await getOsTypeId(),
+      maintenance_review_id: await getMaintenanceReviewId(),
+      consultant_id: null,
+      mandatory_itens: [],
+      quotation_itens: [service, part],
+      claim_services: await getClaims(),
+      technical_consultant_id: technicalConsultant?.id,
     }
     console.log(dataFormatted)
     try {
       const respCreate: any = await api.create(
-        '/service-schedule',
+        'https://tunapconnect-api.herokuapp.com/api/quotations',
         dataFormatted,
       )
+
       const idCreatedResponse = respCreate.data.data.id
 
       router.push('/budget/' + idCreatedResponse)
@@ -242,54 +303,127 @@ export default function ServiceBudgetCreate() {
       plate: client_vehicle?.plate ?? 'Não informado',
     })
   }
-  function handleAddKit(kit: Kit) {
-    SetKit(null)
-    SetKit({
-      tipo: kit.tipo,
-      descricao: kit.descricao ?? 'Não informado', 
-      qtd: kit.qtd ?? '0',
-      desconto: kit.desconto ?? '0',
-      valor: kit.valor ?? '0',
-      total: kit.total ?? '0'
-    })
-    addTotals(kit)
-  }
 
-
-  function handleAddService(service: Service) {
-    SetService(null)
-    SetService({
-      tipo: service.tipo,
-      descricao: service.descricao ?? 'Não informado', 
-      qtd: service.qtd ?? '0',
-      desconto: service.desconto ?? '0',
-      valor: service.valor ?? '0',
-      total: service.total ?? '0'
-    })
+  function handleAddService(newService: Service) {
+    SetService((service) => [
+      ...service,
+      {
+        length: null,
+        id: newService.id,
+        company_id: newService.company_id,
+        tipo: 'Serviço',
+        service_code: newService.service_code,
+        integration_code: newService.integration_code,
+        description: newService.description,
+        standard_quantity: newService.standard_quantity,
+        standard_value: newService.standard_value ?? '0',
+        active: newService.active,
+        deleted_at: newService.deleted_at,
+        created_at: newService.created_at,
+        updated_at: newService.updated_at,
+        price_discount: newService.price_discount ?? 0,
+        quantity: newService.quantity ?? 0,
+      },
+    ])
     console.log(service)
-    addTotals(service)
   }
 
-
-  function addTotals(value: any){
-    SetTotals((totals) => [...totals, value]);
-   
+  function handleAddPart(newPart: Part) {
+    SetPart((part) => [
+      ...part,
+      {
+        length: null,
+        id: newPart.id,
+        company_id: newPart.company_id,
+        tipo: 'Peça',
+        product_code: newPart.product_code,
+        sale_value: newPart.sale_value ?? '0',
+        name: newPart.name ?? 'Sem nome',
+        tunap_code: newPart.tunap_code,
+        guarantee_value: newPart.guarantee_value ?? '0',
+        active: newPart.active,
+        created_at: newPart.created_at,
+        updated_at: newPart.updated_at,
+        price_discount: newPart.price_discount ?? 0,
+        quantity: newPart.quantity ?? 0,
+      },
+    ])
   }
-  // function handleAddClainServiceVehicle(client_vehicle: any) {
-  //   console.log(client_vehicle)
-  // setClientVehicle(null)
-  // setClientVehicle({
-  //   id: client_vehicle.id,
-  //   brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-  //   chassis: client_vehicle?.chasis ?? 'Não informado',
-  //   vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-  //   model:
-  //     `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-  //     'Não informado',
-  //   color: client_vehicle?.color ?? 'Não informado',
-  //   plate: client_vehicle?.plate ?? 'Não informado',
-  // })
-  // }
+
+  function removeTotals(array: any, value: number) {
+    const updatedArray = [...array]
+    updatedArray.splice(value, 1)
+    switch (array) {
+      case kit:
+        SetKit(updatedArray)
+        break
+      case service:
+        SetService(updatedArray)
+        break
+      case part:
+        SetPart(updatedArray)
+        break
+    }
+  }
+  function totalValueItems() {
+    const totalTotalPart = part.reduce(
+      (accumulator, part) => accumulator + (parseInt(part.sale_value) || 0),
+      0,
+    )
+
+    return totalTotalPart
+  }
+  function descontosValueItems() {
+    const descontoTotalPart = part.reduce(
+      (accumulator, part) => accumulator + (part.price_discount || 0),
+      0,
+    )
+
+    return descontoTotalPart
+  }
+  function totalValueService() {
+    const totalTotalService = service.reduce(
+      (accumulator, service) =>
+        accumulator + (parseInt(service.standard_value) || 0),
+      0,
+    )
+
+    return totalTotalService
+  }
+  function descontosValueService() {
+    const descontoTotalService = service.reduce(
+      (accumulator, service) => accumulator + (service.price_discount || 0),
+      0,
+    )
+
+    return descontoTotalService
+  }
+  function descontosValueTotal() {
+    const descontoTotalService = service.reduce(
+      (accumulator, service) => accumulator + (service.price_discount || 0),
+      0,
+    )
+    const descontoTotalPart = part.reduce(
+      (accumulator, part) => accumulator + (part.price_discount || 0),
+      0,
+    )
+    return descontoTotalService + descontoTotalPart
+  }
+  function totalValue() {
+    const totalTotalPart = part.reduce(
+      (accumulator, part) =>
+        accumulator + (parseInt(part.sale_value) - part.price_discount || 0),
+      0,
+    )
+    const totalTotalService = service.reduce(
+      (accumulator, service) =>
+        accumulator +
+        (parseInt(service.standard_value) - service.price_discount || 0),
+      0,
+    )
+
+    return totalTotalPart + totalTotalService
+  }
 
   const {
     data: dataTechnicalConsultantList,
@@ -304,13 +438,21 @@ export default function ServiceBudgetCreate() {
     ],
     async () => {
       const resp = await api.get(
-        `/technical-consultant?company_id=${companySelected}`,
+        `https://tunapconnect-api.herokuapp.com/api/technical-consultant?company_id=${companySelected}`,
       )
       return resp.data.data
     },
     { enabled: !!companySelected },
   )
-
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    name: string,
+  ) => {
+    SetBudget({
+      ...budget,
+      [name]: event.target.value,
+    })
+  }
   useEffect(() => {
     if (dataTechnicalConsultantListStatus === 'success') {
       setTechnicalConsultantsList(
@@ -365,13 +507,275 @@ export default function ServiceBudgetCreate() {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
-            <HeaderBreadcrumb
-              data={HeaderBreadcrumbData}
-              title="Orçamentos"
-            />
+            <HeaderBreadcrumb data={HeaderBreadcrumbData} title="Orçamentos" />
           </Grid>
           <Grid item xs={12} md={7} lg={7}>
             <Stack spacing={3}>
+              {/* Resumo */}
+
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Resumo do orçamento</TitleCard>
+                </Stack>
+                <DividerCard />
+
+                <div style={{ display: 'flex', width: '100%' }}>
+                  <Grid style={{ width: '50%' }}>
+                    <List dense={false} style={{ rowGap: '30px' }}>
+                      <Stack
+                        style={{
+                          backgroundColor: 'rgba(197, 203, 208, 1)',
+                          padding: '14px 6px',
+                        }}
+                      >
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700', color: '#606060' }}
+                        >
+                          Descrição
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        style={{
+                          paddingTop: '20px',
+                          rowGap: '30px',
+                          fontSize: '20px',
+                        }}
+                      >
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700' }}
+                        >
+                          Valor dos itens:
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700' }}
+                        >
+                          Descontos nos itens:
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700' }}
+                        >
+                          Valor dos Serviços:
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700' }}
+                        >
+                          Desconto nos Serviços:
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700' }}
+                        >
+                          Total de descontos:
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700' }}
+                        >
+                          Total líquido:
+                        </Typography>
+                      </Stack>
+                    </List>
+                  </Grid>
+                  <Grid style={{ width: '50%' }}>
+                    <List dense={false}>
+                      <Stack
+                        style={{
+                          backgroundColor: 'rgba(197, 203, 208, 1)',
+                          padding: '14px 6px',
+                        }}
+                      >
+                        <Typography
+                          variant="body1"
+                          style={{ fontWeight: '700', color: '#606060' }}
+                        >
+                          Preço
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        style={{
+                          paddingTop: '20px',
+                          rowGap: '30px',
+                          fontSize: '20px',
+                        }}
+                      >
+                        <Typography
+                          variant="body1"
+                          style={{ color: '#1C4961' }}
+                        >
+                          {formatMoneyPtBR(totalValueItems())}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ color: '#FF0057' }}
+                        >
+                          {formatMoneyPtBR(descontosValueItems())}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ color: '#1C4961' }}
+                        >
+                          {formatMoneyPtBR(totalValueService())}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ color: '#FF0057' }}
+                        >
+                          {formatMoneyPtBR(descontosValueService())}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ color: '#FF0057' }}
+                        >
+                          {formatMoneyPtBR(descontosValueTotal())}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{ color: '#1C4961' }}
+                        >
+                          {formatMoneyPtBR(totalValue())}
+                        </Typography>
+                      </Stack>
+                    </List>
+                  </Grid>
+                </div>
+              </Paper>
+              {/* Orçamento */}
+
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>ORÇAMENTO</TitleCard>
+                  <MoreOptionsButtonSelect
+                    handleIsEditSelectedCard={handleIsEditSelectedCard}
+                    typeEdit="budget"
+                  />
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  <Box display={'flex'} paddingBottom={'24px'}>
+                    <Typography style={{ fontWeight: '900' }}>
+                      Número do Orçamento:
+                    </Typography>
+                    {wasEdited && isEditSelectedCard === 'budget' ? (
+                      <TextField
+                        onChange={(event) => handleChange(event, 'number')}
+                      ></TextField>
+                    ) : (
+                      <Typography style={{ fontWeight: '900' }}>
+                        {budget?.number}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box
+                    display={'flex'}
+                    paddingBottom={'24px'}
+                    alignItems={'center'}
+                  >
+                    <Typography style={{ fontWeight: '900' }}>
+                      Data da emissão:
+                    </Typography>
+                    <DateInput
+                      dateSchedule={budgetDate}
+                      handleDateSchedule={handleDateSchedule}
+                      disabled={false}
+                    ></DateInput>
+                  </Box>
+                  <Box display={'flex'} alignItems={'center'}>
+                    <Typography style={{ fontWeight: '900' }}>
+                      Responsável:
+                    </Typography>
+                    <TextField
+                      id="standard-select-currency"
+                      select
+                      sx={{
+                        width: '50%',
+                      }}
+                      value={technicalConsultant?.id}
+                      variant="standard"
+                      onChange={(e) =>
+                        handleTechnicalConsultant(parseInt(e.target.value))
+                      }
+                    >
+                      <MenuItem value={technicalConsultant?.id}>
+                        {'Selecione um Consultor'}
+                      </MenuItem>
+                      {technicalConsultantsList.map((option) => (
+                        <MenuItem
+                          key={option.id + option.name}
+                          value={option.id}
+                        >
+                          {option.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Box>
+                  <Box display={'flex'} paddingTop={'24px'}>
+                    <Typography style={{ fontWeight: '900' }}>
+                      Tipo de Orçamento:
+                    </Typography>
+                    {wasEdited && isEditSelectedCard === 'budget' ? (
+                      <TextField
+                        onChange={(event) => handleChange(event, 'typeBudget')}
+                      ></TextField>
+                    ) : (
+                      <Typography style={{ fontWeight: '900' }}>
+                        {budget?.typeBudget}
+                      </Typography>
+                    )}
+                  </Box>
+                </List>
+              </Paper>
+              {wasEdited && isEditSelectedCard === 'budget' && (
+                <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      justifyContent="flex-end"
+                      spacing={2}
+                    >
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleCancelled()}
+                      >
+                        Ok
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                </Grid>
+              )}
               {/* cliente */}
               <Paper
                 sx={{
@@ -462,9 +866,9 @@ export default function ServiceBudgetCreate() {
 
           <Grid item xs={12} md={5} lg={5}>
             <Stack spacing={2}>
-            {/* RECLAMAÇÕES */}
+              {/* RECLAMAÇÕES */}
 
-            <Paper
+              <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
@@ -485,24 +889,51 @@ export default function ServiceBudgetCreate() {
                 <DividerCard />
                 <List dense={false}>
                   {complaint?.map((option, index) => {
-                      return  <ListItemCard style={{ paddingBottom: "20"}}><InfoCardName>{option}</InfoCardName>{wasEdited && isEditSelectedCard == "complaintEdit" && ( <IconButton
-                        aria-label="search"
-                        color="warning"
-                        onClick={() => removeComplaint(index)}
-                        sx={{ marginLeft: 1, color: 'red' }}
-                      >
-                        <Delete />
-                      </IconButton>)}</ListItemCard>
-                      })}
-                  
+                    return (
+                      <ListItemCard style={{ paddingBottom: '20' }}>
+                        <Typography
+                          style={{
+                            fontWeight: '900',
+                            maxWidth: '100%',
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          {option}
+                        </Typography>
+                        {wasEdited && isEditSelectedCard == 'complaintEdit' && (
+                          <IconButton
+                            aria-label="search"
+                            color="warning"
+                            onClick={() => removeComplaint(index)}
+                            sx={{ marginLeft: 1, color: 'red' }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        )}
+                      </ListItemCard>
+                    )
+                  })}
                 </List>
-                <TextField value={textFieldValue} onChange={handleTextFieldChange} placeholder='Reclamação...'></TextField>
-                <div style={{ marginTop: '13px', display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button onClick={() => addComplaint()} variant="contained" color="primary">
+                <TextField
+                  value={textFieldValue}
+                  onChange={handleTextFieldChange}
+                  placeholder="Reclamação..."
+                ></TextField>
+                <div
+                  style={{
+                    marginTop: '13px',
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                  }}
+                >
+                  <Button
+                    onClick={() => addComplaint()}
+                    variant="contained"
+                    color="primary"
+                  >
                     Enviar
                   </Button>
-              </div>
-
+                </div>
               </Paper>
               {wasEdited && isEditSelectedCard === 'complaintEdit' && (
                 <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
@@ -520,7 +951,6 @@ export default function ServiceBudgetCreate() {
                       justifyContent="flex-end"
                       spacing={2}
                     >
-                
                       <ButtonSubmit
                         variant="contained"
                         size="small"
@@ -530,13 +960,11 @@ export default function ServiceBudgetCreate() {
                       </ButtonSubmit>
                     </Stack>
                   </Paper>
-
-                  
                 </Grid>
               )}
               {/* ITENS SELECIONADOS */}
 
-               <Paper
+              <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
@@ -549,46 +977,155 @@ export default function ServiceBudgetCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>ITENS SELECIONADOS</TitleCard>
-                 
                 </Stack>
                 <DividerCard />
-              
-                <div style={{ marginTop: '13px', flexWrap: "wrap", rowGap: "20px", display: 'flex', justifyContent: 'flex-end', columnGap: "10px" }}>
-                  <Button onClick={() => setOpenModalCreateKit(true)} variant="contained" style={{ background: "rgba(14, 148, 139, 1)"}}>
-                  + Kits
+
+                <div
+                  style={{
+                    marginTop: '13px',
+                    flexWrap: 'wrap',
+                    rowGap: '20px',
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    columnGap: '10px',
+                  }}
+                >
+                  <Button
+                    onClick={() => setOpenModalCreateKit(true)}
+                    variant="contained"
+                    style={{ background: 'rgba(14, 148, 139, 1)' }}
+                  >
+                    + Kits
                   </Button>
-                  <Button onClick={() => setOpenModalCreateService(true)} variant="contained" style={{ background: "rgba(14, 148, 139, 0.77)"}}>
-                  + Serviços
+                  <Button
+                    onClick={() => setOpenModalCreateService(true)}
+                    variant="contained"
+                    style={{ background: 'rgba(14, 148, 139, 0.77)' }}
+                  >
+                    + Serviços
                   </Button>
-                  <Button onClick={() => addComplaint()} variant="contained" style={{ background: "rgba(14, 148, 139, 1)"}}>
-                  + Peças
+                  <Button
+                    onClick={() => setOpenModalCreatePart(true)}
+                    variant="contained"
+                    style={{ background: 'rgba(14, 148, 139, 1)' }}
+                  >
+                    + Peças
                   </Button>
-              </div>
-              <List dense={false}>
-                 <Stack style={{backgroundColor: "rgba(197, 203, 208, 1)", padding: "14px 6px", textAlign: 'center'}}>
-                  <Typography variant="body1" style={{fontSize: "13px"}}>Classificação Itens Qtd Preço Desconto Unitário Total ações</Typography >
-                 </Stack>
-                 {totals?.map((option, index) => {
-                    return <ListItem style={{columnGap: '20px'}}>
-                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{option.descricao}</ListItemText>
-                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{option.tipo + (index + 1)} </ListItemText>
-                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{option.qtd}</ListItemText>
-                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{formatMoneyPtBR(option.desconto) || ''}</ListItemText>
-                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{formatMoneyPtBR(option.valor) || ''}</ListItemText>
-                    <ListItemText style={{fontSize: "13px", fontWeight: '900'}}>{formatMoneyPtBR(option.total) || ''}</ListItemText>
+                </div>
+                <List dense={false}>
+                  <Stack
+                    style={{
+                      backgroundColor: 'rgba(197, 203, 208, 1)',
+                      padding: '14px 6px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant="body1" style={{ fontSize: '13px' }}>
+                      Classificação Itens Qtd Desconto Preço Total ações
+                    </Typography>
+                  </Stack>
+                  {service?.map((option, index) => {
+                    return (
+                      <ListItem style={{ columnGap: '5px' }}>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {option.description}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {' '}
+                          {option.tipo}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {option.quantity}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {formatMoneyPtBR(option.price_discount) || ''}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {formatMoneyPtBR(parseInt(option.standard_value)) ||
+                            ''}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {formatMoneyPtBR(
+                            parseInt(option.standard_value) -
+                              option.price_discount,
+                          ) || ''}
+                        </Typography>
+                        <IconButton
+                          aria-label="search"
+                          color="warning"
+                          onClick={() => removeTotals(service, index)}
+                          sx={{ margin: 0, color: 'red', padding: 0 }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </ListItem>
+                    )
+                  })}
+                  {part?.map((option, index) => {
+                    return (
+                      <ListItem style={{ columnGap: '5px', maxWidth: '100%' }}>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {option.name}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {' '}
+                          {option.tipo}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {option.quantity}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {formatMoneyPtBR(option.price_discount) || ''}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {formatMoneyPtBR(parseInt(option.sale_value)) || ''}
+                        </Typography>
+                        <Typography
+                          style={{ fontSize: '15px', fontWeight: '900' }}
+                        >
+                          {formatMoneyPtBR(
+                            parseInt(option.sale_value) - option.price_discount,
+                          ) || ''}
+                        </Typography>
+                        <IconButton
+                          aria-label="search"
+                          color="warning"
+                          onClick={() => removeTotals(part, index)}
+                          sx={{ margin: 0, color: 'red', padding: 0 }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </ListItem>
+                    )
+                  })}
 
-                  </ListItem>
-                 })}
-                  
-
-                 <div>
-
-                 </div>
-              </List>
-
+                  <div></div>
+                </List>
               </Paper>
-                {/* Veículo */}
-                <Paper
+              {/* Veículo */}
+              <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
@@ -714,17 +1251,22 @@ export default function ServiceBudgetCreate() {
         openMolal={openModalClientVehicleSearch}
         handleAddClientVehicle={handleAddClientVehicle}
       />
-       <ModalCreateKit
+      <ModalCreateKit
         handleClose={handleCloseModalCreateKit}
         openMolal={openModalCreateKit}
-        handleAddKit={handleAddKit}
+        handleAddService={handleAddService}
+        handleAddPart={handleAddPart}
       />
       <ModalCreateService
         handleClose={handleCloseModalCreateService}
         openMolal={openModalCreateService}
         handleAddService={handleAddService}
       />
-     
+      <ModalCreatePart
+        handleClose={handleCloseModalCreatePart}
+        openMolal={openModalCreatePart}
+        handleAddPart={handleAddPart}
+      />
       {/* <ModalSearchClaimService
         handleClose={handleCloseModalClaimServiceVehicleSearch}
         openMolal={openModalClaimServiceSearch}

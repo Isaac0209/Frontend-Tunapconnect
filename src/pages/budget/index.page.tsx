@@ -442,7 +442,7 @@ export default function BudgetList() {
                   sx={{ alignSelf: 'flex-end' }}
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={async () => {
-                     await router.push(`/budget/create`)
+                    await router.push(`/budget/create`)
                   }}
                   // disabled
                 >

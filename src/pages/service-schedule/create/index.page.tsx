@@ -67,6 +67,8 @@ type isEditSelectedCardType =
   | 'clientVehicle'
   | 'schedule'
   | 'technicalConsultant'
+  | 'budget'
+  | 'complaintEdit'
   | null
 
 type updateData = {

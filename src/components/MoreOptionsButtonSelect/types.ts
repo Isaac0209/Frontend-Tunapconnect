@@ -5,6 +5,8 @@ export type isEditSelectedCardType =
   | 'clientVehicle'
   | 'schedule'
   | 'technicalConsultant'
+  | 'budget'
+  | 'complaintEdit'
   | null
 
 export type MoreOptionsButtonSelectProps = {

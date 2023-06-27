@@ -66,8 +66,10 @@ const api = new ApiCore()
 type isEditSelectedCardType =
   | 'client'
   | 'clientVehicle'
-  | 'schedule'
+  | 'complaintEdit'
   | 'technicalConsultant'
+  | 'budget'
+  | 'schedule'
   | null
 
 type updateData = {

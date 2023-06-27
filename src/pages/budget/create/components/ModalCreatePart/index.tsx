@@ -20,12 +20,12 @@ import { ButtonIcon, ButtonModalDialog } from '../../styles'
 import { ApiCore } from '@/lib/api'
 import { useContext, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { Service } from '@/types/budget'
+import { Part } from '@/types/budget'
 
-interface ModalSearchServiceProps {
+interface ModalSearchPartProps {
   openMolal: boolean
   handleClose: () => void
-  handleAddService: (data: Service) => void
+  handleAddPart: (data: Part) => void
 }
 
 type SearchFormProps = {
@@ -34,18 +34,18 @@ type SearchFormProps = {
   desconto: number
 }
 
-export default function ModalSearchService({
+export default function ModalSearchPart({
   openMolal,
   handleClose,
-  handleAddService,
-}: ModalSearchServiceProps) {
-  const [serviceList, setServiceList] = useState<Service[] | []>([])
+  handleAddPart,
+}: ModalSearchPartProps) {
+  const [partList, setPartList] = useState<Part[] | []>([])
 
   const [adicionais, setAdicions] = useState({
     desconto: 0,
     quantidade: 0,
   })
-  const [serviceSelect, setServiceSelect] = useState<Service | null>(null)
+  const [partSelect, setPartSelect] = useState<Part | null>(null)
   const {
     register,
     handleSubmit,
@@ -66,20 +66,18 @@ export default function ModalSearchService({
     name: string,
   ) => {
     var value = parseInt(event.target.value)
-
     setAdicions({
       ...adicionais,
       [name]: value,
     })
   }
   async function onSubmitSearch(data: SearchFormProps) {
-    console.log(companySelected)
     try {
       const result = await api.get(
-        `https://tunapconnect-api.herokuapp.com/api/service?search=${data.search}&company_id=${companySelected}`,
+        `https://tunapconnect-api.herokuapp.com/api/product?company_id=${companySelected}&search=${data.search}`,
       )
 
-      setServiceList(result.data.data)
+      setPartList(result.data.data)
     } catch (error) {
       console.log(error)
     }
@@ -88,7 +86,7 @@ export default function ModalSearchService({
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
-        <DialogTitle>Buscar por Serviços</DialogTitle>
+        <DialogTitle>Buscar por Peças</DialogTitle>
         <ListItem>
           <ListItemText>Quantidade:</ListItemText>
           <TextField
@@ -144,15 +142,15 @@ export default function ModalSearchService({
               // subheader={<li />}
             >
               <li>
-                {serviceList.map((item, index) => (
+                {partList.map((item, index) => (
                   <ListItemButton
                     key={`${index}-${item}`}
                     onClick={() => {
                       item.price_discount = adicionais.desconto
                       item.quantity = adicionais.quantidade
-                      setServiceSelect(item)
+                      setPartSelect(item)
                     }}
-                    selected={item.id === serviceSelect?.id}
+                    selected={item.id === partSelect?.id}
                     sx={{
                       '&.Mui-selected': {
                         background: '#1C4961',
@@ -173,7 +171,7 @@ export default function ModalSearchService({
                     }}
                   >
                     <ListItemText
-                      primary={`${item.description}`}
+                      primary={`${item.name}`}
                       secondary={
                         <>
                           <Typography
@@ -182,7 +180,7 @@ export default function ModalSearchService({
                             variant="body2"
                             color="text.primary"
                           >
-                            Preço: {item.standard_value}
+                            Preço: {item.sale_value}
                           </Typography>
                         </>
                       }
@@ -197,8 +195,8 @@ export default function ModalSearchService({
           <ButtonModalDialog
             onClick={() => {
               handleClose()
-              setServiceList([])
-              setServiceSelect(null)
+              setPartList([])
+              setPartSelect(null)
               setAdicions({
                 desconto: 0,
                 quantidade: 0,
@@ -210,11 +208,11 @@ export default function ModalSearchService({
           <ButtonModalDialog
             // disabled={clientSelected === null}
             onClick={() => {
-              if (serviceSelect) {
-                handleAddService(serviceSelect)
+              if (partSelect) {
+                handleAddPart(partSelect)
                 handleClose()
-                setServiceList([])
-                setServiceSelect(null)
+                setPartList([])
+                setPartSelect(null)
                 setAdicions({
                   desconto: 0,
                   quantidade: 0,

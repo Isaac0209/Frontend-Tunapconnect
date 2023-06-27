@@ -1,3 +1,5 @@
+import { Dayjs } from 'dayjs'
+
 export interface ServiceSchedulesListProps {
   id: number
   client: string
@@ -30,20 +32,59 @@ export interface ClientResponseType {
   fullName: string
 }
 export interface Kit {
-  tipo: string
-  descricao: string
-  qtd: string
-  desconto: string
-  valor: string
-  total: string
+  kit_id: number
+  name: string
+  products: Part[]
+  services: Service[]
+}
+export interface Claims {
+  id: number | undefined
+  company_id: number | undefined
+  integration_code: string | null
+  description: string | null
+  deleted_at: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 export interface Service {
+  length: any
+  id: number
+  company_id: number
   tipo: string
-  descricao: string
-  qtd: string
-  desconto: string
-  valor: string
-  total: string
+  service_code: string
+  integration_code: string
+  description: string
+  standard_quantity: string
+  standard_value: string
+  active: boolean
+  deleted_at: Date
+  created_at: Date
+  updated_at: Date
+  price_discount: number
+  quantity: number
+}
+export interface Budget {
+  number: number
+  date: Dayjs | null
+  TechnicalConsultant: TechnicalConsultant | null
+  typeBudget: string
+}
+export interface Part {
+  length: any
+
+  id: number
+  company_id: number
+  tipo: string
+  product_code: string
+  sale_value: string
+  name: string
+  tunap_code: string
+  guarantee_value: string
+  active: boolean
+  created_at: Date
+  updated_at: Date
+  price_discount: number
+  quantity: number
 }
 
 export interface ClientVehicle {
