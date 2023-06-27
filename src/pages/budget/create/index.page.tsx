@@ -897,16 +897,17 @@ export default function ServiceBudgetCreate() {
                         >
                           {key}
                         </Typography>
-                        {wasEdited && isEditSelectedCard === 'complaintEdit' && (
-                          <IconButton
-                            aria-label="search"
-                            color="warning"
-                            onClick={() => removeComplaint(index)}
-                            sx={{ marginLeft: 1, color: 'red' }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        )}
+                        {wasEdited &&
+                          isEditSelectedCard === 'complaintEdit' && (
+                            <IconButton
+                              aria-label="search"
+                              color="warning"
+                              onClick={() => removeComplaint(index)}
+                              sx={{ marginLeft: 1, color: 'red' }}
+                            >
+                              <Delete />
+                            </IconButton>
+                          )}
                       </ListItemCard>
                     )
                   })}
@@ -1053,7 +1054,9 @@ export default function ServiceBudgetCreate() {
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
-                          {formatMoneyPtBR(parseInt(key.standard_value) - key.price_discount, ) || ''}
+                          {formatMoneyPtBR(
+                            parseInt(key.standard_value) - key.price_discount,
+                          ) || ''}
                         </Typography>
                         <IconButton
                           aria-label="search"
@@ -1069,7 +1072,8 @@ export default function ServiceBudgetCreate() {
                   {part?.map((key, index) => {
                     return (
                       <ListItem style={{ columnGap: '5px', maxWidth: '100%' }}>
-                        <Typography key={index}
+                        <Typography
+                          key={index}
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
                           {key.name}
