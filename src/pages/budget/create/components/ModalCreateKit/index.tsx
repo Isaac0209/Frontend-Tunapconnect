@@ -229,8 +229,8 @@ export default function ModalSearchKit({
                 }
                 if (kitSelect?.products?.length != 0) {
                   for (let i = 0; i < kitSelect?.products?.length; i++) {
-                    kitSelect.products[i].desconto = adicionais.desconto
-                    kitSelect.products[i].quantidade = adicionais.quantidade
+                    kitSelect.products[i].price_discount = adicionais.desconto
+                    kitSelect.products[i].quantity = adicionais.quantidade
 
                     handleAddPart(kitSelect?.products[i])
                   }
