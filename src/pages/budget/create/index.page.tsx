@@ -1071,7 +1071,10 @@ export default function ServiceBudgetCreate() {
                   })}
                   {part?.map((key, index) => {
                     return (
-                      <ListItem key={index} style={{ columnGap: '5px', maxWidth: '100%' }}>
+                      <ListItem
+                        key={index}
+                        style={{ columnGap: '5px', maxWidth: '100%' }}
+                      >
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
