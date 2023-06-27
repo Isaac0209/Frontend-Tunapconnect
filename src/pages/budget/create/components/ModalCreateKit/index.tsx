@@ -42,8 +42,7 @@ export default function ModalSearchKit({
   handleAddService,
   handleAddPart,
 }: ModalSearchKitProps) {
-  const [partList, setPartList] = useState<Part[] | []>([])
-  const [serviceList, setServiceList] = useState<Service[] | []>([])
+
   const [kitList, setKitList] = useState<Kit[] | []>([])
 
   const [adicionais, setAdicions] = useState({
@@ -152,11 +151,7 @@ export default function ModalSearchKit({
                   <ListItemButton
                     key={`${index}-${item}`}
                     onClick={() => {
-                      console.log(item.products.length)
-
-                      if (item.services?.length == 0) {
-                        console.log('opa')
-                      }
+                    
                       setKitSelect(item)
                     }}
                     selected={item.kit_id === kitSelect?.kit_id}
@@ -204,8 +199,6 @@ export default function ModalSearchKit({
           <ButtonModalDialog
             onClick={() => {
               handleClose()
-              setPartList([])
-              setServiceList([])
 
               setKitSelect(null)
               setAdicions({
@@ -220,14 +213,14 @@ export default function ModalSearchKit({
             // disabled={clientSelected === null}
             onClick={() => {
               if (kitSelect) {
-                if (kitSelect?.services?.length != 0) {
+                if (kitSelect?.services?.length !== 0) {
                   for (let i = 0; i < kitSelect?.services?.length; i++) {
                     kitSelect.services[i].price_discount = adicionais.desconto
                     kitSelect.services[i].quantity = adicionais.quantidade
                     handleAddService(kitSelect?.services[i])
                   }
                 }
-                if (kitSelect?.products?.length != 0) {
+                if (kitSelect?.products?.length !== 0) {
                   for (let i = 0; i < kitSelect?.products?.length; i++) {
                     kitSelect.products[i].price_discount = adicionais.desconto
                     kitSelect.products[i].quantity = adicionais.quantidade
@@ -236,8 +229,7 @@ export default function ModalSearchKit({
                   }
                 }
                 handleClose()
-                setPartList([])
-                setServiceList([])
+                
                 setKitSelect(null)
                 setAdicions({
                   desconto: 0,
