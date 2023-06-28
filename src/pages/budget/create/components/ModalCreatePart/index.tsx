@@ -57,7 +57,7 @@ export default function ModalCreatePart({
 
     try {
       const result = await api.get(
-        `/product?search=${data.search}&company_id=${companySelected}`,
+        `https://tunapconnect-api.herokuapp.com/api/product?search=${data.search}&company_id=${companySelected}`,
       )
 
       setPartList(result.data.data)

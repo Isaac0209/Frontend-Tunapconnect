@@ -62,7 +62,7 @@ export default function ModalSearchClientVehicle({
 
     try {
       const result = await api.get(
-        `/client-vehicle?company_id=${companySelected}&search=${
+        `https://tunapconnect-api.herokuapp.com/api/client-vehicle?company_id=${companySelected}&search=${
           data.search
         }&limit=10${pagination ? '&current_page=' + pagination.actual : ''}`,
       )

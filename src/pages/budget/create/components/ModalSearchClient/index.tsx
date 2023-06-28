@@ -60,7 +60,7 @@ export default function ModalSearchClient({
 
     try {
       const result = await api.get(
-        `/client?company_id=${companySelected}&search=${data.search}&limit=10${
+        `https://tunapconnect-api.herokuapp.com/api/client?company_id=${companySelected}&search=${data.search}&limit=10${
           pagination ? '&current_page=' + pagination.actual : ''
         }`,
       )

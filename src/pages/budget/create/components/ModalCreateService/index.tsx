@@ -57,7 +57,7 @@ export default function ModalCreateService({
 
     try {
       const result = await api.get(
-        `/service?search=${data.search}&company_id=${companySelected}`,
+        `https://tunapconnect-api.herokuapp.com/api/service?search=${data.search}&company_id=${companySelected}`,
       )
 
       setServiceList(result.data.data)
