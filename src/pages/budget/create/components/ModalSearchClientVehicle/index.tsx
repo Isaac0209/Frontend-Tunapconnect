@@ -6,74 +6,162 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import {
-  Box,
-  List,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { ButtonIcon, ButtonModalDialog } from '../../styles'
-import { ApiCore } from '@/lib/api'
-import { useContext, useState } from 'react'
+import { ButtonIcon, ButtonModalDialog, ButtonPaginate } from '../../styles'
+import { api } from '@/lib/api'
+import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { ClientVehicleResponseType } from './type'
+import ClientVehicleTable from './Components/Table'
 
 interface ModalSearchClientVehicleProps {
   openMolal: boolean
   handleClose: () => void
   handleAddClientVehicle: (data: ClientVehicleResponseType) => void
+  dataVehicleCreated: ClientVehicleResponseType | null
 }
 
 type SearchFormProps = {
   search: string
 }
 
+type paginationProps = {
+  actual: number
+  total: number
+}
+
 export default function ModalSearchClientVehicle({
   openMolal,
   handleClose,
   handleAddClientVehicle,
+  dataVehicleCreated,
 }: ModalSearchClientVehicleProps) {
   const [clientVehicleList, setClientVehicleList] = useState<
     ClientVehicleResponseType[] | []
   >([])
   const [clientVehicleSelected, setClientVehicleSelected] =
     useState<ClientVehicleResponseType | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [pagination, setPagination] = useState<paginationProps | null>(null)
 
-  const {
-    register,
-    handleSubmit,
-    // formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
       search: '',
     },
   })
 
-  const api = new ApiCore()
-
   const { companySelected } = useContext(CompanyContext)
 
   async function onSubmitSearch(data: SearchFormProps) {
-    console.log(data)
+    setIsLoading(true)
+    setClientVehicleList([])
+
     try {
       const result = await api.get(
-        `https://tunapconnect-api.herokuapp.com/api/client-vehicle?company_id=${companySelected}&search=${data.search}`,
+        `/client-vehicle?company_id=${companySelected}&search=${
+          data.search
+        }&limit=10${pagination ? '&current_page=' + pagination.actual : ''}`,
       )
-      console.log(result.data.data)
+
       setClientVehicleList(result.data.data)
+      if (!pagination) {
+        setPagination((prevState) => {
+          return {
+            actual: 1,
+            total: result.data.total_pages,
+          }
+        })
+      }
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsLoading(false)
     }
   }
+
+  function handleSelectedClientVehicle(client: ClientVehicleResponseType) {
+    setClientVehicleSelected(client)
+  }
+
+  function handlePaginateNext() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual < prevState.total) {
+          return {
+            ...prevState,
+            actual: prevState.actual + 1,
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
+  }
+  function handlePaginatePrevious() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual > 1) {
+          return {
+            ...prevState,
+            actual: prevState.actual - 1,
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
+  }
+
+  function handleDoubleClickClientVehicle() {
+    if (clientVehicleSelected) {
+      handleAddClientVehicle(clientVehicleSelected)
+      handleClose()
+      setClientVehicleSelected(null)
+      setClientVehicleList([])
+      setValue('search', '')
+    }
+  }
+
+  useEffect(() => {
+    if (openMolal) {
+      reset({
+        search: '',
+      })
+      if (dataVehicleCreated) {
+        setClientVehicleList([dataVehicleCreated])
+      } else {
+        setClientVehicleList([])
+        setClientVehicleSelected(null)
+      }
+    }
+  }, [openMolal])
+
+  // const DisableButtonNext = pagination
+  //   ? pagination?.actual >= pagination?.total
+  //   : false
+  // const DisableButtonPrevious = pagination ? pagination?.actual <= 1 : false
 
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
-        <DialogTitle>Buscar por veículo do cliente</DialogTitle>
+        <DialogTitle>
+          <Stack
+            justifyContent="space-between"
+            alignItems="center"
+            direction="row"
+          >
+            {' '}
+            <Typography variant="h6">Buscar por veículo</Typography>
+            {/* {clientList.length > 0 && ( */}
+            {/* )} */}
+          </Stack>
+        </DialogTitle>
         <DialogContent>
           <Box
             component="form"
@@ -98,69 +186,43 @@ export default function ModalSearchClientVehicle({
                 aria-label="search"
                 color="primary"
                 sx={{ marginLeft: 1 }}
+                disabled={isLoading}
+                onClick={() => setPagination(null)}
               >
                 <SearchIcon />
               </ButtonIcon>
             </Stack>
-            <List
-              sx={{
-                width: '100%',
-                maxWidth: 360,
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'auto',
-                maxHeight: 300,
-                '& ul': { padding: 0 },
-              }}
-              // subheader={<li />}
-            >
-              <li>
-                {clientVehicleList.length > 0 &&
-                  clientVehicleList.map((item, index) => (
-                    <ListItemButton
-                      key={`${index}-${item.id}`}
-                      onClick={() => setClientVehicleSelected(item)}
-                      selected={item.id === clientVehicleSelected?.id}
-                      sx={{
-                        '&.Mui-selected': {
-                          background: '#1C4961',
-                          color: '#fff',
-                          '&:hover': {
-                            background: '#1C4961',
-                            color: '#fff',
-                            opacity: 0.7,
-                          },
-                          '& span': {
-                            color: '#fff',
-                            '&:hover': {
-                              color: '#fff',
-                              opacity: 0.7,
-                            },
-                          },
-                        },
-                      }}
-                    >
-                      <ListItemText
-                        primary={`${item.vehicle.model.name} - ${item.vehicle.name}`}
-                        secondary={
-                          <>
-                            <Typography
-                              sx={{ display: 'inline' }}
-                              component="span"
-                              variant="body2"
-                              color="text.primary"
-                            >
-                              {item.plate}
-                              {' - '}
-                            </Typography>
-                            <span>{item.chasis}</span>
-                          </>
-                        }
-                      />
-                    </ListItemButton>
-                  ))}
-              </li>
-            </List>
+
+            <ClientVehicleTable
+              data={clientVehicleList}
+              handleSelectedClientVehicle={handleSelectedClientVehicle}
+              isLoading={isLoading}
+              handleDoubleClick={handleDoubleClickClientVehicle}
+            />
+
+            {clientVehicleList.length > 0 && (
+              <Stack
+                direction="row"
+                justifyContent="center"
+                gap={1}
+                marginTop={2}
+              >
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginatePrevious}
+                  // disabled={DisableButtonPrevious}
+                >
+                  <ArrowBackIosNewIcon />
+                </ButtonPaginate>
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginateNext}
+                  // disabled={DisableButtonNext}
+                >
+                  <ArrowForwardIosIcon />
+                </ButtonPaginate>
+              </Stack>
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 3, pb: 2 }}>
@@ -174,17 +236,18 @@ export default function ModalSearchClientVehicle({
             Cancel
           </ButtonModalDialog>
           <ButtonModalDialog
-            // disabled={ClientVehicleSelected === null}
+            // disabled={clientSelected === null}
             onClick={() => {
               if (clientVehicleSelected) {
                 handleAddClientVehicle(clientVehicleSelected)
                 handleClose()
-                setClientVehicleList([])
                 setClientVehicleSelected(null)
+                setClientVehicleList([])
+                setValue('search', '')
               }
             }}
           >
-            Adicionar
+            Selecionar
           </ButtonModalDialog>
         </DialogActions>
       </Dialog>

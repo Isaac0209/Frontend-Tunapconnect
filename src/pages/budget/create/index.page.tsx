@@ -1,6 +1,7 @@
 import * as React from 'react'
 // import { useForm, SubmitHandler } from 'react-hook-form'
 import { useContext, useEffect, useState } from 'react'
+import SearchIcon from '@mui/icons-material/Search'
 
 import Container from '@mui/material/Container'
 
@@ -18,6 +19,9 @@ import {
   TechnicalConsultant,
   Part,
   Budget,
+  TypeBudget,
+  ServiceTypeApi,
+  PartTypeApi,
 } from '@/types/budget'
 import { ApiCore } from '@/lib/api'
 
@@ -28,7 +32,6 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
-  ButtonAdd,
   ButtonSubmit,
   DividerCard,
   InfoCardName,
@@ -52,20 +55,25 @@ import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
 import { useQuery } from 'react-query'
-import { formatCPF } from '@/ultis/formatCPF'
-import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
 
-import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
-import { Box, Button, ListItem, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  InputAdornment,
+  ListItem,
+  OutlinedInput,
+  Typography,
+} from '@mui/material'
 import ModalCreateKit from './components/ModalCreateKit'
 import ModalCreateService from './components/ModalCreateService'
 import ModalCreatePart from './components/ModalCreatePart'
 import { DateInput } from '@/components/DateInput'
+import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
@@ -106,10 +114,14 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 
 export default function ServiceBudgetCreate() {
   const [client, setClient] = useState<ClientInfor | null>()
-  const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
+  const [clientVehicle, setClientVehicle] =
+    useState<ClientVehicleResponseType | null>()
   const [kit, SetKit] = useState<Kit[]>([])
-  const [service, SetService] = useState<Service[]>([])
-  const [part, SetPart] = useState<Part[]>([])
+  const [service, SetService] = useState<ServiceTypeApi[]>([])
+  const [serviceList, SetServiceList] = useState<Service[]>([])
+
+  const [part, SetPart] = useState<PartTypeApi[]>([])
+  const [partList, SetPartList] = useState<Part[]>([])
 
   const [budgetDate, setBudgetDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [textFieldValue, setTextFieldValue] = useState('')
@@ -119,6 +131,10 @@ export default function ServiceBudgetCreate() {
       id: 0,
       name: '-',
     })
+  const [typeBudget, setTypeBudget] = useState<TypeBudget | null>({
+    id: 0,
+    name: '-',
+  })
   const [budget, SetBudget] = useState<Budget>({
     number: 0,
     date: budgetDate,
@@ -129,6 +145,7 @@ export default function ServiceBudgetCreate() {
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
     TechnicalConsultant[]
   >([])
+  const [typeBudgetList, setTypeBudgetList] = useState<TypeBudget[]>([])
   const [isEditSelectedCard, setIsEditSelectedCard] =
     useState<isEditSelectedCardType>(null)
   const [wasEdited, setWasEdited] = useState(false)
@@ -155,6 +172,13 @@ export default function ServiceBudgetCreate() {
   function handleTechnicalConsultant(id: number) {
     setTechnicalConsultant((prevState) => {
       return technicalConsultantsList.filter((c) => c.id === id)[0]
+    })
+  }
+  function handleTypeBudget(id: number) {
+    setTypeBudget((prevState) => {
+      console.log(typeBudgetList)
+
+      return typeBudgetList.filter((c) => c.id === id)[0]
     })
   }
   function handleCloseModalClienteSearch() {
@@ -206,16 +230,7 @@ export default function ServiceBudgetCreate() {
     updatedArray.splice(value, 1)
     setComplaint(updatedArray)
   }
-  async function getOsTypeId() {
-    try {
-      const result = await api.get(
-        `https://tunapconnect-api.herokuapp.com/api/os?company_id=${companySelected}`,
-      )
-      return result.data.data[0].id
-    } catch (error) {
-      console.log(error)
-    }
-  }
+
   async function getMaintenanceReviewId() {
     try {
       const result = await api.get(
@@ -241,7 +256,7 @@ export default function ServiceBudgetCreate() {
       company_id: `${companySelected}`,
       client_vehicle_id: clientVehicle?.id,
       client_id: client?.id,
-      os_type_id: await getOsTypeId(),
+      os_type_id: typeBudget?.id,
       maintenance_review_id: await getMaintenanceReviewId(),
       consultant_id: null,
       mandatory_itens: [],
@@ -280,71 +295,54 @@ export default function ServiceBudgetCreate() {
     setClient({
       id: client.id,
       name: client.name ?? 'Não informado',
-      cpf: client.document ?? 'Não informado',
+      document: client.document ?? 'Não informado',
       email: client.email ?? ['Não informado'],
-      telefone: client.phone ?? ['Não informado'],
+      phone: client.phone ?? ['Não informado'],
       address: client.address ?? ['Não informado'],
     })
   }
   function handleAddClientVehicle(client_vehicle: ClientVehicleResponseType) {
     setClientVehicle(null)
-    setClientVehicle({
-      id: client_vehicle.id,
-      brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-      chassis: client_vehicle?.chasis ?? 'Não informado',
-      vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-      model:
-        `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-        'Não informado',
-      color: client_vehicle?.color ?? 'Não informado',
-      plate: client_vehicle?.plate ?? 'Não informado',
-    })
+    setClientVehicle(client_vehicle)
+    // setClientVehicle({
+    //   id: client_vehicle.id,
+    //   brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+    //   chassis: client_vehicle?.chasis ?? 'Não informado',
+    //   vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
+    //   model:
+    //     `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
+    //     'Não informado',
+    //   color: client_vehicle?.color ?? 'Não informado',
+    //   plate: client_vehicle?.plate ?? 'Não informado',
+    // })
   }
 
   function handleAddService(newService: Service) {
     SetService((service) => [
       ...service,
       {
-        length: null,
-        id: newService.id,
-        company_id: newService.company_id,
-        tipo: 'Serviço',
-        service_code: newService.service_code,
-        integration_code: newService.integration_code,
-        description: newService.description,
-        standard_quantity: newService.standard_quantity,
-        standard_value: newService.standard_value ?? '0',
-        active: newService.active,
-        deleted_at: newService.deleted_at,
-        created_at: newService.created_at,
-        updated_at: newService.updated_at,
-        price_discount: newService.price_discount ?? 0,
-        quantity: newService.quantity ?? 0,
+        service_id: newService.id,
+        products_id: null,
+        price: newService.standard_value ?? '0',
+        price_discount: newService.price_discount.toString() ?? '0',
+        quantity: newService.quantity.toString() ?? '0',
       },
     ])
-    console.log(service)
+    SetServiceList((prevState) => [...prevState, newService])
   }
 
   function handleAddPart(newPart: Part) {
     SetPart((part) => [
       ...part,
       {
-        length: null,
-        id: newPart.id,
-        company_id: newPart.company_id,
-        tipo: 'Peça',
-        product_code: newPart.product_code,
-        sale_value: newPart.sale_value ?? '0',
-        name: newPart.name ?? 'Sem nome',
-        tunap_code: newPart.tunap_code,
-        guarantee_value: newPart.guarantee_value ?? '0',
-        active: newPart.active,
-        created_at: newPart.created_at,
-        updated_at: newPart.updated_at,
-        price_discount: newPart.price_discount ?? 0,
-        quantity: newPart.quantity ?? 0,
+        service_id: null,
+        products_id: newPart.id,
+        price: newPart.sale_value ?? '0',
+        price_discount: newPart.price_discount.toString() ?? '0',
+        quantity: newPart.quantity.toString() ?? '0',
       },
     ])
+    SetPartList((prevState) => [...prevState, newPart])
   }
 
   function removeTotals(array: any, value: number) {
@@ -364,7 +362,7 @@ export default function ServiceBudgetCreate() {
   }
   function totalValueItems() {
     const totalTotalPart = part.reduce(
-      (accumulator, part) => accumulator + (parseInt(part.sale_value) || 0),
+      (accumulator, part) => accumulator + (parseInt(part.price) || 0),
       0,
     )
 
@@ -372,7 +370,7 @@ export default function ServiceBudgetCreate() {
   }
   function descontosValueItems() {
     const descontoTotalPart = part.reduce(
-      (accumulator, part) => accumulator + (part.price_discount || 0),
+      (accumulator, part) => accumulator + (parseInt(part.price_discount) || 0),
       0,
     )
 
@@ -380,8 +378,7 @@ export default function ServiceBudgetCreate() {
   }
   function totalValueService() {
     const totalTotalService = service.reduce(
-      (accumulator, service) =>
-        accumulator + (parseInt(service.standard_value) || 0),
+      (accumulator, service) => accumulator + (parseInt(service.price) || 0),
       0,
     )
 
@@ -389,7 +386,8 @@ export default function ServiceBudgetCreate() {
   }
   function descontosValueService() {
     const descontoTotalService = service.reduce(
-      (accumulator, service) => accumulator + (service.price_discount || 0),
+      (accumulator, service) =>
+        accumulator + (parseInt(service.price_discount) || 0),
       0,
     )
 
@@ -397,11 +395,12 @@ export default function ServiceBudgetCreate() {
   }
   function descontosValueTotal() {
     const descontoTotalService = service.reduce(
-      (accumulator, service) => accumulator + (service.price_discount || 0),
+      (accumulator, service) =>
+        accumulator + (parseInt(service.price_discount) || 0),
       0,
     )
     const descontoTotalPart = part.reduce(
-      (accumulator, part) => accumulator + (part.price_discount || 0),
+      (accumulator, part) => accumulator + (parseInt(part.price_discount) || 0),
       0,
     )
     return descontoTotalService + descontoTotalPart
@@ -409,13 +408,14 @@ export default function ServiceBudgetCreate() {
   function totalValue() {
     const totalTotalPart = part.reduce(
       (accumulator, part) =>
-        accumulator + (parseInt(part.sale_value) - part.price_discount || 0),
+        accumulator +
+        (parseInt(part.price) - parseInt(part.price_discount) || 0),
       0,
     )
     const totalTotalService = service.reduce(
       (accumulator, service) =>
         accumulator +
-        (parseInt(service.standard_value) - service.price_discount || 0),
+        (parseInt(service.price) - parseInt(service.price_discount) || 0),
       0,
     )
 
@@ -460,6 +460,31 @@ export default function ServiceBudgetCreate() {
       )
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
+
+  const { data: dataTypeBudgetList, status: dataTypeBudgetListStatus } =
+    useQuery<TypeBudget[]>(
+      ['service_schedule', 'by_id', 'edit', 'data-type-budget-list', 'options'],
+      async () => {
+        const resp = await api.get(
+          `https://tunapconnect-api.herokuapp.com/api/os?company_id=${companySelected}`,
+        )
+        console.log(resp.data.data)
+
+        return resp.data.data
+      },
+      { enabled: !!companySelected },
+    )
+  useEffect(() => {
+    console.log(dataTypeBudgetList)
+    if (dataTypeBudgetListStatus === 'success') {
+      setTypeBudgetList(
+        dataTypeBudgetList.map((item: TypeBudget) => ({
+          id: item.id,
+          name: item.name,
+        })),
+      )
+    }
+  }, [dataTypeBudgetListStatus, dataTypeBudgetList])
 
   // useEffect(() => {
   //   if (dataServiceScheduleStatus === 'success') {
@@ -673,20 +698,6 @@ export default function ServiceBudgetCreate() {
                 </Stack>
                 <DividerCard />
                 <List dense={false}>
-                  <Box display={'flex'} paddingBottom={'24px'}>
-                    <Typography style={{ fontWeight: '900' }}>
-                      Número do Orçamento:
-                    </Typography>
-                    {wasEdited && isEditSelectedCard === 'budget' ? (
-                      <TextField
-                        onChange={(event) => handleChange(event, 'number')}
-                      ></TextField>
-                    ) : (
-                      <Typography style={{ fontWeight: '900' }}>
-                        {budget?.number}
-                      </Typography>
-                    )}
-                  </Box>
                   <Box
                     display={'flex'}
                     paddingBottom={'24px'}
@@ -730,19 +741,38 @@ export default function ServiceBudgetCreate() {
                       ))}
                     </TextField>
                   </Box>
-                  <Box display={'flex'} paddingTop={'24px'}>
+                  <Box
+                    display={'flex'}
+                    alignItems={'center'}
+                    paddingTop={'24px'}
+                  >
                     <Typography style={{ fontWeight: '900' }}>
-                      Tipo de Orçamento:
+                      Tipo de orçamento:
                     </Typography>
-                    {wasEdited && isEditSelectedCard === 'budget' ? (
-                      <TextField
-                        onChange={(event) => handleChange(event, 'typeBudget')}
-                      ></TextField>
-                    ) : (
-                      <Typography style={{ fontWeight: '900' }}>
-                        {budget?.typeBudget}
-                      </Typography>
-                    )}
+                    <TextField
+                      id="standard-select-currency"
+                      select
+                      sx={{
+                        width: '50%',
+                      }}
+                      value={typeBudget?.id}
+                      variant="standard"
+                      onChange={(e) =>
+                        handleTypeBudget(parseInt(e.target.value))
+                      }
+                    >
+                      <MenuItem value={typeBudget?.id}>
+                        {'Selecione um Tipo'}
+                      </MenuItem>
+                      {typeBudgetList.map((option) => (
+                        <MenuItem
+                          key={option.id + option.name}
+                          value={option.id}
+                        >
+                          {option.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   </Box>
                 </List>
               </Paper>
@@ -787,80 +817,139 @@ export default function ServiceBudgetCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Cliente</TitleCard>
-                  <ButtonAdd
-                    aria-label="add to client"
-                    onClick={() => setOpenModalClientSearch(true)}
-                  >
-                    <AddCircleIcon />
-                  </ButtonAdd>
                 </Stack>
                 <DividerCard />
-                <List dense={false}>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Nome:</InfoCardName>{' '}
-                    {client?.name && (
-                      <InfoCardText>{client?.name}</InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>CPF:</InfoCardName>{' '}
-                    {client?.cpf && (
-                      <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
-                    )}
-                  </ListItemCard>
-                  {client?.telefone ? (
-                    client?.telefone.map((phone, index) => (
-                      <ListItemCard
-                        key={index + '-' + phone}
-                        alignItems="flex-start"
-                      >
+                {client ? (
+                  <List dense={false}>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Nome:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {client?.name ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>CPF:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {client?.document
+                          ? formatCNPJAndCPF(client?.document)
+                          : 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    {client?.phone && client?.phone.length > 0 ? (
+                      client?.phone.map((phone: string, index: number) => (
+                        <ListItemCard
+                          key={index + '-' + phone}
+                          alignItems="flex-start"
+                        >
+                          <InfoCardName>Telefone:</InfoCardName>{' '}
+                          <InfoCardText>{phone}</InfoCardText>
+                        </ListItemCard>
+                      ))
+                    ) : (
+                      <ListItemCard>
                         <InfoCardName>Telefone:</InfoCardName>{' '}
-                        <InfoCardText>{phone}</InfoCardText>
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
                       </ListItemCard>
-                    ))
-                  ) : (
-                    <ListItemCard>
-                      <InfoCardName>Telefone:</InfoCardName>{' '}
-                      <InfoCardText width="100%"></InfoCardText>
-                    </ListItemCard>
-                  )}
-                  {client?.email ? (
-                    client?.email.map((email, index) => (
-                      <ListItemCard
-                        key={index + '-' + email}
-                        alignItems="flex-start"
-                      >
+                    )}
+                    {client?.email && client.email.length ? (
+                      client?.email.map((email: string, index: number) => (
+                        <ListItemCard
+                          key={index + '-' + email}
+                          alignItems="flex-start"
+                        >
+                          <InfoCardName>E-mail:</InfoCardName>{' '}
+                          <InfoCardText>{email}</InfoCardText>
+                        </ListItemCard>
+                      ))
+                    ) : (
+                      <ListItemCard alignItems="flex-start">
                         <InfoCardName>E-mail:</InfoCardName>{' '}
-                        <InfoCardText>{email}</InfoCardText>
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
                       </ListItemCard>
-                    ))
-                  ) : (
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>E-mail:</InfoCardName>{' '}
-                      <InfoCardText width="100%"></InfoCardText>
-                    </ListItemCard>
-                  )}
-                  {client?.address ? (
-                    client?.address.map((address, index) => (
-                      <ListItemCard
-                        key={index + '-' + address}
-                        alignItems="flex-start"
-                      >
+                    )}
+                    {client?.address && client?.address.length ? (
+                      client?.address.map((address, index) => (
+                        <ListItemCard
+                          key={index + '-' + address}
+                          alignItems="flex-start"
+                        >
+                          <InfoCardName>Endereço:</InfoCardName>{' '}
+                          <InfoCardText>{address}</InfoCardText>
+                        </ListItemCard>
+                      ))
+                    ) : (
+                      <ListItemCard alignItems="flex-start">
                         <InfoCardName>Endereço:</InfoCardName>{' '}
-                        <InfoCardText>{address}</InfoCardText>
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
                       </ListItemCard>
-                    ))
-                  ) : (
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Endereço:</InfoCardName>{' '}
-                      <InfoCardText width="100%"></InfoCardText>
-                    </ListItemCard>
-                  )}
-                </List>
+                    )}
+                  </List>
+                ) : (
+                  <Box
+                    sx={{
+                      with: '100%',
+                      height: 100,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      display: 'flex',
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      gap={1}
+                      sx={{
+                        py: 10,
+                      }}
+                      component="form"
+                      // onSubmit={handleSubmitClient(onSubmitClient)}
+                    >
+                      <Typography variant="h6">Adicione um Cliente</Typography>
+
+                      <OutlinedInput
+                        id="outlined-adornment-weight"
+                        size="small"
+                        placeholder="Digite um nome"
+                        onClick={() => {
+                          setOpenModalClientSearch(true)
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.code === 'Enter') {
+                            setOpenModalClientSearch(true)
+                          }
+                        }}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="sbumit seach client"
+                              edge="end"
+                              onClick={() => {
+                                setOpenModalClientSearch(true)
+                              }}
+                            >
+                              <SearchIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        required
+                        aria-describedby="outlined-weight-helper-text"
+                        inputProps={{
+                          'aria-label': 'weight',
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                )}
               </Paper>
             </Stack>
           </Grid>
-
           <Grid item xs={12} md={5} lg={5}>
             <Stack spacing={2}>
               {/* RECLAMAÇÕES */}
@@ -915,6 +1004,11 @@ export default function ServiceBudgetCreate() {
                 <TextField
                   value={textFieldValue}
                   onChange={handleTextFieldChange}
+                  onKeyDown={(ev) => {
+                    if (ev.key === 'Enter' && textFieldValue.length >= 1) {
+                      addComplaint()
+                    }
+                  }}
                   placeholder="Reclamação..."
                 ></TextField>
                 <div
@@ -925,7 +1019,9 @@ export default function ServiceBudgetCreate() {
                   }}
                 >
                   <Button
-                    onClick={() => addComplaint()}
+                    onClick={() => {
+                      if (textFieldValue.length >= 1) return addComplaint()
+                    }}
                     variant="contained"
                     color="primary"
                   >
@@ -1022,7 +1118,7 @@ export default function ServiceBudgetCreate() {
                       Classificação Itens Qtd Desconto Preço Total ações
                     </Typography>
                   </Stack>
-                  {service?.map((key, index) => {
+                  {serviceList?.map((key, index) => {
                     return (
                       <ListItem key={index} style={{ columnGap: '5px' }}>
                         <Typography
@@ -1069,7 +1165,7 @@ export default function ServiceBudgetCreate() {
                       </ListItem>
                     )
                   })}
-                  {part?.map((key, index) => {
+                  {partList?.map((key, index) => {
                     return (
                       <ListItem
                         key={index}
@@ -1137,68 +1233,113 @@ export default function ServiceBudgetCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Veículo</TitleCard>
-                  <ButtonAdd
-                    aria-label="add to client"
-                    onClick={() => {
-                      setOpenModalClientVehicleSearch(true)
-                    }}
-                  >
-                    <AddCircleIcon />
-                  </ButtonAdd>
                 </Stack>
                 <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Marca:</InfoCardName>{' '}
-                    {clientVehicle?.brand ? (
-                      <InfoCardText>{clientVehicle?.brand}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Modelo:</InfoCardName>{' '}
-                    {clientVehicle?.model ? (
-                      <InfoCardText>{clientVehicle?.model}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Veículo:</InfoCardName>{' '}
-                    {clientVehicle?.vehicle ? (
-                      <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Cor:</InfoCardName>{' '}
-                    {clientVehicle?.color ? (
-                      <InfoCardText>{clientVehicle?.color}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Chassi:</InfoCardName>{' '}
-                    {clientVehicle?.chassis ? (
-                      <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Placa:</InfoCardName>{' '}
-                    {clientVehicle?.plate ? (
+                {clientVehicle ? (
+                  <List dense={false}>
+                    <ListItemCard>
+                      <InfoCardName>Marca:</InfoCardName>{' '}
                       <InfoCardText>
-                        {formatPlate(clientVehicle?.plate)}
+                        {clientVehicle?.vehicle?.model?.brand?.name ??
+                          'Não informado'}
                       </InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                </List>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Modelo:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.model?.name ?? 'Não informado'}{' '}
+                        -{clientVehicle.vehicle.model_year ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Veículo:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.name ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Cor:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.color ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Chassi:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.chasis ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Placa:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.plate ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>KM:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.mileage ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                  </List>
+                ) : (
+                  <Box
+                    sx={{
+                      with: '100%',
+                      height: 100,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      display: 'flex',
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      gap={1}
+                      sx={{
+                        py: 10,
+                      }}
+                      // onSubmit={handleSubmitClientVehicle(
+                      //   onSubmitClientVehicle,
+                      // )}
+                    >
+                      <Typography variant="h6">Adicione um Veículo</Typography>
+
+                      <OutlinedInput
+                        id="outlined-adornment-weight"
+                        size="small"
+                        placeholder="Digite um nome"
+                        onClick={() => {
+                          setOpenModalClientVehicleSearch(true)
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.code === 'Enter') {
+                            setOpenModalClientVehicleSearch(true)
+                          }
+                        }}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="search submit"
+                              edge="end"
+                              onClick={() =>
+                                setOpenModalClientVehicleSearch(true)
+                              }
+                            >
+                              <SearchIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        required
+                        aria-describedby="outlined-weight-helper-text"
+                        inputProps={{
+                          'aria-label': 'weight',
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                )}
               </Paper>
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
@@ -1230,6 +1371,7 @@ export default function ServiceBudgetCreate() {
               </Grid>
             </Stack>
           </Grid>
+
           {actionAlerts !== null && (
             <ActionAlerts
               isOpen={actionAlerts.isOpen}
@@ -1244,11 +1386,13 @@ export default function ServiceBudgetCreate() {
         handleClose={handleCloseModalClienteSearch}
         openMolal={openModalClientSearch}
         handleAddClient={handleAddClient}
+        dataClient={null}
       />
       <ModalSearchClientVehicle
         handleClose={handleCloseModalClientVehicleSearch}
         openMolal={openModalClientVehicleSearch}
         handleAddClientVehicle={handleAddClientVehicle}
+        dataVehicleCreated={null}
       />
       <ModalCreateKit
         handleClose={handleCloseModalCreateKit}

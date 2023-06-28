@@ -14,8 +14,8 @@ export interface ServiceSchedulesListProps {
 export interface ClientInfor {
   id: number
   name: string
-  cpf: string
-  telefone: string[]
+  document: string
+  phone: string[]
   email: string[]
   address: string[]
 }
@@ -66,7 +66,20 @@ export interface Part {
   price_discount: number
   quantity: number
 }
-
+export interface ServiceTypeApi {
+  service_id: number | undefined
+  products_id: null
+  price: string
+  price_discount: string
+  quantity: string
+}
+export interface PartTypeApi {
+  service_id: null
+  products_id: number | undefined
+  price: string
+  price_discount: string
+  quantity: string
+}
 export interface Kit {
   kit_id: number
   name: string
@@ -80,10 +93,14 @@ export interface ClientVehicle {
   model: string
   vehicle: string
   color: string
-  chassis: string
+  chasis: string
   plate: string
 }
 export interface TechnicalConsultant {
+  id: number
+  name: string
+}
+export interface TypeBudget {
   id: number
   name: string
 }

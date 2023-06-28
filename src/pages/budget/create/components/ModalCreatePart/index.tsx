@@ -6,23 +6,19 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { ButtonIcon, ButtonModalDialog } from '../../styles'
-import { ApiCore } from '@/lib/api'
-import { useContext, useState } from 'react'
+import { ButtonIcon, ButtonModalDialog, ButtonPaginate } from '../../styles'
+import { api } from '@/lib/api'
+import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
+import PartTable from './Components/Table'
+
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { Part } from '@/types/budget'
 
-interface ModalSearchPartProps {
+interface ModalCreatePartProps {
   openMolal: boolean
   handleClose: () => void
   handleAddPart: (data: Part) => void
@@ -30,77 +26,129 @@ interface ModalSearchPartProps {
 
 type SearchFormProps = {
   search: string
-  quantidade: number
-  desconto: number
 }
 
-export default function ModalSearchPart({
+type paginationProps = {
+  actual: number
+  total: number
+}
+
+export default function ModalCreatePart({
   openMolal,
   handleClose,
   handleAddPart,
-}: ModalSearchPartProps) {
-  const [partList, setPartList] = useState<Part[] | []>([])
+}: ModalCreatePartProps) {
+  const [PartList, setPartList] = useState<Part[] | []>([])
+  const [PartSelected, setPartSelected] = useState<Part | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [pagination, setPagination] = useState<paginationProps | null>(null)
 
-  const [adicionais, setAdicions] = useState({
-    desconto: 0,
-    quantidade: 0,
-  })
-  const [partSelect, setPartSelect] = useState<Part | null>(null)
-  const {
-    register,
-    handleSubmit,
-    // formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
       search: '',
-      quantidade: 0,
-      desconto: 0,
     },
   })
 
-  const api = new ApiCore()
-
   const { companySelected } = useContext(CompanyContext)
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    name: string,
-  ) => {
-    var value = parseInt(event.target.value)
-    setAdicions({
-      ...adicionais,
-      [name]: value,
-    })
-  }
+
   async function onSubmitSearch(data: SearchFormProps) {
+    setIsLoading(true)
+    setPartList([])
+
     try {
       const result = await api.get(
-        `https://tunapconnect-api.herokuapp.com/api/product?company_id=${companySelected}&search=${data.search}`,
+        `/product?search=${data.search}&company_id=${companySelected}`,
       )
 
       setPartList(result.data.data)
+      if (!pagination) {
+        setPagination((prevState) => {
+          return {
+            actual: 1,
+            total: result.data.total_pages,
+          }
+        })
+      }
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsLoading(false)
     }
   }
+
+  function handleSelectedPart(Part: Part) {
+    setPartSelected(Part)
+  }
+
+  function handlePaginateNext() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual < prevState.total) {
+          return {
+            ...prevState,
+            actual: prevState.actual + 1,
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
+  }
+  function handlePaginatePrevious() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual > 1) {
+          return {
+            ...prevState,
+            actual: prevState.actual - 1,
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
+  }
+
+  function handleDoubleClickClient() {
+    if (PartSelected) {
+      handleAddPart(PartSelected)
+      handleClose()
+      setPartList([])
+      setPartSelected(null)
+      setValue('search', '')
+    }
+  }
+
+  useEffect(() => {
+    if (openMolal) {
+      reset({
+        search: '',
+      })
+    }
+  }, [openMolal])
+
+  // const DisableButtonNext = pagination
+  //   ? pagination?.actual >= pagination?.total
+  //   : false
+  // const DisableButtonPrevious = pagination ? pagination?.actual <= 1 : false
 
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
-        <DialogTitle>Buscar por Peças</DialogTitle>
-        <ListItem>
-          <ListItemText>Quantidade:</ListItemText>
-          <TextField
-            onChange={(event) => handleChange(event, 'quantidade')}
-            type="number"
-          ></TextField>
-        </ListItem>
-        <ListItem>
-          <ListItemText>Desconto:</ListItemText>
-          <TextField
-            onChange={(event) => handleChange(event, 'desconto')}
-            type="number"
-          ></TextField>
-        </ListItem>
+        <DialogTitle>
+          <Stack
+            justifyContent="space-between"
+            alignItems="center"
+            direction="row"
+          >
+            {' '}
+            <Typography variant="h6">Buscar por Peças</Typography>
+            {/* {clientList.length > 0 && ( */}
+            {/* )} */}
+          </Stack>
+        </DialogTitle>
         <DialogContent>
           <Box
             component="form"
@@ -125,70 +173,43 @@ export default function ModalSearchPart({
                 aria-label="search"
                 color="primary"
                 sx={{ marginLeft: 1 }}
+                disabled={isLoading}
+                onClick={() => setPagination(null)}
               >
                 <SearchIcon />
               </ButtonIcon>
             </Stack>
-            <List
-              sx={{
-                width: '100%',
-                maxWidth: 360,
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'auto',
-                maxHeight: 300,
-                '& ul': { padding: 0 },
-              }}
-              // subheader={<li />}
-            >
-              <li>
-                {partList.map((item, index) => (
-                  <ListItemButton
-                    key={`${index}-${item}`}
-                    onClick={() => {
-                      item.price_discount = adicionais.desconto
-                      item.quantity = adicionais.quantidade
-                      setPartSelect(item)
-                    }}
-                    selected={item.id === partSelect?.id}
-                    sx={{
-                      '&.Mui-selected': {
-                        background: '#1C4961',
-                        color: '#fff',
-                        '&:hover': {
-                          background: '#1C4961',
-                          color: '#fff',
-                          opacity: 0.7,
-                        },
-                        '& span': {
-                          color: '#fff',
-                          '&:hover': {
-                            color: '#fff',
-                            opacity: 0.7,
-                          },
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={`${item.name}`}
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            Preço: {item.sale_value}
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                ))}
-              </li>
-            </List>
+
+            <PartTable
+              data={PartList}
+              handleSelectedPart={handleSelectedPart}
+              isLoading={isLoading}
+              handleDoubleClick={handleDoubleClickClient}
+            />
+
+            {PartList.length > 0 && (
+              <Stack
+                direction="row"
+                justifyContent="center"
+                gap={1}
+                marginTop={2}
+              >
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginatePrevious}
+                  // disabled={DisableButtonPrevious}
+                >
+                  <ArrowBackIosNewIcon />
+                </ButtonPaginate>
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginateNext}
+                  // disabled={DisableButtonNext}
+                >
+                  <ArrowForwardIosIcon />
+                </ButtonPaginate>
+              </Stack>
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 3, pb: 2 }}>
@@ -196,11 +217,7 @@ export default function ModalSearchPart({
             onClick={() => {
               handleClose()
               setPartList([])
-              setPartSelect(null)
-              setAdicions({
-                desconto: 0,
-                quantidade: 0,
-              })
+              setPartSelected(null)
             }}
           >
             Cancel
@@ -208,19 +225,16 @@ export default function ModalSearchPart({
           <ButtonModalDialog
             // disabled={clientSelected === null}
             onClick={() => {
-              if (partSelect) {
-                handleAddPart(partSelect)
+              if (PartSelected) {
+                handleAddPart(PartSelected)
                 handleClose()
                 setPartList([])
-                setPartSelect(null)
-                setAdicions({
-                  desconto: 0,
-                  quantidade: 0,
-                })
+                setPartSelected(null)
+                setValue('search', '')
               }
             }}
           >
-            Adicionar
+            Selecionar
           </ButtonModalDialog>
         </DialogActions>
       </Dialog>

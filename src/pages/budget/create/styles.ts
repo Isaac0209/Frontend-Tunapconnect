@@ -28,7 +28,25 @@ export const InfoCardName = styled(Typography)(({ theme }) => ({
 export const InfoCardText = styled(Typography)(({ theme }) => ({
   lineHeight: 1.5,
 }))
-
+export const ButtonPaginate = styled(IconButton)(({ theme }) => ({
+  height: 32,
+  width: 40,
+  // maxWidth: 100,
+  background: '#1C4961',
+  color: '#fff',
+  borderRadius: 5,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '2px 10px',
+  '&:hover': {
+    background: '#1ACABA',
+    color: 'white',
+  },
+  '&:disabled': {
+    background: '#e0f2f1',
+  },
+}))
 export const ButtonLeft = styled(Button)(({ theme }) => ({
   color: 'white',
   background: '#0E948B',
