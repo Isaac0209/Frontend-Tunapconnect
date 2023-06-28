@@ -18,7 +18,7 @@ export function formatCNPJAndCPFNumber(value: number, isCpf: boolean): string {
     const stringDefault = '00000000000'
     const qtdDigits = 11 - `${value}`.length
 
-    let inicialCpfString = stringDefault.slice(0, qtdDigits)
+    const inicialCpfString = stringDefault.slice(0, qtdDigits)
     return `${inicialCpfString}${value}`.replace(
       /(\d{3})(\d{3})(\d{3})(\d{2})/,
       '$1.$2.$3-$4',
@@ -28,7 +28,7 @@ export function formatCNPJAndCPFNumber(value: number, isCpf: boolean): string {
     const stringDefault = '0000000000000'
     const qtdDigits = 13 - `${value}`.length
 
-    let inicialCpfString = stringDefault.slice(0, qtdDigits)
+    const inicialCpfString = stringDefault.slice(0, qtdDigits)
 
     return `${inicialCpfString}${value}`.replace(
       /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,

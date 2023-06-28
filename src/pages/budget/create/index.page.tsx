@@ -14,7 +14,6 @@ import {
   ClientResponseType,
   Kit,
   Service,
-  ClientVehicle,
   // ServiceSchedulesListProps,
   TechnicalConsultant,
   Part,
@@ -134,12 +133,6 @@ export default function ServiceBudgetCreate() {
   const [typeBudget, setTypeBudget] = useState<TypeBudget | null>({
     id: 0,
     name: '-',
-  })
-  const [budget, SetBudget] = useState<Budget>({
-    number: 0,
-    date: budgetDate,
-    TechnicalConsultant: technicalConsultant,
-    typeBudget: '',
   })
 
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
@@ -441,15 +434,6 @@ export default function ServiceBudgetCreate() {
     },
     { enabled: !!companySelected },
   )
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    name: string,
-  ) => {
-    SetBudget({
-      ...budget,
-      [name]: event.target.value,
-    })
-  }
   useEffect(() => {
     if (dataTechnicalConsultantListStatus === 'success') {
       setTechnicalConsultantsList(
