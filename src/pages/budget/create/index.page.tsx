@@ -321,8 +321,8 @@ export default function ServiceBudgetCreate() {
         service_id: newService.id,
         products_id: null,
         price: newService.standard_value ?? '0',
-        price_discount: newService.price_discount.toString() ?? '0',
-        quantity: newService.quantity.toString() ?? '0',
+        price_discount: newService.price_discount?.toString() ?? '0',
+        quantity: newService.quantity?.toString() ?? '0',
       },
     ])
     SetServiceList((prevState) => [...prevState, newService])
