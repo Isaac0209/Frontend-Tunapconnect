@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper'
 import { TableCellHeader, TableRowSBody, TableRowSNoData } from './style'
 import { Stack } from '@mui/system'
 import { useState } from 'react'
-import { Box, CircularProgress, TextField } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { Kit } from '@/types/budget'
 
 interface KitTableProps {

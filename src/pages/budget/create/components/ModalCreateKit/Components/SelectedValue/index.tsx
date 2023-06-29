@@ -6,10 +6,8 @@ import DialogActions from '@mui/material/DialogActions'
 
 import DialogTitle from '@mui/material/DialogTitle'
 import { List, ListItem, ListItemText } from '@mui/material'
-import { useForm } from 'react-hook-form'
 import { ButtonModalDialog } from '../../../../styles'
-import { useContext, useState } from 'react'
-import { CompanyContext } from '@/contexts/CompanyContext'
+import { useState } from 'react'
 import { Part } from 'formidable'
 import { Kit, Service } from '@/types/budget'
 
@@ -19,12 +17,6 @@ interface ModalSelectValueProps {
   handleAddService: (data: Service | any) => void
   handleAddPart: (data: Part | any) => void
   value: Kit
-}
-
-type SearchFormProps = {
-  search: string
-  quantidade: number
-  desconto: number
 }
 
 export default function ModalSelectedValue({
