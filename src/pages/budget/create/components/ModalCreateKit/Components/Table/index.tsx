@@ -10,22 +10,22 @@ import { TableCellHeader, TableRowSBody, TableRowSNoData } from './style'
 import { Stack } from '@mui/system'
 import { useState } from 'react'
 import { Box, CircularProgress, TextField } from '@mui/material'
-import { Part } from '@/types/budget'
+import { Kit } from '@/types/budget'
 
-interface PartTableProps {
-  handleSelectedPart: (client: Part) => void
-  data: Part[]
+interface KitTableProps {
+  handleSelectedKit: (client: Kit) => void
+  data: Kit[]
   isLoading: boolean
   handleDoubleClick: () => void
 }
 
-export default function PartTable({
+export default function ServiceTable({
   data,
-  handleSelectedPart,
+  handleSelectedKit,
   isLoading,
   handleDoubleClick,
-}: PartTableProps) {
-  const [partSelected, setPartSelect] = useState<number | null>(null)
+}: KitTableProps) {
+  const [kitSelected, setKitSelect] = useState<number | null>(null)
 
   return (
     <>
@@ -38,16 +38,14 @@ export default function PartTable({
           <TableHead>
             <TableRow>
               <TableCellHeader>Nome</TableCellHeader>
-              <TableCellHeader>Preço:</TableCellHeader>
-              <TableCellHeader>Desconto:</TableCellHeader>
-              <TableCellHeader>Quantidade:</TableCellHeader>
+              <TableCellHeader>Id:</TableCellHeader>
             </TableRow>
           </TableHead>
           <TableBody>
             {data && data.length > 0 ? (
               data.map((row) => (
                 <TableRowSBody
-                  key={row.id}
+                  key={row.name}
                   sx={{
                     '&:last-child td, &:last-child th': { border: 0 },
                   }}
@@ -55,31 +53,13 @@ export default function PartTable({
                     if (e.detail === 2) {
                       handleDoubleClick()
                     }
-                    handleSelectedPart(row)
-                    setPartSelect(row.id)
+                    handleSelectedKit(row)
+                    setKitSelect(row.kit_id)
                   }}
-                  selected={partSelected === row.id}
+                  selected={kitSelected === row.kit_id}
                 >
                   <TableCell scope="row">{row.name}</TableCell>
-                  <TableCell align="right">{row.sale_value}</TableCell>
-                  <TableCell>
-                    <TextField
-                      onChange={(env) => {
-                        row.price_discount = parseInt(env.target.value)
-                      }}
-                    >
-                      {row.price_discount}
-                    </TextField>
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      onChange={(env) => {
-                        row.quantity = parseInt(env.target.value)
-                      }}
-                    >
-                      {row.quantity}
-                    </TextField>
-                  </TableCell>
+                  <TableCell align="right">{row.kit_id}</TableCell>
                 </TableRowSBody>
               ))
             ) : (
@@ -92,7 +72,7 @@ export default function PartTable({
                       </Box>
                     ) : (
                       <>
-                        <p>Nenhuma peça encontrado</p>
+                        <p>Nenhum Kit encontrado</p>
                         {/* <ButtonModalNewClient
                           onClick={() => handleModalNewClient()}
                         >

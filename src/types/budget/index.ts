@@ -33,6 +33,7 @@ export interface ClientResponseType {
 }
 
 export interface Service {
+  service: any
   length: any
   id: number
   company_id: number
@@ -51,6 +52,7 @@ export interface Service {
 }
 
 export interface Part {
+  product: any
   length: any
   id: number
   company_id: number

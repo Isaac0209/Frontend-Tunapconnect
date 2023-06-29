@@ -72,6 +72,7 @@ import ModalCreateService from './components/ModalCreateService'
 import ModalCreatePart from './components/ModalCreatePart'
 import { DateInput } from '@/components/DateInput'
 import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
+import ModalSelectedValue from './components/ModalCreateKit/Components/SelectedValue'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
@@ -114,7 +115,7 @@ export default function ServiceBudgetCreate() {
   const [client, setClient] = useState<ClientInfor | null>()
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
-  const [kit, SetKit] = useState<Kit[]>([])
+  const [kit, SetKit] = useState<Kit | any>()
   const [service, SetService] = useState<ServiceTypeApi[]>([])
   const [serviceList, SetServiceList] = useState<Service[]>([])
 
@@ -148,6 +149,7 @@ export default function ServiceBudgetCreate() {
   const [openModalCreateKit, setOpenModalCreateKit] = useState(false)
   const [openModalCreateService, setOpenModalCreateService] = useState(false)
   const [openModalCreatePart, setOpenModalCreatePart] = useState(false)
+  const [openModalSelectedValue, setOpenModalSelectedValue] = useState(false)
 
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
@@ -181,6 +183,9 @@ export default function ServiceBudgetCreate() {
   }
   function handleCloseModalCreateKit() {
     setOpenModalCreateKit(false)
+  }
+  function handleCloseModalSelectedValue() {
+    setOpenModalSelectedValue(false)
   }
   function handleCloseModalCreateService() {
     setOpenModalCreateService(false)
@@ -323,6 +328,11 @@ export default function ServiceBudgetCreate() {
     SetServiceList((prevState) => [...prevState, newService])
   }
 
+  const handleSelectedValue = async (newValores: any) => {
+    SetKit(newValores)
+    setOpenModalSelectedValue(true)
+  }
+
   function handleAddPart(newPart: Part) {
     SetPart((part) => [
       ...part,
@@ -330,8 +340,8 @@ export default function ServiceBudgetCreate() {
         service_id: null,
         products_id: newPart.id,
         price: newPart.sale_value ?? '0',
-        price_discount: newPart.price_discount.toString() ?? '0',
-        quantity: newPart.quantity.toString() ?? '0',
+        price_discount: newPart.price_discount?.toString() ?? '0',
+        quantity: newPart.quantity?.toString() ?? '0',
       },
     ])
     SetPartList((prevState) => [...prevState, newPart])
@@ -346,9 +356,11 @@ export default function ServiceBudgetCreate() {
         break
       case service:
         SetService(updatedArray)
+        SetServiceList(updatedArray)
         break
       case part:
         SetPart(updatedArray)
+        SetPartList(updatedArray)
         break
     }
   }
@@ -1380,8 +1392,14 @@ export default function ServiceBudgetCreate() {
       <ModalCreateKit
         handleClose={handleCloseModalCreateKit}
         openMolal={openModalCreateKit}
-        handleAddService={handleAddService}
+        handleSelectedValue={handleSelectedValue}
+      />
+      <ModalSelectedValue
+        handleClose={handleCloseModalSelectedValue}
+        openMolal={openModalSelectedValue}
         handleAddPart={handleAddPart}
+        handleAddService={handleAddService}
+        value={kit}
       />
       <ModalCreateService
         handleClose={handleCloseModalCreateService}

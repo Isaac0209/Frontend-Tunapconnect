@@ -6,74 +6,55 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { ButtonIcon, ButtonModalDialog } from '../../styles'
-import { ApiCore } from '@/lib/api'
-import { useContext, useState } from 'react'
+import { ButtonIcon, ButtonModalDialog, ButtonPaginate } from '../../styles'
+import { api } from '@/lib/api'
+import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { Part } from 'formidable'
-import { Kit, Service } from '@/types/budget'
+import KitTable from './Components/Table'
 
-interface ModalSearchKitProps {
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import { Kit } from '@/types/budget'
+
+interface ModalCreateKitProps {
   openMolal: boolean
   handleClose: () => void
-  handleAddService: (data: Service | any) => void
-  handleAddPart: (data: Part | any) => void
+  handleSelectedValue: (data: Kit) => void
 }
 
 type SearchFormProps = {
   search: string
-  quantidade: number
-  desconto: number
 }
 
-export default function ModalSearchKit({
+type paginationProps = {
+  actual: number
+  total: number
+}
+
+export default function ModalCreateKit({
   openMolal,
   handleClose,
-  handleAddService,
-  handleAddPart,
-}: ModalSearchKitProps) {
+  handleSelectedValue,
+}: ModalCreateKitProps) {
   const [kitList, setKitList] = useState<Kit[] | []>([])
-  const [adicionais, setAdicions] = useState({
-    desconto: 0,
-    quantidade: 0,
-  })
-  const [kitSelect, setKitSelect] = useState<Kit | null>(null)
-  const {
-    register,
-    handleSubmit,
-    // formState: { errors },
-  } = useForm({
+  const [kitSelected, setKitSelected] = useState<Kit | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [pagination, setPagination] = useState<paginationProps | null>(null)
+
+  const { register, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
       search: '',
-      quantidade: 0,
-      desconto: 0,
     },
   })
 
-  const api = new ApiCore()
-
   const { companySelected } = useContext(CompanyContext)
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    name: string,
-  ) => {
-    const value = parseInt(event.target.value)
-    setAdicions({
-      ...adicionais,
-      [name]: value,
-    })
-  }
+
   async function onSubmitSearch(data: SearchFormProps) {
+    setIsLoading(true)
+    setKitList([])
+
     try {
       const result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/kit?search=${data.search}&company_id=${companySelected}`,
@@ -81,29 +62,94 @@ export default function ModalSearchKit({
 
       setKitList(result.data.data)
       console.log(result.data.data)
+      if (!pagination) {
+        setPagination((prevState) => {
+          return {
+            actual: 1,
+            total: result.data.total_pages,
+          }
+        })
+      }
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsLoading(false)
     }
   }
+
+  function handleSelectedKit(kit: Kit) {
+    setKitSelected(kit)
+  }
+
+  function handlePaginateNext() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual < prevState.total) {
+          return {
+            ...prevState,
+            actual: prevState.actual + 1,
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
+  }
+  function handlePaginatePrevious() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual > 1) {
+          return {
+            ...prevState,
+            actual: prevState.actual - 1,
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
+  }
+
+  function handleDoubleClickClient() {
+    if (kitSelected) {
+      handleSelectedValue(kitSelected)
+      handleClose()
+      setKitList([])
+      setKitSelected(null)
+      setValue('search', '')
+    }
+  }
+
+  useEffect(() => {
+    if (openMolal) {
+      reset({
+        search: '',
+      })
+    }
+  }, [openMolal])
+
+  // const DisableButtonNext = pagination
+  //   ? pagination?.actual >= pagination?.total
+  //   : false
+  // const DisableButtonPrevious = pagination ? pagination?.actual <= 1 : false
 
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
-        <DialogTitle>Buscar por Kits</DialogTitle>
-        <ListItem>
-          <ListItemText>Quantidade:</ListItemText>
-          <TextField
-            onChange={(event) => handleChange(event, 'quantidade')}
-            type="number"
-          ></TextField>
-        </ListItem>
-        <ListItem>
-          <ListItemText>Desconto:</ListItemText>
-          <TextField
-            onChange={(event) => handleChange(event, 'desconto')}
-            type="number"
-          ></TextField>
-        </ListItem>
+        <DialogTitle>
+          <Stack
+            justifyContent="space-between"
+            alignItems="center"
+            direction="row"
+          >
+            {' '}
+            <Typography variant="h6">Buscar por Serviços</Typography>
+            {/* {clientList.length > 0 && ( */}
+            {/* )} */}
+          </Stack>
+        </DialogTitle>
         <DialogContent>
           <Box
             component="form"
@@ -128,80 +174,51 @@ export default function ModalSearchKit({
                 aria-label="search"
                 color="primary"
                 sx={{ marginLeft: 1 }}
+                disabled={isLoading}
+                onClick={() => setPagination(null)}
               >
                 <SearchIcon />
               </ButtonIcon>
             </Stack>
-            <List
-              sx={{
-                width: '100%',
-                maxWidth: 360,
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'auto',
-                maxHeight: 300,
-                '& ul': { padding: 0 },
-              }}
-              // subheader={<li />}
-            >
-              <li>
-                {kitList.map((item, index) => (
-                  <ListItemButton
-                    key={`${index}-${item}`}
-                    onClick={() => {
-                      setKitSelect(item)
-                    }}
-                    selected={item.kit_id === kitSelect?.kit_id}
-                    sx={{
-                      '&.Mui-selected': {
-                        background: '#1C4961',
-                        color: '#fff',
-                        '&:hover': {
-                          background: '#1C4961',
-                          color: '#fff',
-                          opacity: 0.7,
-                        },
-                        '& span': {
-                          color: '#fff',
-                          '&:hover': {
-                            color: '#fff',
-                            opacity: 0.7,
-                          },
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={`${item.name}`}
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            {/* Preço: {item.sale_value} */}
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                ))}
-              </li>
-            </List>
+
+            <KitTable
+              data={kitList}
+              handleSelectedKit={handleSelectedKit}
+              isLoading={isLoading}
+              handleDoubleClick={handleDoubleClickClient}
+            />
+
+            {kitList.length > 0 && (
+              <Stack
+                direction="row"
+                justifyContent="center"
+                gap={1}
+                marginTop={2}
+              >
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginatePrevious}
+                  // disabled={DisableButtonPrevious}
+                >
+                  <ArrowBackIosNewIcon />
+                </ButtonPaginate>
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginateNext}
+                  // disabled={DisableButtonNext}
+                >
+                  <ArrowForwardIosIcon />
+                </ButtonPaginate>
+              </Stack>
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 3, pb: 2 }}>
           <ButtonModalDialog
             onClick={() => {
               handleClose()
-
-              setKitSelect(null)
-              setAdicions({
-                desconto: 0,
-                quantidade: 0,
-              })
+              setKitList([])
+              setKitSelected(null)
             }}
           >
             Cancel
@@ -209,32 +226,16 @@ export default function ModalSearchKit({
           <ButtonModalDialog
             // disabled={clientSelected === null}
             onClick={() => {
-              if (kitSelect) {
-                if (kitSelect?.services?.length !== 0) {
-                  for (let i = 0; i < kitSelect?.services?.length; i++) {
-                    kitSelect.services[i].price_discount = adicionais.desconto
-                    kitSelect.services[i].quantity = adicionais.quantidade
-                    handleAddService(kitSelect?.services[i])
-                  }
-                }
-                if (kitSelect?.products?.length !== 0) {
-                  for (let i = 0; i < kitSelect?.products?.length; i++) {
-                    kitSelect.products[i].price_discount = adicionais.desconto
-                    kitSelect.products[i].quantity = adicionais.quantidade
-
-                    handleAddPart(kitSelect?.products[i])
-                  }
-                }
+              if (kitSelected) {
+                handleSelectedValue(kitSelected)
                 handleClose()
-                setKitSelect(null)
-                setAdicions({
-                  desconto: 0,
-                  quantidade: 0,
-                })
+                setKitList([])
+                setKitSelected(null)
+                setValue('search', '')
               }
             }}
           >
-            Adicionar
+            Selecionar
           </ButtonModalDialog>
         </DialogActions>
       </Dialog>
