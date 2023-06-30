@@ -92,7 +92,6 @@ type updateData = {
   consultant_id: number | undefined | null
   mandatory_itens: any[]
   quotation_itens: any[]
-  technical_consultant_id: number | undefined
   client_id: number | undefined
   client_vehicle_id: number | undefined
   company_id: string | undefined
@@ -248,18 +247,17 @@ export default function ServiceBudgetCreate() {
   }
 
   async function onSave() {
-    console.log(service)
+    const quotationItems = [service, part]
     const dataFormatted: updateData = {
       company_id: `${companySelected}`,
       client_vehicle_id: clientVehicle?.id,
       client_id: client?.id,
       os_type_id: typeBudget?.id,
       maintenance_review_id: await getMaintenanceReviewId(),
-      consultant_id: null,
+      consultant_id: technicalConsultant?.id,
       mandatory_itens: [],
-      quotation_itens: [service, part],
+      quotation_itens: quotationItems,
       claim_services: await getClaims(),
-      technical_consultant_id: technicalConsultant?.id,
     }
     console.log(dataFormatted)
     try {
@@ -325,7 +323,27 @@ export default function ServiceBudgetCreate() {
         quantity: newService.quantity?.toString() ?? '0',
       },
     ])
-    SetServiceList((prevState) => [...prevState, newService])
+    SetServiceList((serviceList) => [
+      ...serviceList,
+      {
+        service: null,
+        length: null,
+        id: newService.id,
+        company_id: newService.company_id,
+        tipo: 'Serviço',
+        service_code: newService.service_code,
+        integration_code: newService.integration_code,
+        description: newService.description,
+        standard_quantity: newService.standard_quantity,
+        standard_value: newService.standard_value ?? '0',
+        active: newService.active,
+        deleted_at: newService.deleted_at,
+        created_at: newService.created_at,
+        updated_at: newService.updated_at,
+        price_discount: newService.price_discount ?? 0,
+        quantity: newService.quantity ?? 0,
+      },
+    ])
   }
 
   const handleSelectedValue = async (newValores: any) => {
@@ -344,7 +362,26 @@ export default function ServiceBudgetCreate() {
         quantity: newPart.quantity?.toString() ?? '0',
       },
     ])
-    SetPartList((prevState) => [...prevState, newPart])
+    SetPartList((partList) => [
+      ...partList,
+      {
+        product: null,
+        length: null,
+        id: newPart.id,
+        company_id: newPart.company_id,
+        tipo: 'Peça',
+        product_code: newPart.product_code,
+        sale_value: newPart.sale_value ?? '0',
+        name: newPart.name ?? 'Sem nome',
+        tunap_code: newPart.tunap_code,
+        guarantee_value: newPart.guarantee_value ?? '0',
+        active: newPart.active,
+        created_at: newPart.created_at,
+        updated_at: newPart.updated_at,
+        price_discount: newPart.price_discount ?? 0,
+        quantity: newPart.quantity ?? 0,
+      },
+    ])
   }
 
   function removeTotals(array: any, value: number) {

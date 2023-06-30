@@ -107,7 +107,8 @@ export default function BudgetList() {
     )
   }
 
-  const handleDelete = (id: number) => {
+  const handleDeleteBudget = (id: number) => {
+    console.log('tentando')
     api
       .delete(`https://tunapconnect-api.herokuapp.com/api/quotations/${id}`)
       .then((response) => {
@@ -240,7 +241,7 @@ export default function BudgetList() {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation()
             const id = params.id
-            ActionDeleteConfirmations(id as number, handleDelete)
+            ActionDeleteConfirmations(id as number, handleDeleteBudget)
           }
           return (
             <IconButton
