@@ -23,7 +23,7 @@ import IconButton from '@mui/material/IconButton'
 import { Delete } from '@mui/icons-material'
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
+import { ActionDeleteConfirmations } from '@/helpers/ActionDeleteConfirmations'
 import { useRouter } from 'next/router'
 import { TableApp } from '@/components/TableApp'
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -107,13 +107,8 @@ export default function BudgetList() {
     )
   }
 
-  const handleDeleteBudget = (id: number) => {
-    console.log('tentando')
-    api
-      .delete(`https://tunapconnect-api.herokuapp.com/api/quotations/${id}`)
-      .then((response) => {
-        refetch()
-      })
+  const handleDelete = (id: number) => {
+    refetch()
   }
 
   let url = `https://tunapconnect-api.herokuapp.com/api/quotations?company_id=${companySelected}`
@@ -241,7 +236,7 @@ export default function BudgetList() {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation()
             const id = params.id
-            ActionDeleteConfirmations(id as number, handleDeleteBudget)
+            ActionDeleteConfirmations(id as number, handleDelete)
           }
           return (
             <IconButton

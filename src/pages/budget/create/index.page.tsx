@@ -20,6 +20,7 @@ import {
   TypeBudget,
   ServiceTypeApi,
   PartTypeApi,
+  Claim,
 } from '@/types/budget'
 import { ApiCore } from '@/lib/api'
 
@@ -88,7 +89,7 @@ type isEditSelectedCardType =
 
 type updateData = {
   os_type_id: number | undefined
-  maintenance_review_id: number
+  maintenance_review_id: number | null
   consultant_id: number | undefined | null
   mandatory_itens: any[]
   quotation_itens: any[]
@@ -96,7 +97,7 @@ type updateData = {
   client_vehicle_id: number | undefined
   company_id: string | undefined
   // chasis: string | undefined
-  claim_services: any[]
+  claim_services: Claim[] | undefined
 }
 
 const HeaderBreadcrumbData: listBreadcrumb[] = [
@@ -117,6 +118,7 @@ export default function ServiceBudgetCreate() {
   const [kit, SetKit] = useState<Kit | any>()
   const [service, SetService] = useState<ServiceTypeApi[]>([])
   const [serviceList, SetServiceList] = useState<Service[]>([])
+  const [claim, SetClaim] = useState<Claim[]>([])
 
   const [part, SetPart] = useState<PartTypeApi[]>([])
   const [partList, SetPartList] = useState<Part[]>([])
@@ -242,18 +244,39 @@ export default function ServiceBudgetCreate() {
       const result = await api.get(
         `https://tunapconnect-api.herokuapp.com/api/claim-service?company_id=${companySelected}`,
       )
-      return result.data.data
+      for (let i = 0; i < result.data.data.lenght; i++) {
+        SetClaim((claim) => [
+          ...claim,
+          {
+            claim_service_id: result.data.data[i].id,
+          },
+        ])
+      }
+      return claim
     } catch (error) {}
   }
 
   async function onSave() {
-    const quotationItems = [service, part]
+    const quotationItems = [
+      ...service,
+      ...part.map((item) => {
+        // Faça a conversão de cada elemento PartTypeApi para ServiceTypeApi
+        const convertedItem: ServiceTypeApi = {
+          service_id: null,
+          products_id: item.products_id !== null ? item.products_id : null,
+          price: item.price,
+          price_discount: item.price_discount,
+          quantity: item.quantity,
+        }
+        return convertedItem
+      }),
+    ]
     const dataFormatted: updateData = {
       company_id: `${companySelected}`,
       client_vehicle_id: clientVehicle?.id,
       client_id: client?.id,
       os_type_id: typeBudget?.id,
-      maintenance_review_id: await getMaintenanceReviewId(),
+      maintenance_review_id: null,
       consultant_id: technicalConsultant?.id,
       mandatory_itens: [],
       quotation_itens: quotationItems,
@@ -265,21 +288,22 @@ export default function ServiceBudgetCreate() {
         'https://tunapconnect-api.herokuapp.com/api/quotations',
         dataFormatted,
       )
+      console.log(respCreate.data)
 
-      const idCreatedResponse = respCreate.data.data.id
-
-      router.push('/budget/' + idCreatedResponse)
+      const idCreatedResponse = respCreate.data.Quotation.id
+      // router.push('/budget/' + idCreatedResponse)
 
       setIsEditSelectedCard(null)
       setActionAlerts({
         isOpen: true,
-        title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
+        title: `${respCreate.data.message ?? 'Criado com sucesso!'}!`,
         type: 'success',
       })
     } catch (e: any) {
+      console.log(e)
       setActionAlerts({
         isOpen: true,
-        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        title: `Error inesperado`,
         type: 'error',
       })
     }

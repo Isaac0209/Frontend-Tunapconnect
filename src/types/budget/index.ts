@@ -69,8 +69,8 @@ export interface Part {
   quantity: number
 }
 export interface ServiceTypeApi {
-  service_id: number | undefined
-  products_id: null
+  service_id: number | null
+  products_id: null | number | undefined
   price: string
   price_discount: string
   quantity: string
@@ -81,6 +81,9 @@ export interface PartTypeApi {
   price: string
   price_discount: string
   quantity: string
+}
+export interface Claim {
+  claim_service_id: number | null | undefined
 }
 export interface Kit {
   kit_id: number
