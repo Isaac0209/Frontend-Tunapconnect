@@ -157,7 +157,7 @@ export default function ServiceBudgetCreate() {
   // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
   //   useState(false)
 
-  const router = useRouter()
+  // const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
 
@@ -229,16 +229,16 @@ export default function ServiceBudgetCreate() {
     setComplaint(updatedArray)
   }
 
-  async function getMaintenanceReviewId() {
-    try {
-      const result = await api.get(
-        `https://tunapconnect-api.herokuapp.com/api/maintenance-review?company_id=${companySelected}`,
-      )
-      return result.data.data[0].id
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // async function getMaintenanceReviewId() {
+  //   try {
+  //     const result = await api.get(
+  //       `https://tunapconnect-api.herokuapp.com/api/maintenance-review?company_id=${companySelected}`,
+  //     )
+  //     return result.data.data[0].id
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
   async function getClaims() {
     try {
       const result = await api.get(
@@ -290,7 +290,7 @@ export default function ServiceBudgetCreate() {
       )
       console.log(respCreate.data)
 
-      const idCreatedResponse = respCreate.data.Quotation.id
+      // const idCreatedResponse = respCreate.data.Quotation.id
       // router.push('/budget/' + idCreatedResponse)
 
       setIsEditSelectedCard(null)
