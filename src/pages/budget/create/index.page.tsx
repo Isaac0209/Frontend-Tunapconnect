@@ -42,7 +42,7 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 // import * as locale from 'date-fns/locale/pt-BR';
 import IconButton from '@mui/material/IconButton'
-import { Delete, ResetTvOutlined } from '@mui/icons-material'
+import { Delete } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
 import TextField from '@mui/material/TextField'
@@ -72,8 +72,6 @@ import ModalCreatePart from './components/ModalCreatePart'
 import { DateInput } from '@/components/DateInput'
 import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
 import ModalSelectedValue from './components/ModalCreateKit/Components/SelectedValue'
-import { fetchData } from 'next-auth/client/_utils'
-import { textSpanEnd } from 'typescript'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
