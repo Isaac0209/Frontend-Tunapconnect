@@ -42,7 +42,7 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 // import * as locale from 'date-fns/locale/pt-BR';
 import IconButton from '@mui/material/IconButton'
-import { Delete } from '@mui/icons-material'
+import { Delete, ResetTvOutlined } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
 import TextField from '@mui/material/TextField'
@@ -72,6 +72,8 @@ import ModalCreatePart from './components/ModalCreatePart'
 import { DateInput } from '@/components/DateInput'
 import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
 import ModalSelectedValue from './components/ModalCreateKit/Components/SelectedValue'
+import { fetchData } from 'next-auth/client/_utils'
+import { textSpanEnd } from 'typescript'
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
@@ -220,6 +222,24 @@ export default function ServiceBudgetCreate() {
   }
   function addComplaint() {
     setComplaint((complaint) => [...complaint, textFieldValue])
+    const dataFormatted = {
+      company_id: companySelected,
+      description: textFieldValue,
+      integration_code: null,
+    }
+    api
+      .create(
+        'https://tunapconnect-api.herokuapp.com/api/claim-service',
+        dataFormatted,
+      )
+      .then((response) => {
+        SetClaim((claim) => [
+          ...claim,
+          {
+            claim_service_id: response.data.data.id,
+          },
+        ])
+      })
   }
   function removeComplaint(value: number) {
     const updatedArray = [...complaint]
@@ -237,23 +257,23 @@ export default function ServiceBudgetCreate() {
   //     console.log(error)
   //   }
   // }
-  async function getClaims() {
-    try {
-      const result = await api.get(
-        `https://tunapconnect-api.herokuapp.com/api/claim-service?company_id=${companySelected}`,
-      )
-      for (let i = 0; i < result.data.data.lenght; i++) {
-        SetClaim((claim) => [
-          ...claim,
-          {
-            claim_service_id: result.data.data[i].id,
-          },
-        ])
-      }
-      return claim
-    } catch (error) {}
-  }
-
+  // async function getClaims() {
+  //   try {
+  //     const result = await api.get(
+  //       `https://tunapconnect-api.herokuapp.com/api/claim-service?company_id=${companySelected}`,
+  //     )
+  //     const data = result.data.data
+  //     data.forEach((element: { id: any }) => {
+  //       SetClaim((claim) => [
+  //         ...claim,
+  //         {
+  //           claim_service_id: element.id,
+  //         },
+  //       ])
+  //     });
+  //     return await data
+  //   } catch (error) {}
+  // }
   async function onSave() {
     const quotationItems = [
       ...service,
@@ -278,7 +298,7 @@ export default function ServiceBudgetCreate() {
       consultant_id: technicalConsultant?.id,
       mandatory_itens: [],
       quotation_itens: quotationItems,
-      claim_services: await getClaims(),
+      claim_services: claim,
     }
     console.log(dataFormatted)
     try {
@@ -294,7 +314,7 @@ export default function ServiceBudgetCreate() {
       setIsEditSelectedCard(null)
       setActionAlerts({
         isOpen: true,
-        title: `${respCreate.data.message ?? 'Criado com sucesso!'}!`,
+        title: `Criado com sucesso!`,
         type: 'success',
       })
     } catch (e: any) {
@@ -1166,6 +1186,7 @@ export default function ServiceBudgetCreate() {
                       backgroundColor: 'rgba(197, 203, 208, 1)',
                       padding: '14px 6px',
                       textAlign: 'center',
+                      overflowX: 'auto',
                     }}
                   >
                     <Typography variant="body1" style={{ fontSize: '13px' }}>
@@ -1174,7 +1195,10 @@ export default function ServiceBudgetCreate() {
                   </Stack>
                   {serviceList?.map((key, index) => {
                     return (
-                      <ListItem key={index} style={{ columnGap: '5px' }}>
+                      <ListItem
+                        key={index}
+                        style={{ columnGap: '5px', overflowX: 'auto' }}
+                      >
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
                         >
@@ -1223,7 +1247,11 @@ export default function ServiceBudgetCreate() {
                     return (
                       <ListItem
                         key={index}
-                        style={{ columnGap: '5px', maxWidth: '100%' }}
+                        style={{
+                          columnGap: '5px',
+                          maxWidth: '100%',
+                          overflowX: 'auto',
+                        }}
                       >
                         <Typography
                           style={{ fontSize: '15px', fontWeight: '900' }}
